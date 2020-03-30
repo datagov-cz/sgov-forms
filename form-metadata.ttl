@@ -1,0 +1,19 @@
+@prefix fm: <http://onto.fel.cvut.cz/ontologies/form-metadata/> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form> .
+@prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://onto.fel.cvut.cz/ontologies/form-metadata>
+  a owl:Ontology ;
+.
+
+fm:object-identifier-quality a owl:Class .
+fm:root-entity a owl:Class .
+fm:ignore a owl:DatatypeProperty .
+fm:external a owl:DatatypeProperty .

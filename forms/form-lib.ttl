@@ -1,0 +1,200 @@
+# baseURI: http://onto.fel.cvut.cz/ontologies/form-lib
+# imports: http://onto.fel.cvut.cz/ontologies/form
+# imports: http://spinrdf.org/spin
+
+@prefix fl: <http://onto.fel.cvut.cz/ontologies/form-lib/> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form> .
+@prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://onto.fel.cvut.cz/ontologies/form-lib>
+  a owl:Ontology ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/form> ;
+  owl:imports <http://spinrdf.org/spin> ;
+.
+fl:create-a
+  a spin:Function ;
+  spin:body [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "answer" ;
+          ]
+        ) ;
+      sp:text """SELECT ?answer
+WHERE {
+     BIND (URI(CONCAT(str(?arg1),\"-\",\"a\")) AS ?answer) .
+}
+    
+""" ;
+      sp:where (
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:uri ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 spin:_arg1 ;
+                      ] ;
+                    sp:arg2 "-" ;
+                    sp:arg3 "a" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "answer" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType rdfs:Resource ;
+      rdfs:comment "Object that this answer describes." ;
+    ] ;
+  rdfs:comment "Generate answer based on object it originates from." ;
+  rdfs:subClassOf spin:Functions ;
+.
+fl:create-q
+  a spin:Function ;
+  spin:body [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "question" ;
+          ]
+        ) ;
+      sp:text """SELECT ?question
+WHERE {
+     BIND (URI(CONCAT(str(?arg1),\"-\",\"q\")) AS ?question) .
+}
+    
+""" ;
+      sp:where (
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:uri ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 spin:_arg1 ;
+                      ] ;
+                    sp:arg2 "-" ;
+                    sp:arg3 "q" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "question" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType rdfs:Resource ;
+      rdfs:comment "Object that this question describes." ;
+    ] ;
+  rdfs:comment "Generate question based on object it originates from." ;
+  rdfs:subClassOf spin:Functions ;
+.
+fl:create-qo
+  a spin:Function ;
+  spin:body [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "originEntity" ;
+          ]
+        ) ;
+      sp:text """SELECT ?originEntity
+WHERE {
+     BIND (URI(CONCAT(str(?arg1),\"-\",\"qo\")) AS ?originEntity) .
+}
+    
+""" ;
+      sp:where (
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:uri ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 spin:_arg1 ;
+                      ] ;
+                    sp:arg2 "-" ;
+                    sp:arg3 "qo" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "originEntity" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType rdfs:Resource ;
+      rdfs:comment "Entity that was used to create this origin." ;
+    ] ;
+  rdfs:comment "Generate question origin based on entity it originates from." ;
+  rdfs:subClassOf spin:Functions ;
+.
+fl:create-qt
+  a spin:Function ;
+  spin:body [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "questionTemplate" ;
+          ]
+        ) ;
+      sp:text """SELECT ?questionTemplate
+WHERE {
+     BIND (URI(CONCAT(str(?arg1),\"-\",\"qt\")) AS ?questionTemplate) .
+}
+    
+""" ;
+      sp:where (
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:uri ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 spin:_arg1 ;
+                      ] ;
+                    sp:arg2 "-" ;
+                    sp:arg3 "qt" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "questionTemplate" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType rdfs:Resource ;
+      rdfs:comment "Entity that this question template describes." ;
+    ] ;
+  rdfs:comment "Generate question template based on entity it originates from." ;
+  rdfs:subClassOf spin:Functions ;
+.
