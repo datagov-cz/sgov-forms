@@ -415,12 +415,6 @@ CONSTRUCT {
     ] ;
   sml:replace false ;
 .
-:bind-endpoint-url
-  a sml:BindWithConstant ;
-  sm:next :bind-source-service-url ;
-  sm:outputVariable "endpointUrl" ;
-  sml:value "http://localhost:8080/rdf4j-server/repositories/sgov" ;
-.
 :bind-possible-values-query-template
   a sml:BindWithConstant ;
   sm:next :attach-possible-values-hook ;
@@ -507,7 +501,7 @@ WHERE
   sml:value [
       a sp:uri ;
       sp:arg1 [
-          sp:varName "endpointUrl" ;
+          sp:varName "formGenRepositoryUrl" ;
         ] ;
     ] ;
 .
