@@ -1,0 +1,1692 @@
+# baseURI: http://onto.fel.cvut.cz/ontologies/kodi/sgov2sforms
+# imports: http://onto.fel.cvut.cz/ontologies/form-layout
+# imports: http://onto.fel.cvut.cz/ontologies/form-lib
+# imports: http://onto.fel.cvut.cz/ontologies/form-metadata
+# imports: http://onto.fel.cvut.cz/ontologies/lib/sm-module-adapter
+# imports: http://onto.fel.cvut.cz/ontologies/lib/spin-function
+# imports: http://onto.fel.cvut.cz/ontologies/s-pipes-lib
+# imports: https://slovník.gov.cz/základní/model
+
+@prefix : <http://onto.fel.cvut.cz/ontologies/kodi/sgov2sforms/> .
+@prefix a-popis-dat: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/> .
+@prefix a-popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/pojem/> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix dce: <http://purl.org/dc/elements/1.1/> .
+@prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
+@prefix fl: <http://onto.fel.cvut.cz/ontologies/form-lib/> .
+@prefix fm: <http://onto.fel.cvut.cz/ontologies/form-metadata/> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
+@prefix form-ecc-lib: <http://onto.fel.cvut.cz/ontologies/aviation/eccairs-form-lib/> .
+@prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix kbss-module: <http://onto.fel.cvut.cz/ontologies/lib/module/> .
+@prefix kbss-spif: <http://onto.fel.cvut.cz/ontologies/lib/spin-function/> .
+@prefix km-rdf4j: <http://onto.fel.cvut.cz/ontologies/lib/module/rdf4j/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/pojem/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sm: <http://topbraid.org/sparqlmotion#> .
+@prefix sml: <http://topbraid.org/sparqlmotionlib#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spif: <http://spinrdf.org/spif#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix termit: <http://onto.fel.cvut.cz/ontologies/application/termit/> .
+@prefix termit-pojem: <http://onto.fel.cvut.cz/ontologies/application/termit/pojem/> .
+@prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix z-sgov: <https://slovník.gov.cz/základní/> .
+@prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
+
+<http://onto.fel.cvut.cz/ontologies/kodi/sgov2sforms>
+  a owl:Ontology ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/form-layout> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/form-lib> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/form-metadata> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/lib/sm-module-adapter> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/lib/spin-function> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/s-pipes-lib> ;
+  owl:imports z-sgov:model ;
+.
+:attach-descriptions
+  a sml:ApplyConstruct ;
+  sm:next :attach-value-types ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "description" ;
+              ] ;
+            sp:predicate dce:description ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# create descriptions
+CONSTRUCT 
+  { 
+     ?q <http://purl.org/dc/elements/1.1/description> ?description .
+  }
+WHERE
+  { 
+     ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+     ?entity  <http://purl.org/dc/terms/description>  ?description .
+  }""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "description" ;
+              ] ;
+            sp:predicate dc:description ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "create descriptions" ;
+    ] ;
+  sml:replace false ;
+.
+:attach-possible-values-hook
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "downloadString" ;
+              ] ;
+            sp:predicate form:has-possible-values-query ;
+            sp:subject [
+                sp:varName "question" ;
+              ] ;
+          ]
+          [
+            sp:object "type-ahead" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "question" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    ?question form:has-possible-values-query ?downloadString .
+    ?question form-lt:has-layout-class \"type-ahead\" .
+}
+WHERE {
+    SERVICE ?sourceServiceUrl {
+         ?entity fm:external true .
+    } .
+    ?question form:has-question-origin ?entity .
+    BIND (CONCAT(str(?sourceServiceUrl), \"?query=\") AS ?dowloadPrefix) .
+    BIND (REPLACE( ?possibleValuesQueryTemplate, \"XXXXX\", str(?entity)) AS ?downloadSuffixRaw) .
+    BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
+    BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString) .
+}""" ;
+      sp:where (
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  sp:object true ;
+                  sp:predicate fm:external ;
+                  sp:subject [
+                      sp:varName "entity" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "sourceServiceUrl" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "question" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:concat ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "sourceServiceUrl" ;
+                      ] ;
+                  ] ;
+                sp:arg2 "?query=" ;
+              ] ;
+            sp:variable [
+                sp:varName "dowloadPrefix" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:replace ;
+                sp:arg1 [
+                    sp:varName "possibleValuesQueryTemplate" ;
+                  ] ;
+                sp:arg2 "XXXXX" ;
+                sp:arg3 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "entity" ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "downloadSuffixRaw" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:encode_for_uri ;
+                sp:arg1 [
+                    sp:varName "downloadSuffixRaw" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "downloadSuffix" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:concat ;
+                sp:arg1 [
+                    sp:varName "dowloadPrefix" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "downloadSuffix" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "downloadString" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  sml:replace true ;
+.
+:attach-value-types
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "checkbox" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# date
+CONSTRUCT {
+       ?q
+          form-lt:has-layout-class \"checkbox\" ;
+   .
+} WHERE {
+   ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+   ?entity   a fm:boolean .
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:boolean ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "date" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "masked-input" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object "DD/MM/YYYY" ;
+            sp:predicate form:has-input-mask ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# boolean
+CONSTRUCT {
+       ?q form-lt:has-layout-class \"masked-input\" ; 
+              form:has-input-mask \"DD/MM/YYYY\" .
+
+} WHERE {
+   ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+   ?entity   a fm:date .
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:date ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "boolean" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "number" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object xsd:int ;
+            sp:predicate form:has-datatype ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object 100 ;
+            sp:predicate xsd:maxInclusive ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object 0 ;
+            sp:predicate xsd:minInclusive ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# number
+CONSTRUCT {
+       ?q
+          form-lt:has-layout-class \"number\" ;
+          form:has-datatype <http://www.w3.org/2001/XMLSchema#int> ;
+          xsd:maxInclusive 100 ;
+          xsd:minInclusive 0 ;
+   .
+} WHERE {
+   ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+   ?entity   a fm:number .
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:number ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "number" ;
+    ] ;
+  sml:replace false ;
+.
+:bind-endpoint-url
+  a sml:BindWithConstant ;
+  sm:next :bind-source-service-url ;
+  sm:outputVariable "endpointUrl" ;
+  sml:value "http://localhost:8080/rdf4j-server/repositories/sgov" ;
+.
+:bind-possible-values-query-template
+  a sml:BindWithConstant ;
+  sm:next :attach-possible-values-hook ;
+  sm:outputVariable "possibleValuesQueryTemplate" ;
+  sml:value """prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+CONSTRUCT {
+      ?value rdfs:label ?label .
+      ?value rdfs:comment ?explanation .
+}
+WHERE {
+          ?value rdfs:label ?label .
+          ?value rdfs:comment ?explanation .
+          ?value a ?entityType .
+}
+VALUES (?entityType) {
+      (<XXXXX>)
+}""" ;
+.
+:bind-root-entity
+  a sml:BindWithConstant ;
+  sm:next :create-root-question ;
+  sm:outputVariable "rootEntity" ;
+  sml:value <https://slovník.gov.cz/generický/pracovní-místa/pojem/pracovní-místo> ;
+.
+:bind-root-question
+  a sml:BindBySelect ;
+  sm:next :layout-form ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "rootQuestion" ;
+          ]
+        ) ;
+      sp:text """SELECT  ?rootQuestion
+WHERE
+  { ?rootQuestion
+              rdf:type  doc:question
+    FILTER NOT EXISTS { ?superQuestion
+                                  doc:has_related_question  ?rootQuestion ;
+                                  rdf:type              doc:question
+                      }
+  }""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "rootQuestion" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "rootQuestion" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "superQuestion" ;
+                        ] ;
+                    ]
+                    [
+                      sp:object doc:question ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "superQuestion" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
+:bind-source-service-url
+  a sml:BindWithConstant ;
+  sm:next :retrieve-graph ;
+  sm:outputVariable "sourceServiceUrl" ;
+  sml:value [
+      a sp:uri ;
+      sp:arg1 [
+          sp:varName "endpointUrl" ;
+        ] ;
+    ] ;
+.
+:construct-subquestions
+  a sml:ApplyConstruct ;
+  kbss-module:has-max-iteration-count "15" ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childQLabel" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "vlastnost" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childQ" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 1 - add intrinsic tropes
+CONSTRUCT 
+  { 
+    ?childQ rdf:type doc:question .
+    ?childQ rdfs:label ?childQLabel .
+    ?childQ form:has-question-origin ?vlastnost .
+    ?parentQ doc:has_related_question ?childQ .
+  }
+WHERE
+  { 
+    ?vlastnost  rdf:type  z-sgov-pojem:typ-vlastnosti .
+    ?vlastnost rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
+    ?vlastnost  skos:prefLabel      ?childQLabel .
+    ?parentQ  form:has-question-origin  ?parentEntity
+    BIND(fl:create-q(str(?vlastnost)) AS ?childQ)
+    FILTER NOT EXISTS {
+          ?parentEntity fm:external true ;
+    }
+  }""" ;
+      sp:where (
+          [
+            sp:object z-sgov-pojem:typ-vlastnosti ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "vlastnost" ;
+              ] ;
+          ]
+          [
+            a sp:TriplePath ;
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:path [
+                a sp:SeqPath ;
+                sp:path1 rdfs:subClassOf ;
+                sp:path2 owl:someValuesFrom ;
+              ] ;
+            sp:subject [
+                sp:varName "vlastnost" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childQLabel" ;
+              ] ;
+            sp:predicate skos:prefLabel ;
+            sp:subject [
+                sp:varName "vlastnost" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "vlastnost" ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object true ;
+                      sp:predicate fm:external ;
+                      sp:subject [
+                          sp:varName "parentEntity" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "1 - add intrinsic tropes" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "relatorLabel" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childQ" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 2 - add relators
+CONSTRUCT 
+  { 
+    ?childQ rdf:type doc:question .
+    ?childQ rdfs:label ?relatorLabel .
+    ?childQ form:has-question-origin ?childEntity .
+    ?parentQ doc:has_related_question ?childQ .
+  }
+WHERE
+  { 
+    ?relator  
+         rdf:type  z-sgov-pojem:typ-vztahu ;
+         skos:prefLabel   ?relatorLabel  ; 
+         rdfs:subClassOf  ?parentRestriction ;
+         rdfs:subClassOf  ?childRestriction .
+    ?parentRestriction
+          owl:onProperty   z-sgov-pojem:má-vztažený-prvek-1 ;
+          owl:someValuesFrom  ?parentEntity .
+    ?childRestriction
+          owl:onProperty   z-sgov-pojem:má-vztažený-prvek-2 ;
+          owl:someValuesFrom  ?childEntity .
+    ?parentQ  form:has-question-origin  ?parentEntity .
+    BIND(fl:create-q(str(?relator)) AS ?childQ)
+    FILTER(?parentEntity != ?childEntity)
+    FILTER NOT EXISTS {
+           ?relator fm:ignore true .
+    }
+    FILTER NOT EXISTS {
+          ?parentEntity fm:external true ;
+    }
+  }""" ;
+      sp:where (
+          [
+            sp:object z-sgov-pojem:typ-vztahu ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "relator" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "relatorLabel" ;
+              ] ;
+            sp:predicate skos:prefLabel ;
+            sp:subject [
+                sp:varName "relator" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "parentRestriction" ;
+              ] ;
+            sp:predicate rdfs:subClassOf ;
+            sp:subject [
+                sp:varName "relator" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childRestriction" ;
+              ] ;
+            sp:predicate rdfs:subClassOf ;
+            sp:subject [
+                sp:varName "relator" ;
+              ] ;
+          ]
+          [
+            sp:object z-sgov-pojem:má-vztažený-prvek-1 ;
+            sp:predicate owl:onProperty ;
+            sp:subject [
+                sp:varName "parentRestriction" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:predicate owl:someValuesFrom ;
+            sp:subject [
+                sp:varName "parentRestriction" ;
+              ] ;
+          ]
+          [
+            sp:object z-sgov-pojem:má-vztažený-prvek-2 ;
+            sp:predicate owl:onProperty ;
+            sp:subject [
+                sp:varName "childRestriction" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childEntity" ;
+              ] ;
+            sp:predicate owl:someValuesFrom ;
+            sp:subject [
+                sp:varName "childRestriction" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "relator" ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "parentEntity" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "childEntity" ;
+                  ] ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object true ;
+                      sp:predicate fm:ignore ;
+                      sp:subject [
+                          sp:varName "relator" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object true ;
+                      sp:predicate fm:external ;
+                      sp:subject [
+                          sp:varName "parentEntity" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "2 - add relators" ;
+    ] ;
+  sml:replace true ;
+.
+:create-root-question
+  a sml:ApplyConstruct ;
+  sm:next :construct-subquestions ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "formQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "formLabel" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject [
+                sp:varName "formQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "formEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "formQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "rootQ" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "formQ" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT 
+  { 
+    ?formQ rdf:type doc:question .
+    ?formQ rdfs:label ?formLabel .
+    ?formQ form:has-question-origin ?formEntity .
+    ?formQ doc:has_related_question ?rootQ .
+  }
+WHERE
+  { ?rootEntity  skos:prefLabel  ?rootEntityLabel
+    BIND(fl:create-q(concat(str(?rootEntity))) AS ?rootQ)
+    BIND(fl:create-q(concat(str(?rootEntity), \"-form\")) AS ?formQ)
+    BIND(concat(str(?rootEntityLabel), \"-form\") AS ?formLabel)
+    BIND(concat(str(?rootEntity), \"-form\") AS ?formEntity)
+  }""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "rootEntityLabel" ;
+              ] ;
+            sp:predicate skos:prefLabel ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 [
+                            sp:varName "rootEntity" ;
+                          ] ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "rootQ" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 [
+                            sp:varName "rootEntity" ;
+                          ] ;
+                      ] ;
+                    sp:arg2 "-form" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "formQ" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:concat ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "rootEntityLabel" ;
+                      ] ;
+                  ] ;
+                sp:arg2 "-form" ;
+              ] ;
+            sp:variable [
+                sp:varName "formLabel" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:concat ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "rootEntity" ;
+                      ] ;
+                  ] ;
+                sp:arg2 "-form" ;
+              ] ;
+            sp:variable [
+                sp:varName "formEntity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "1 - create root question" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "rootQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "rootEntityLabel" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject [
+                sp:varName "rootQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "rootEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "rootQ" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT 
+  { 
+    ?rootQ rdf:type doc:question .
+    ?rootQ rdfs:label ?rootEntityLabel .
+    ?rootQ form:has-question-origin ?rootEntity .
+  }
+WHERE
+  { ?rootEntity  skos:prefLabel  ?rootEntityLabel
+    BIND(fl:create-q(concat(str(?rootEntity))) AS ?rootQ)
+  }""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "rootEntityLabel" ;
+              ] ;
+            sp:predicate skos:prefLabel ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:concat ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 [
+                            sp:varName "rootEntity" ;
+                          ] ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "rootQ" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "0 - create root-subquestion question" ;
+    ] ;
+.
+:layout-form
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "form" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "rootQuestion" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT 
+  { 
+    ?rootQuestion form-lt:has-layout-class \"form\" .
+  }
+WHERE
+  {  }""" ;
+      sp:where () ;
+      rdfs:comment "0 - create form layout question" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "section" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "sectionQuestion" ;
+              ] ;
+          ]
+          [
+            sp:object "collapsed" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "sectionQuestion" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 1 - create section layout classes
+CONSTRUCT {
+    ?sectionQuestion    form-lt:has-layout-class \"section\" .
+   ?sectionQuestion    form-lt:has-layout-class \"collapsed\" .
+}
+WHERE {    
+    ?sectionQuestion doc:has_related_question ?subQuestion .
+    FILTER(?rootQuestion != ?sectionQuestion)
+}""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "subQuestion" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "sectionQuestion" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "rootQuestion" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "sectionQuestion" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "1 - create section layout classes" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "wizard-step" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "topSectionQuestion" ;
+              ] ;
+          ]
+          [
+            sp:object "section" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "topSectionQuestion" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 2 - create wizard step layout for top level sections
+CONSTRUCT {
+    ?topSectionQuestion    form-lt:has-layout-class \"wizard-step\" .
+# TODO !!! remove asi ??
+    ?topSectionQuestion    form-lt:has-layout-class \"section\" .
+}
+WHERE {    
+    ?rootQuestion doc:has_related_question ?topSectionQuestion .
+}""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "topSectionQuestion" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "rootQuestion" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "2 - create wizard step layout for top level sections" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "Layout form" ;
+.
+:merge
+  a sml:Merge ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# root question does not have any subquestions
+ASK 
+WHERE {
+     ?rootQuestion form-lt:has-layout-class \"form\" .
+     FILTER NOT EXISTS {
+           ?rootQuestion doc:has_related_question ?subQuestion .
+     }
+}""" ;
+      sp:where (
+          [
+            sp:object "form" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "rootQuestion" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "subQuestion" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "rootQuestion" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "root question does not have any subquestions" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question with more than one answer
+ASK
+WHERE {
+    ?q a doc:question ;
+            doc:has_answer ?a1 ; 
+            doc:has_answer ?a2 .
+   FILTER(?a1 != ?a2)
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "a1" ;
+              ] ;
+            sp:predicate doc:has_answer ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "a2" ;
+              ] ;
+            sp:predicate doc:has_answer ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "a1" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "a2" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is a question with more than one answer" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question without a label
+ASK
+WHERE {
+    ?question a doc:question .
+    FILTER  NOT  EXISTS {
+            ?question rdfs:label ?label .
+    }
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "question" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "label" ;
+                        ] ;
+                      sp:predicate rdfs:label ;
+                      sp:subject [
+                          sp:varName "question" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is a question without a label" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question without specified question origin
+ASK
+WHERE {
+    ?question a doc:question .
+     FILTER NOT EXISTS {
+           ?question form:has-question-origin ?origin . 
+    }
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "question" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "origin" ;
+                        ] ;
+                      sp:predicate form:has-question-origin ;
+                      sp:subject [
+                          sp:varName "question" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is a question without specified question origin" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is an empty section within the form
+ASK
+WHERE {    
+    ?sectionQ form-lt:has-layout-class \"section\" .
+    FILTER NOT EXISTS {
+        ?sectionQ doc:has_related_question ?subQ .
+    }
+}""" ;
+      sp:where (
+          [
+            sp:object "section" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "sectionQ" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "subQ" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "sectionQ" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is an empty section within the form" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is no \"form\" element
+ASK
+WHERE {
+        FILTER  NOT  EXISTS {
+            ?s form-lt:has-layout-class \"form\" .
+        }
+}""" ;
+      sp:where (
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object "form" ;
+                      sp:predicate form-lt:has-layout-class ;
+                      sp:subject [
+                          sp:varName "s" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is no \"form\" element" ;
+    ] ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question with two answers
+ASK
+WHERE {
+    ?q a doc:question ;
+         doc:has_answer ?a1 ;
+         doc:has_answer ?a2 .
+    FILTER(?a1 != ?a2)
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "a1" ;
+              ] ;
+            sp:predicate doc:has_answer ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "a2" ;
+              ] ;
+            sp:predicate doc:has_answer ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "a1" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "a2" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "there is a question with two answers" ;
+    ] ;
+  sm:next :transform_Return ;
+.
+:question-siblings-ordering
+  a sml:ApplyConstruct ;
+  sm:next :attach-descriptions ;
+  sm:next :attach-possible-values-hook ;
+  sm:next :bind-root-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "q" ;
+              ] ;
+            sp:predicate form:has-preceding-question ;
+            sp:subject [
+                sp:varName "qSibling" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 1 - make object identifier first
+CONSTRUCT 
+  { 
+    ?qSibling form:has-preceding-question ?q .
+  }
+WHERE
+  { 
+     ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+     ?entity   rdf:type  fm:object-identifier-quality .
+     ?qParent  doc:has_related_question  ?q ;
+              doc:has_related_question  ?qSibling
+    FILTER ( ?q != ?qSibling )
+  }""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:object-identifier-quality ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "q" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "qSibling" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "q" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "qSibling" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "1 - make object identifier first" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "qSimpleSibling" ;
+              ] ;
+            sp:predicate form:has-preceding-question ;
+            sp:subject [
+                sp:varName "qSection" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 2 - make sections after regular questions
+CONSTRUCT 
+  { 
+    ?qSection form:has-preceding-question ?qSimpleSibling .
+  }
+WHERE
+  { 
+     ?qParent  doc:has_related_question  ?qSection ;
+              doc:has_related_question  ?qSimpleSibling .
+     ?qSection doc:has_related_question ?qSectionChild .
+    FILTER NOT EXISTS {
+            ?qSimpleSibling doc:has_related_question ?qSimpleSiblingChild .
+    }
+  }""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "qSection" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "qSimpleSibling" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "qSectionChild" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qSection" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object [
+                          sp:varName "qSimpleSiblingChild" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "qSimpleSibling" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "2 - make sections after regular questions" ;
+    ] ;
+  sml:replace false ;
+.
+:retrieve-graph
+  a sml:ApplyConstruct ;
+  sm:next :create-root-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "o" ;
+              ] ;
+            sp:predicate [
+                sp:varName "p" ;
+              ] ;
+            sp:subject [
+                sp:varName "s" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+       ?s ?p ?o .
+} WHERE {
+  SERVICE ?sourceServiceUrl {        
+            ?s ?p ?o .
+  }
+}""" ;
+      sp:where (
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "o" ;
+                    ] ;
+                  sp:predicate [
+                      sp:varName "p" ;
+                    ] ;
+                  sp:subject [
+                      sp:varName "s" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "sourceServiceUrl" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  sml:replace true ;
+.
+:transform
+  a sm:Function ;
+  sm:returnModule :transform_Return ;
+  rdfs:comment "Transforms sgov related data located in ?endpointUrl with ?sourceGraphId into SForms form." ;
+  rdfs:subClassOf sm:Functions ;
+.
+:transform_Return
+  a sml:ReturnRDF ;
+  sml:serialization sml:Turtle ;
+.
