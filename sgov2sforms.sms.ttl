@@ -135,7 +135,7 @@ WHERE
     ?question form-lt:has-layout-class \"type-ahead\" .
 }
 WHERE {
-    SERVICE ?sourceServiceUrl {
+    SERVICE ?formMetadataServiceUrl {
          ?entity fm:external true .
     } .
     ?question form:has-question-origin ?entity .
@@ -157,7 +157,7 @@ WHERE {
                 ]
               ) ;
             sp:serviceURI [
-                sp:varName "sourceServiceUrl" ;
+                sp:varName "formMetadataServiceUrl" ;
               ] ;
           ]
           [
@@ -415,6 +415,73 @@ CONSTRUCT {
     ] ;
   sml:replace false ;
 .
+:bind-form-metadata-service-url
+  a sml:BindWithConstant ;
+  sm:next :retrieve-form-metadata ;
+  sm:outputVariable "formMetadataServiceUrl" ;
+  sml:value [
+      a sp:iri ;
+      sp:arg1 [
+          a sp:concat ;
+          sp:arg1 [
+              a sp:str ;
+              sp:arg1 [
+                  sp:varName "formGenRepositoryUrl" ;
+                ] ;
+            ] ;
+          sp:arg2 "?default-graph-uri=" ;
+          sp:arg3 [
+              a sp:encode_for_uri ;
+              sp:arg1 [
+                  a sp:str ;
+                  sp:arg1 [
+                      sp:varName "formType" ;
+                    ] ;
+                ] ;
+            ] ;
+        ] ;
+    ] ;
+.
+:bind-form-type
+  a sml:BindBySelect ;
+  sm:next :bind-form-metadata-service-url ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "formType" ;
+          ]
+        ) ;
+      sp:text """SELECT ?formType
+WHERE {
+    ?r <http://vfn.cz/ontologies/study-manager/formType> ?formTypeStr .
+    BIND(str(?formTypeStr) as ?formType)
+}""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "formTypeStr" ;
+              ] ;
+            sp:predicate <http://vfn.cz/ontologies/study-manager/formType> ;
+            sp:subject [
+                sp:varName "r" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:str ;
+                sp:arg1 [
+                    sp:varName "formTypeStr" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "formType" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
 :bind-possible-values-query-template
   a sml:BindWithConstant ;
   sm:next :attach-possible-values-hook ;
@@ -434,11 +501,59 @@ VALUES (?entityType) {
       (<XXXXX>)
 }""" ;
 .
-:bind-root-entity
+:bind-record-service-url
   a sml:BindWithConstant ;
+  sm:next :retrieve-record-graph ;
+  sm:outputVariable "recordServiceUrl" ;
+  sml:value [
+      a sp:iri ;
+      sp:arg1 [
+          a sp:concat ;
+          sp:arg1 [
+              a sp:str ;
+              sp:arg1 [
+                  sp:varName "formGenRepositoryUrl" ;
+                ] ;
+            ] ;
+          sp:arg2 "?default-graph-uri=" ;
+          sp:arg3 [
+              a sp:encode_for_uri ;
+              sp:arg1 [
+                  a sp:str ;
+                  sp:arg1 [
+                      sp:varName "recordGraphId" ;
+                    ] ;
+                ] ;
+            ] ;
+        ] ;
+    ] ;
+.
+:bind-root-entity
+  a sml:BindBySelect ;
   sm:next :create-root-question ;
-  sm:outputVariable "rootEntity" ;
-  sml:value <https://slovník.gov.cz/generický/pracovní-místa/pojem/pracovní-místo> ;
+  sm:nodeX 775 ;
+  sm:nodeY 666 ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "rootEntity" ;
+          ]
+        ) ;
+      sp:text """SELECT ?rootEntity
+WHERE {
+    ?rootEntity a fm:root-entity .
+} """ ;
+      sp:where (
+          [
+            sp:object fm:root-entity ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
 .
 :bind-root-question
   a sml:BindBySelect ;
@@ -494,14 +609,28 @@ WHERE
         ) ;
     ] ;
 .
-:bind-source-service-url
+:bind-sgov-service-url
   a sml:BindWithConstant ;
-  sm:next :retrieve-graph ;
-  sm:outputVariable "sourceServiceUrl" ;
+  sm:next :retrieve-sgov ;
+  sm:outputVariable "sgovServiceUrl" ;
   sml:value [
-      a sp:uri ;
+      a sp:iri ;
       sp:arg1 [
-          sp:varName "formGenRepositoryUrl" ;
+          a sp:concat ;
+          sp:arg1 [
+              a sp:str ;
+              sp:arg1 [
+                  sp:varName "formGenRepositoryUrl" ;
+                ] ;
+            ] ;
+          sp:arg2 "?default-graph-uri=" ;
+          sp:arg3 [
+              a sp:encode_for_uri ;
+              sp:arg1 [
+                  a sp:str ;
+                  sp:arg1 <http://onto.fel.cvut.cz/ontologies/sgov-data> ;
+                ] ;
+            ] ;
         ] ;
     ] ;
 .
@@ -1054,6 +1183,7 @@ WHERE
         ) ;
       rdfs:comment "0 - create root-subquestion question" ;
     ] ;
+  sml:replace false ;
 .
 :layout-form
   a sml:ApplyConstruct ;
@@ -1625,9 +1755,9 @@ WHERE
     ] ;
   sml:replace false ;
 .
-:retrieve-graph
+:retrieve-form-metadata
   a sml:ApplyConstruct ;
-  sm:next :create-root-question ;
+  sm:next :bind-root-entity ;
   sml:constructQuery [
       a sp:Construct ;
       sp:templates (
@@ -1646,7 +1776,7 @@ WHERE
       sp:text """CONSTRUCT {
        ?s ?p ?o .
 } WHERE {
-  SERVICE ?sourceServiceUrl {        
+  SERVICE ?formMetadataServiceUrl {        
             ?s ?p ?o .
   }
 }""" ;
@@ -1667,7 +1797,104 @@ WHERE
                 ]
               ) ;
             sp:serviceURI [
-                sp:varName "sourceServiceUrl" ;
+                sp:varName "formMetadataServiceUrl" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  sml:replace true ;
+.
+:retrieve-record-graph
+  a sml:ApplyConstruct ;
+  sm:next :bind-form-type ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "o" ;
+              ] ;
+            sp:predicate [
+                sp:varName "p" ;
+              ] ;
+            sp:subject [
+                sp:varName "s" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+       ?s ?p ?o .
+} WHERE {
+  SERVICE ?recordServiceUrl {        
+            ?s ?p ?o .
+  }
+}""" ;
+      sp:where (
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "o" ;
+                    ] ;
+                  sp:predicate [
+                      sp:varName "p" ;
+                    ] ;
+                  sp:subject [
+                      sp:varName "s" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "recordServiceUrl" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+.
+:retrieve-sgov
+  a sml:ApplyConstruct ;
+  sm:next :create-root-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "o" ;
+              ] ;
+            sp:predicate [
+                sp:varName "p" ;
+              ] ;
+            sp:subject [
+                sp:varName "s" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+       ?s ?p ?o .
+} WHERE {
+  SERVICE ?sgovServiceUrl {        
+            ?s ?p ?o .
+  }
+}""" ;
+      sp:where (
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "o" ;
+                    ] ;
+                  sp:predicate [
+                      sp:varName "p" ;
+                    ] ;
+                  sp:subject [
+                      sp:varName "s" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "sgovServiceUrl" ;
               ] ;
           ]
         ) ;
