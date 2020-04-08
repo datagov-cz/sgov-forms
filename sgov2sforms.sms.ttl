@@ -139,7 +139,7 @@ WHERE {
          ?entity fm:external true .
     } .
     ?question form:has-question-origin ?entity .
-    BIND (CONCAT(str(?sourceServiceUrl), \"?query=\") AS ?dowloadPrefix) .
+    BIND (CONCAT(str(?sgovServiceUrl), \"&query=\") AS ?dowloadPrefix) .
     BIND (REPLACE( ?possibleValuesQueryTemplate, \"XXXXX\", str(?entity)) AS ?downloadSuffixRaw) .
     BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
     BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString) .
@@ -176,10 +176,10 @@ WHERE {
                 sp:arg1 [
                     a sp:str ;
                     sp:arg1 [
-                        sp:varName "sourceServiceUrl" ;
+                        sp:varName "sgovServiceUrl" ;
                       ] ;
                   ] ;
-                sp:arg2 "?query=" ;
+                sp:arg2 "&query=" ;
               ] ;
             sp:variable [
                 sp:varName "dowloadPrefix" ;
