@@ -650,136 +650,6 @@ WHERE
           ]
           [
             sp:object [
-                sp:varName "childQLabel" ;
-              ] ;
-            sp:predicate rdfs:label ;
-            sp:subject [
-                sp:varName "childQ" ;
-              ] ;
-          ]
-          [
-            sp:object [
-                sp:varName "vlastnost" ;
-              ] ;
-            sp:predicate form:has-question-origin ;
-            sp:subject [
-                sp:varName "childQ" ;
-              ] ;
-          ]
-          [
-            sp:object [
-                sp:varName "childQ" ;
-              ] ;
-            sp:predicate doc:has_related_question ;
-            sp:subject [
-                sp:varName "parentQ" ;
-              ] ;
-          ]
-        ) ;
-      sp:text """# 1 - add intrinsic tropes
-CONSTRUCT 
-  { 
-    ?childQ rdf:type doc:question .
-    ?childQ rdfs:label ?childQLabel .
-    ?childQ form:has-question-origin ?vlastnost .
-    ?parentQ doc:has_related_question ?childQ .
-  }
-WHERE
-  { 
-    ?vlastnost  rdf:type  z-sgov-pojem:typ-vlastnosti .
-    ?vlastnost rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
-    ?vlastnost  skos:prefLabel      ?childQLabel .
-    ?parentQ  form:has-question-origin  ?parentEntity
-    BIND(fl:create-q(str(?vlastnost)) AS ?childQ)
-    FILTER NOT EXISTS {
-          ?parentEntity fm:external true ;
-    }
-  }""" ;
-      sp:where (
-          [
-            sp:object z-sgov-pojem:typ-vlastnosti ;
-            sp:predicate rdf:type ;
-            sp:subject [
-                sp:varName "vlastnost" ;
-              ] ;
-          ]
-          [
-            a sp:TriplePath ;
-            sp:object [
-                sp:varName "parentEntity" ;
-              ] ;
-            sp:path [
-                a sp:SeqPath ;
-                sp:path1 rdfs:subClassOf ;
-                sp:path2 owl:someValuesFrom ;
-              ] ;
-            sp:subject [
-                sp:varName "vlastnost" ;
-              ] ;
-          ]
-          [
-            sp:object [
-                sp:varName "childQLabel" ;
-              ] ;
-            sp:predicate skos:prefLabel ;
-            sp:subject [
-                sp:varName "vlastnost" ;
-              ] ;
-          ]
-          [
-            sp:object [
-                sp:varName "parentEntity" ;
-              ] ;
-            sp:predicate form:has-question-origin ;
-            sp:subject [
-                sp:varName "parentQ" ;
-              ] ;
-          ]
-          [
-            a sp:Bind ;
-            sp:expression [
-                a fl:create-q ;
-                sp:arg1 [
-                    a sp:str ;
-                    sp:arg1 [
-                        sp:varName "vlastnost" ;
-                      ] ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "childQ" ;
-              ] ;
-          ]
-          [
-            a sp:Filter ;
-            sp:expression [
-                a sp:notExists ;
-                sp:elements (
-                    [
-                      sp:object true ;
-                      sp:predicate fm:external ;
-                      sp:subject [
-                          sp:varName "parentEntity" ;
-                        ] ;
-                    ]
-                  ) ;
-              ] ;
-          ]
-        ) ;
-      rdfs:comment "1 - add intrinsic tropes" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:templates (
-          [
-            sp:object doc:question ;
-            sp:predicate rdf:type ;
-            sp:subject [
-                sp:varName "childQ" ;
-              ] ;
-          ]
-          [
-            sp:object [
                 sp:varName "relatorLabel" ;
               ] ;
             sp:predicate rdfs:label ;
@@ -818,9 +688,13 @@ WHERE
   { 
     ?relator  
          rdf:type  z-sgov-pojem:typ-vztahu ;
-         skos:prefLabel   ?relatorLabel  ; 
+         skos:prefLabel   ?relatorPrefLabel  ; 
          rdfs:subClassOf  ?parentRestriction ;
          rdfs:subClassOf  ?childRestriction .
+    OPTIONAL {
+          ?relator skos:hiddenLabel ?relatorHiddenLabel .
+    }
+    BIND(coalesce(?relatorHiddenLabel, ?relatorPrefLabel) as ?relatorLabel)
     ?parentRestriction
           owl:onProperty   z-sgov-pojem:má-vztažený-prvek-1 ;
           owl:someValuesFrom  ?parentEntity .
@@ -847,7 +721,7 @@ WHERE
           ]
           [
             sp:object [
-                sp:varName "relatorLabel" ;
+                sp:varName "relatorPrefLabel" ;
               ] ;
             sp:predicate skos:prefLabel ;
             sp:subject [
@@ -870,6 +744,35 @@ WHERE
             sp:predicate rdfs:subClassOf ;
             sp:subject [
                 sp:varName "relator" ;
+              ] ;
+          ]
+          [
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "relatorHiddenLabel" ;
+                    ] ;
+                  sp:predicate skos:hiddenLabel ;
+                  sp:subject [
+                      sp:varName "relator" ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:coalesce ;
+                sp:arg1 [
+                    sp:varName "relatorHiddenLabel" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "relatorPrefLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "relatorLabel" ;
               ] ;
           ]
           [
@@ -972,6 +875,169 @@ WHERE
           ]
         ) ;
       rdfs:comment "2 - add relators" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "tropeLabel" ;
+              ] ;
+            sp:predicate rdfs:label ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "trope" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "childQ" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 1 - add intrinsic tropes
+CONSTRUCT 
+  { 
+    ?childQ rdf:type doc:question .
+    ?childQ rdfs:label ?tropeLabel .
+    ?childQ form:has-question-origin ?trope .
+    ?parentQ doc:has_related_question ?childQ .
+  }
+WHERE
+  { 
+    ?trope  rdf:type  z-sgov-pojem:typ-vlastnosti .
+    ?trope rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
+    ?trope  skos:prefLabel      ?tropePrefLabel .
+       OPTIONAL {
+          ?trope skos:hiddenLabel ?tropeHiddenLabel .
+    }
+    BIND(coalesce(?tropeHiddenLabel, ?tropePrefLabel) as ?tropeLabel)
+    ?parentQ  form:has-question-origin  ?parentEntity
+    BIND(fl:create-q(str(?trope)) AS ?childQ)
+    FILTER NOT EXISTS {
+          ?parentEntity fm:external true ;
+    }
+  }""" ;
+      sp:where (
+          [
+            sp:object z-sgov-pojem:typ-vlastnosti ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "trope" ;
+              ] ;
+          ]
+          [
+            a sp:TriplePath ;
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:path [
+                a sp:SeqPath ;
+                sp:path1 rdfs:subClassOf ;
+                sp:path2 owl:someValuesFrom ;
+              ] ;
+            sp:subject [
+                sp:varName "trope" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "tropePrefLabel" ;
+              ] ;
+            sp:predicate skos:prefLabel ;
+            sp:subject [
+                sp:varName "trope" ;
+              ] ;
+          ]
+          [
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "tropeHiddenLabel" ;
+                    ] ;
+                  sp:predicate skos:hiddenLabel ;
+                  sp:subject [
+                      sp:varName "trope" ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:coalesce ;
+                sp:arg1 [
+                    sp:varName "tropeHiddenLabel" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "tropePrefLabel" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "tropeLabel" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "parentEntity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "parentQ" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a fl:create-q ;
+                sp:arg1 [
+                    a sp:str ;
+                    sp:arg1 [
+                        sp:varName "trope" ;
+                      ] ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "childQ" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object true ;
+                      sp:predicate fm:external ;
+                      sp:subject [
+                          sp:varName "parentEntity" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "1 - add intrinsic tropes" ;
     ] ;
   sml:replace true ;
 .
@@ -1596,6 +1662,19 @@ WHERE {
   sm:next :bind-root-question ;
   sml:constructQuery [
       a sp:Construct ;
+      sp:templates () ;
+      sp:text """# 3 - make relators after other types of questions TODO
+CONSTRUCT {
+    
+}
+WHERE {
+    
+}""" ;
+      sp:where () ;
+      rdfs:comment "3 - make relators after other types of questions TODO" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
       sp:templates (
           [
             sp:object [
@@ -1677,6 +1756,106 @@ WHERE
           ]
         ) ;
       rdfs:comment "1 - make object identifier first" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "q" ;
+              ] ;
+            sp:predicate form:has-preceding-question ;
+            sp:subject [
+                sp:varName "qSiblingDescription" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# 4 - description should be after identifier TODO
+CONSTRUCT {
+        ?qSiblingDescription form:has-preceding-question ?q .
+}
+WHERE {
+     ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+     ?entity   rdf:type  fm:object-identifier-quality .
+     ?qParent  doc:has_related_question  ?q ;
+              doc:has_related_question  ?qSiblingDescription .
+   ?qSiblingDescription form:has-question-origin  ?description .
+   ?description rdfs:subClassOf <http://purl.org/dc/terms/description> .
+    FILTER ( ?q != ?qSiblingDescription )
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:object-identifier-quality ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "q" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "qSiblingDescription" ;
+              ] ;
+            sp:predicate doc:has_related_question ;
+            sp:subject [
+                sp:varName "qParent" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "description" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "qSiblingDescription" ;
+              ] ;
+          ]
+          [
+            sp:object dc:description ;
+            sp:predicate rdfs:subClassOf ;
+            sp:subject [
+                sp:varName "description" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "q" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "qSiblingDescription" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "4 - description should be after identifier TODO" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
