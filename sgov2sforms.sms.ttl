@@ -616,19 +616,25 @@ WHERE
   sml:value [
       a sp:iri ;
       sp:arg1 [
-          a sp:concat ;
+          a sp:coalesce ;
           sp:arg1 [
-              a sp:str ;
-              sp:arg1 [
-                  sp:varName "formGenRepositoryUrl" ;
-                ] ;
+              sp:varName "sgovRepositoryUrl" ;
             ] ;
-          sp:arg2 "?default-graph-uri=" ;
-          sp:arg3 [
-              a sp:encode_for_uri ;
+          sp:arg2 [
+              a sp:concat ;
               sp:arg1 [
                   a sp:str ;
-                  sp:arg1 <http://onto.fel.cvut.cz/ontologies/sgov-data> ;
+                  sp:arg1 [
+                      sp:varName "formGenRepositoryUrl" ;
+                    ] ;
+                ] ;
+              sp:arg2 "?default-graph-uri=" ;
+              sp:arg3 [
+                  a sp:encode_for_uri ;
+                  sp:arg1 [
+                      a sp:str ;
+                      sp:arg1 <http://onto.fel.cvut.cz/ontologies/sgov-data> ;
+                    ] ;
                 ] ;
             ] ;
         ] ;
