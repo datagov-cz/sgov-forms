@@ -18,6 +18,90 @@
   owl:imports <http://onto.fel.cvut.cz/ontologies/form> ;
   owl:imports <http://spinrdf.org/spin> ;
 .
+fl:capitalize-first-letter
+  a spin:Function ;
+  spin:body [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "langCapitalizedString" ;
+          ]
+        ) ;
+      sp:text """SELECT  ?langCapitalizedString
+WHERE {
+    BIND(
+            CONCAT(
+                UCASE(SUBSTR(?arg1, 1, 1)), 
+                SUBSTR(?arg1, 2)
+            ) as ?capitalizedString)
+	BIND(
+         IF(LANG(?arg1), STRLANG(STR(?capitalizedString), LANG(?arg1)), ?capitalizedString) as ?langCapitalizedString
+    )
+}""" ;
+      sp:where (
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:concat ;
+                sp:arg1 [
+                    a sp:ucase ;
+                    sp:arg1 [
+                        a sp:substr ;
+                        sp:arg1 spin:_arg1 ;
+                        sp:arg2 1 ;
+                        sp:arg3 1 ;
+                      ] ;
+                  ] ;
+                sp:arg2 [
+                    a sp:substr ;
+                    sp:arg1 spin:_arg1 ;
+                    sp:arg2 2 ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "capitalizedString" ;
+              ] ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:if ;
+                sp:arg1 [
+                    a sp:lang ;
+                    sp:arg1 spin:_arg1 ;
+                  ] ;
+                sp:arg2 [
+                    a sp:strlang ;
+                    sp:arg1 [
+                        a sp:str ;
+                        sp:arg1 [
+                            sp:varName "capitalizedString" ;
+                          ] ;
+                      ] ;
+                    sp:arg2 [
+                        a sp:lang ;
+                        sp:arg1 spin:_arg1 ;
+                      ] ;
+                  ] ;
+                sp:arg3 [
+                    sp:varName "capitalizedString" ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "langCapitalizedString" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg1 ;
+      spl:valueType xsd:string ;
+      rdfs:comment "String whose first letter should be capitalized." ;
+    ] ;
+  rdfs:comment "Capitalize first letter of a provided string." ;
+  rdfs:subClassOf spin:Functions ;
+.
 fl:create-a
   a spin:Function ;
   spin:body [
