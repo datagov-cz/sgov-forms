@@ -68,13 +68,19 @@
       sp:text """# create descriptions
 CONSTRUCT 
   { 
-     ?q <http://purl.org/dc/elements/1.1/description> ?description .
+     ?q dce:description ?description .
   }
 WHERE
   { 
      ?q rdf:type doc:question ;
            form:has-question-origin  ?entity .
-     ?entity  <http://purl.org/dc/terms/description>  ?description .
+     OPTIONAL {
+         ?entity  skos:definition  ?definition .
+     }
+     OPTIONAL {
+         ?entity  skos:scopeNote  ?scopeNote .
+     }
+     BIND(COALESCE(?definition, ?scopeNote) as ?description)
   }""" ;
       sp:where (
           [
@@ -94,12 +100,46 @@ WHERE
               ] ;
           ]
           [
-            sp:object [
-                sp:varName "description" ;
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "definition" ;
+                    ] ;
+                  sp:predicate skos:definition ;
+                  sp:subject [
+                      sp:varName "entity" ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object [
+                      sp:varName "scopeNote" ;
+                    ] ;
+                  sp:predicate skos:scopeNote ;
+                  sp:subject [
+                      sp:varName "entity" ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:coalesce ;
+                sp:arg1 [
+                    sp:varName "definition" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "scopeNote" ;
+                  ] ;
               ] ;
-            sp:predicate dc:description ;
-            sp:subject [
-                sp:varName "entity" ;
+            sp:variable [
+                sp:varName "description" ;
               ] ;
           ]
         ) ;
@@ -249,11 +289,11 @@ WHERE {
               ] ;
           ]
         ) ;
-      sp:text """# date
+      sp:text """# boolean
 CONSTRUCT {
        ?q
-          form-lt:has-layout-class \"checkbox\" ;
-   .
+             form-lt:has-layout-class \"checkbox\" ;
+        .
 } WHERE {
    ?q rdf:type doc:question ;
            form:has-question-origin  ?entity .
@@ -284,7 +324,54 @@ CONSTRUCT {
               ] ;
           ]
         ) ;
-      rdfs:comment "date" ;
+      rdfs:comment "boolean" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object "datetime" ;
+            sp:predicate form-lt:has-layout-class ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """# datetime
+CONSTRUCT {
+       ?q  form-lt:has-layout-class \"datetime\" .
+
+} WHERE {
+   ?q rdf:type doc:question ;
+           form:has-question-origin  ?entity .
+   ?entity   a fm:datetime .
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "entity" ;
+              ] ;
+            sp:predicate form:has-question-origin ;
+            sp:subject [
+                sp:varName "q" ;
+              ] ;
+          ]
+          [
+            sp:object fm:datetime ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "entity" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "datetime" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
@@ -304,7 +391,7 @@ CONSTRUCT {
               ] ;
           ]
         ) ;
-      sp:text """# boolean
+      sp:text """# date
 CONSTRUCT {
        ?q form-lt:has-layout-class \"masked-input\" ; 
               form:has-input-mask \"DD/MM/YYYY\" .
@@ -339,7 +426,7 @@ CONSTRUCT {
               ] ;
           ]
         ) ;
-      rdfs:comment "boolean" ;
+      rdfs:comment "date" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
@@ -698,9 +785,9 @@ WHERE
          rdfs:subClassOf  ?parentRestriction ;
          rdfs:subClassOf  ?childRestriction .
     OPTIONAL {
-          ?relator skos:hiddenLabel ?relatorHiddenLabel .
+          ?relator skos:altLabel ?relatorAltLabel .
     }
-    BIND(coalesce(?relatorHiddenLabel, ?relatorPrefLabel) as ?relatorLabel)
+    BIND(fl:capitalize-first-letter(coalesce(?relatorAltLabel, ?relatorPrefLabel)) as ?relatorLabel)
     ?parentRestriction
           owl:onProperty   z-sgov-pojem:má-vztažený-prvek-1 ;
           owl:someValuesFrom  ?parentEntity .
@@ -757,9 +844,9 @@ WHERE
             sp:elements (
                 [
                   sp:object [
-                      sp:varName "relatorHiddenLabel" ;
+                      sp:varName "relatorAltLabel" ;
                     ] ;
-                  sp:predicate skos:hiddenLabel ;
+                  sp:predicate skos:altLabel ;
                   sp:subject [
                       sp:varName "relator" ;
                     ] ;
@@ -769,12 +856,15 @@ WHERE
           [
             a sp:Bind ;
             sp:expression [
-                a sp:coalesce ;
+                a fl:capitalize-first-letter ;
                 sp:arg1 [
-                    sp:varName "relatorHiddenLabel" ;
-                  ] ;
-                sp:arg2 [
-                    sp:varName "relatorPrefLabel" ;
+                    a sp:coalesce ;
+                    sp:arg1 [
+                        sp:varName "relatorAltLabel" ;
+                      ] ;
+                    sp:arg2 [
+                        sp:varName "relatorPrefLabel" ;
+                      ] ;
                   ] ;
               ] ;
             sp:variable [
@@ -933,10 +1023,10 @@ WHERE
     ?trope  rdf:type  z-sgov-pojem:typ-vlastnosti .
     ?trope rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
     ?trope  skos:prefLabel      ?tropePrefLabel .
-       OPTIONAL {
-          ?trope skos:hiddenLabel ?tropeHiddenLabel .
+    OPTIONAL {
+          ?trope skos:altLabel ?tropeAltLabel .
     }
-    BIND(coalesce(?tropeHiddenLabel, ?tropePrefLabel) as ?tropeLabel)
+    BIND(fl:capitalize-first-letter(coalesce(?tropeAltLabel, ?tropePrefLabel)) as ?tropeLabel)
     ?parentQ  form:has-question-origin  ?parentEntity
     BIND(fl:create-q(str(?trope)) AS ?childQ)
     FILTER NOT EXISTS {
@@ -979,9 +1069,9 @@ WHERE
             sp:elements (
                 [
                   sp:object [
-                      sp:varName "tropeHiddenLabel" ;
+                      sp:varName "tropeAltLabel" ;
                     ] ;
-                  sp:predicate skos:hiddenLabel ;
+                  sp:predicate skos:altLabel ;
                   sp:subject [
                       sp:varName "trope" ;
                     ] ;
@@ -991,12 +1081,15 @@ WHERE
           [
             a sp:Bind ;
             sp:expression [
-                a sp:coalesce ;
+                a fl:capitalize-first-letter ;
                 sp:arg1 [
-                    sp:varName "tropeHiddenLabel" ;
-                  ] ;
-                sp:arg2 [
-                    sp:varName "tropePrefLabel" ;
+                    a sp:coalesce ;
+                    sp:arg1 [
+                        sp:varName "tropeAltLabel" ;
+                      ] ;
+                    sp:arg2 [
+                        sp:varName "tropePrefLabel" ;
+                      ] ;
                   ] ;
               ] ;
             sp:variable [
@@ -1776,7 +1869,7 @@ WHERE
               ] ;
           ]
         ) ;
-      sp:text """# 4 - description should be after identifier TODO
+      sp:text """# 4 - description should be after identifier (TODO does not work)
 CONSTRUCT {
         ?qSiblingDescription form:has-preceding-question ?q .
 }
@@ -1787,7 +1880,7 @@ WHERE {
      ?qParent  doc:has_related_question  ?q ;
               doc:has_related_question  ?qSiblingDescription .
    ?qSiblingDescription form:has-question-origin  ?description .
-   ?description rdfs:subClassOf <http://purl.org/dc/terms/description> .
+   ?description rdfs:subClassOf dc:description .
     FILTER ( ?q != ?qSiblingDescription )
 }""" ;
       sp:where (
@@ -1861,7 +1954,7 @@ WHERE {
               ] ;
           ]
         ) ;
-      rdfs:comment "4 - description should be after identifier TODO" ;
+      rdfs:comment "4 - description should be after identifier (TODO does not work)" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
