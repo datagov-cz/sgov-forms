@@ -8,8 +8,8 @@
 # imports: https://slovník.gov.cz/základní/model
 
 @prefix : <http://onto.fel.cvut.cz/ontologies/kodi/sgov2sforms/> .
-@prefix a-popis-dat: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/> .
-@prefix a-popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/pojem/> .
+@prefix a-popis-dat: <http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/> .
+@prefix a-popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/> .
 @prefix dc: <http://purl.org/dc/terms/> .
 @prefix dce: <http://purl.org/dc/elements/1.1/> .
 @prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
@@ -22,7 +22,6 @@
 @prefix kbss-spif: <http://onto.fel.cvut.cz/ontologies/lib/spin-function/> .
 @prefix km-rdf4j: <http://onto.fel.cvut.cz/ontologies/lib/module/rdf4j/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovnik/agendovy/popis-dat/pojem/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -618,8 +617,7 @@ VALUES (?entityType) {
 :bind-root-entity
   a sml:BindBySelect ;
   sm:next :create-root-question ;
-  sm:nodeX 775 ;
-  sm:nodeY 666 ;
+  sm:next :retrieve-related-dataset-iris ;
   sml:selectQuery [
       a sp:Select ;
       sp:resultVariables (
@@ -698,6 +696,7 @@ WHERE
 .
 :bind-sgov-service-url
   a sml:BindWithConstant ;
+  sm:next :retrieve-related-dataset-iris ;
   sm:next :retrieve-sgov ;
   sm:outputVariable "sgovServiceUrl" ;
   sml:value [
@@ -2130,9 +2129,196 @@ WHERE
         ) ;
     ] ;
 .
-:retrieve-sgov
+:retrieve-related-dataset-iris
+  a sml:ApplyConstruct ;
+  sm:next :retrieve-related-datasets ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "importedGlosar" ;
+              ] ;
+            sp:predicate :related-dataset ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+          [
+            sp:object [
+                sp:varName "importedModel" ;
+              ] ;
+            sp:predicate :related-dataset ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT  {
+    ?rootEntity :related-dataset ?importedGlosar ; 
+                              :related-dataset ?importedModel .
+} WHERE {
+    SERVICE ?sgovServiceUrl {
+            GRAPH ?glosar  {
+                 ?rootEntity skos:inScheme  ?glosar .
+            }
+
+            ?slovnik a-popis-dat-pojem:má-glosář ?glosar .
+            ?slovnik a-popis-dat-pojem:má-model ?model .
+
+            ?glosar owl:imports* ?importedGlosar .
+            ?model owl:imports* ?importedModel .
+     }
+}""" ;
+      sp:where (
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  a sp:NamedGraph ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "glosar" ;
+                          ] ;
+                        sp:predicate skos:inScheme ;
+                        sp:subject [
+                            sp:varName "rootEntity" ;
+                          ] ;
+                      ]
+                    ) ;
+                  sp:graphNameNode [
+                      sp:varName "glosar" ;
+                    ] ;
+                ]
+                [
+                  sp:object [
+                      sp:varName "glosar" ;
+                    ] ;
+                  sp:predicate a-popis-dat-pojem:má-glosář ;
+                  sp:subject [
+                      sp:varName "slovnik" ;
+                    ] ;
+                ]
+                [
+                  sp:object [
+                      sp:varName "model" ;
+                    ] ;
+                  sp:predicate a-popis-dat-pojem:má-model ;
+                  sp:subject [
+                      sp:varName "slovnik" ;
+                    ] ;
+                ]
+                [
+                  a sp:TriplePath ;
+                  sp:object [
+                      sp:varName "importedGlosar" ;
+                    ] ;
+                  sp:path [
+                      a sp:ModPath ;
+                      sp:modMax -2 ;
+                      sp:modMin 0 ;
+                      sp:subPath owl:imports ;
+                    ] ;
+                  sp:subject [
+                      sp:varName "glosar" ;
+                    ] ;
+                ]
+                [
+                  a sp:TriplePath ;
+                  sp:object [
+                      sp:varName "importedModel" ;
+                    ] ;
+                  sp:path [
+                      a sp:ModPath ;
+                      sp:modMax -2 ;
+                      sp:modMin 0 ;
+                      sp:subPath owl:imports ;
+                    ] ;
+                  sp:subject [
+                      sp:varName "model" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "sgovServiceUrl" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  sml:replace true ;
+.
+:retrieve-related-datasets
   a sml:ApplyConstruct ;
   sm:next :create-root-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:templates (
+          [
+            sp:object [
+                sp:varName "o" ;
+              ] ;
+            sp:predicate [
+                sp:varName "p" ;
+              ] ;
+            sp:subject [
+                sp:varName "s" ;
+              ] ;
+          ]
+        ) ;
+      sp:text """CONSTRUCT {
+    ?s ?p ?o 
+} WHERE {
+        ?rootEntity :related-dataset ?g . 
+        SERVICE ?sgovServiceUrl {
+               GRAPH ?g {
+                      ?s ?p ?o
+                }
+         }
+}""" ;
+      sp:where (
+          [
+            sp:object [
+                sp:varName "g" ;
+              ] ;
+            sp:predicate :related-dataset ;
+            sp:subject [
+                sp:varName "rootEntity" ;
+              ] ;
+          ]
+          [
+            a sp:Service ;
+            sp:elements (
+                [
+                  a sp:NamedGraph ;
+                  sp:elements (
+                      [
+                        sp:object [
+                            sp:varName "o" ;
+                          ] ;
+                        sp:predicate [
+                            sp:varName "p" ;
+                          ] ;
+                        sp:subject [
+                            sp:varName "s" ;
+                          ] ;
+                      ]
+                    ) ;
+                  sp:graphNameNode [
+                      sp:varName "g" ;
+                    ] ;
+                ]
+              ) ;
+            sp:serviceURI [
+                sp:varName "sgovServiceUrl" ;
+              ] ;
+          ]
+        ) ;
+    ] ;
+  sml:replace true ;
+.
+:retrieve-sgov
+  a sml:ApplyConstruct ;
   sml:constructQuery [
       a sp:Construct ;
       sp:templates (
