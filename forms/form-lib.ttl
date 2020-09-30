@@ -22,76 +22,11 @@ fl:capitalize-first-letter
   a spin:Function ;
   spin:body [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "langCapitalizedString" ;
-          ]
-        ) ;
-      sp:text """SELECT  ?langCapitalizedString
+      sp:text """SELECT ?langCapitalizedString
 WHERE {
-    BIND(
-            CONCAT(
-                UCASE(SUBSTR(?arg1, 1, 1)), 
-                SUBSTR(?arg1, 2)
-            ) as ?capitalizedString)
-	BIND(
-         IF(LANG(?arg1), STRLANG(STR(?capitalizedString), LANG(?arg1)), ?capitalizedString) as ?langCapitalizedString
-    )
+    BIND (CONCAT(UCASE(SUBSTR(?arg1, 1, 1)), SUBSTR(?arg1, 2)) AS ?capitalizedString) .
+    BIND (IF(lang(?arg1), STRLANG(str(?capitalizedString), lang(?arg1)), ?capitalizedString) AS ?langCapitalizedString) .
 }""" ;
-      sp:where (
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:concat ;
-                sp:arg1 [
-                    a sp:ucase ;
-                    sp:arg1 [
-                        a sp:substr ;
-                        sp:arg1 spin:_arg1 ;
-                        sp:arg2 1 ;
-                        sp:arg3 1 ;
-                      ] ;
-                  ] ;
-                sp:arg2 [
-                    a sp:substr ;
-                    sp:arg1 spin:_arg1 ;
-                    sp:arg2 2 ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "capitalizedString" ;
-              ] ;
-          ]
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:if ;
-                sp:arg1 [
-                    a sp:lang ;
-                    sp:arg1 spin:_arg1 ;
-                  ] ;
-                sp:arg2 [
-                    a sp:strlang ;
-                    sp:arg1 [
-                        a sp:str ;
-                        sp:arg1 [
-                            sp:varName "capitalizedString" ;
-                          ] ;
-                      ] ;
-                    sp:arg2 [
-                        a sp:lang ;
-                        sp:arg1 spin:_arg1 ;
-                      ] ;
-                  ] ;
-                sp:arg3 [
-                    sp:varName "capitalizedString" ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "langCapitalizedString" ;
-              ] ;
-          ]
-        ) ;
     ] ;
   spin:constraint [
       a spl:Argument ;
@@ -106,37 +41,10 @@ fl:create-a
   a spin:Function ;
   spin:body [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "answer" ;
-          ]
-        ) ;
       sp:text """SELECT ?answer
 WHERE {
-     BIND (URI(CONCAT(str(?arg1),\"-\",\"a\")) AS ?answer) .
-}
-    
-""" ;
-      sp:where (
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:uri ;
-                sp:arg1 [
-                    a sp:concat ;
-                    sp:arg1 [
-                        a sp:str ;
-                        sp:arg1 spin:_arg1 ;
-                      ] ;
-                    sp:arg2 "-" ;
-                    sp:arg3 "a" ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "answer" ;
-              ] ;
-          ]
-        ) ;
+    BIND (URI(CONCAT(str(?arg1), \"-\", \"a\")) AS ?answer) .
+}""" ;
     ] ;
   spin:constraint [
       a spl:Argument ;
@@ -151,37 +59,10 @@ fl:create-q
   a spin:Function ;
   spin:body [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "question" ;
-          ]
-        ) ;
       sp:text """SELECT ?question
 WHERE {
-     BIND (URI(CONCAT(str(?arg1),\"-\",\"q\")) AS ?question) .
-}
-    
-""" ;
-      sp:where (
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:uri ;
-                sp:arg1 [
-                    a sp:concat ;
-                    sp:arg1 [
-                        a sp:str ;
-                        sp:arg1 spin:_arg1 ;
-                      ] ;
-                    sp:arg2 "-" ;
-                    sp:arg3 "q" ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "question" ;
-              ] ;
-          ]
-        ) ;
+    BIND (URI(CONCAT(str(?arg1), \"-\", \"q\")) AS ?question) .
+}""" ;
     ] ;
   spin:constraint [
       a spl:Argument ;
@@ -196,37 +77,10 @@ fl:create-qo
   a spin:Function ;
   spin:body [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "originEntity" ;
-          ]
-        ) ;
       sp:text """SELECT ?originEntity
 WHERE {
-     BIND (URI(CONCAT(str(?arg1),\"-\",\"qo\")) AS ?originEntity) .
-}
-    
-""" ;
-      sp:where (
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:uri ;
-                sp:arg1 [
-                    a sp:concat ;
-                    sp:arg1 [
-                        a sp:str ;
-                        sp:arg1 spin:_arg1 ;
-                      ] ;
-                    sp:arg2 "-" ;
-                    sp:arg3 "qo" ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "originEntity" ;
-              ] ;
-          ]
-        ) ;
+    BIND (URI(CONCAT(str(?arg1), \"-\", \"qo\")) AS ?originEntity) .
+}""" ;
     ] ;
   spin:constraint [
       a spl:Argument ;
@@ -241,37 +95,10 @@ fl:create-qt
   a spin:Function ;
   spin:body [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "questionTemplate" ;
-          ]
-        ) ;
       sp:text """SELECT ?questionTemplate
 WHERE {
-     BIND (URI(CONCAT(str(?arg1),\"-\",\"qt\")) AS ?questionTemplate) .
-}
-    
-""" ;
-      sp:where (
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:uri ;
-                sp:arg1 [
-                    a sp:concat ;
-                    sp:arg1 [
-                        a sp:str ;
-                        sp:arg1 spin:_arg1 ;
-                      ] ;
-                    sp:arg2 "-" ;
-                    sp:arg3 "qt" ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "questionTemplate" ;
-              ] ;
-          ]
-        ) ;
+    BIND (URI(CONCAT(str(?arg1), \"-\", \"qt\")) AS ?questionTemplate) .
+}""" ;
     ] ;
   spin:constraint [
       a spl:Argument ;
