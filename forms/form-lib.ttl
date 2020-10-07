@@ -61,7 +61,8 @@ fl:create-q
       a sp:Select ;
       sp:text """SELECT ?question
 WHERE {
-    BIND (URI(CONCAT(str(?arg1), \"-\", \"q\")) AS ?question) .
+    BIND(IF(?arg2, CONCAT(str(?arg2),\"-\"),\"\") as ?uniqueId)
+    BIND (URI(CONCAT(str(?arg1), \"-\", ?uniqueId, \"q\")) AS ?question) .
 }""" ;
     ] ;
   spin:constraint [
@@ -69,6 +70,11 @@ WHERE {
       spl:predicate sp:arg1 ;
       spl:valueType rdfs:Resource ;
       rdfs:comment "Object that this question describes." ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg2 ;
+      rdfs:comment "Additional identifier that makes this quesiton unique. This parameter is optional." ;
     ] ;
   rdfs:comment "Generate question based on object it originates from." ;
   rdfs:subClassOf spin:Functions ;
