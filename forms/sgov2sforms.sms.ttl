@@ -150,6 +150,16 @@ WHERE {
     ] ;
   sml:replace false ;
 .
+:bind-execution-id
+  a sml:BindWithConstant ;
+  sm:next :bind-form-metadata-service-url ;
+  sm:nodeX 784 ;
+  sm:nodeY 331 ;
+  sm:outputVariable "executionId" ;
+  sml:value [
+      sp:varName "recordKey" ;
+    ] ;
+.
 :bind-form-metadata-service-url
   a sml:BindWithConstant ;
   sm:next :retrieve-form-metadata ;
@@ -316,7 +326,7 @@ WHERE {
     } .
     BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
     ?parentQ form:has-question-origin ?parentEntity .
-    BIND (fl:create-q(str(?trope)) AS ?childQ) .
+    BIND (fl:create-q(str(?trope),?executionId) AS ?childQ) .
     FILTER NOT EXISTS {
         ?parentEntity fm:external true .
     }
@@ -345,7 +355,7 @@ WHERE {
     ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
     ?childRestriction owl:someValuesFrom ?childEntity .
     ?parentQ form:has-question-origin ?parentEntity .
-    BIND (fl:create-q(str(?relator)) AS ?childQ) .
+    BIND (fl:create-q(str(?relator),?executionId) AS ?childQ) .
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
         ?relator fm:ignore true .
@@ -371,7 +381,7 @@ CONSTRUCT {
 }
 WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
-    BIND (fl:create-q(CONCAT(str(?rootEntity))) AS ?rootQ) .
+    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -385,13 +395,28 @@ CONSTRUCT {
 }
 WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
-    BIND (fl:create-q(CONCAT(str(?rootEntity))) AS ?rootQ) .
-    BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\")) AS ?formQ) .
+    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
+    BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\"),?executionId) AS ?formQ) .
     BIND (CONCAT(str(?rootEntityLabel), \"-form\") AS ?formLabel) .
     BIND (CONCAT(str(?rootEntity), \"-form\") AS ?formEntity) .
 }""" ;
     ] ;
   sml:replace false ;
+.
+:extract-record-key
+  a sml:BindBySelect ;
+  sm:next :bind-execution-id ;
+  sm:nodeX 826 ;
+  sm:nodeY 193 ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:text """SELECT ?recordKey
+WHERE {
+     ?r  a    <http://vfn.cz/ontologies/study-manager/patient-record> .
+     ?r  <http://vfn.cz/ontologies/study-manager/key> ?recordKey
+}""" ;
+    ] ;
+  rdfs:label "bind-record-key" ;
 .
 :layout-form
   a sml:ApplyConstruct ;
@@ -585,6 +610,8 @@ WHERE {
 :retrieve-record-graph
   a sml:ApplyConstruct ;
   sm:next :bind-form-type ;
+  sm:next :extract-record-key ;
+  sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
