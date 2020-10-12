@@ -151,14 +151,284 @@ WHERE {
   sml:replace false ;
 .
 :bind-execution-id
-  a sml:BindWithConstant ;
-  sm:next :bind-form-metadata-service-url ;
-  sm:nodeX 784 ;
-  sm:nodeY 331 ;
-  sm:outputVariable "executionId" ;
-  sml:value [
-      sp:varName "recordKey" ;
+  a sml:BindBySelect ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# multiple root questions exists
+ASK
+WHERE {
+           ?qRoot1 a doc:question .
+           FILTER NOT EXISTS {
+                 ?qNE1 a doc:question .
+                 ?qNE1 doc:has_related_question ?qRoot1 .
+           }
+           ?qRoot2 a doc:question .
+           FILTER NOT EXISTS {
+                 ?qNE2 a doc:question .
+                 ?qNE2 doc:has_related_question ?qRoot2 .
+           }
+           FILTER(?qRoot1 != ?qRoot2)
+}""" ;
+      sp:where (
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "qRoot1" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object doc:question ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "qNE1" ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "qRoot1" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "qNE1" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            sp:object doc:question ;
+            sp:predicate rdf:type ;
+            sp:subject [
+                sp:varName "qRoot2" ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:notExists ;
+                sp:elements (
+                    [
+                      sp:object doc:question ;
+                      sp:predicate rdf:type ;
+                      sp:subject [
+                          sp:varName "qNE2" ;
+                        ] ;
+                    ]
+                    [
+                      sp:object [
+                          sp:varName "qRoot2" ;
+                        ] ;
+                      sp:predicate doc:has_related_question ;
+                      sp:subject [
+                          sp:varName "qNE2" ;
+                        ] ;
+                    ]
+                  ) ;
+              ] ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:ne ;
+                sp:arg1 [
+                    sp:varName "qRoot1" ;
+                  ] ;
+                sp:arg2 [
+                    sp:varName "qRoot2" ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "multiple root questions exists" ;
     ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# root quesiton is bound but does not have recognizable IRI
+ASK
+WHERE {
+    OPTIONAL {
+           ?qRoot a doc:question .
+           FILTER NOT EXISTS {
+                 ?qNE a doc:question .
+                 ?qNE doc:has_related_question ?qRoot
+           }
+   }
+   FILTER(
+         !  (bound(?qRoot) && regex(str(?qRoot), \"^.*-form-.*-q$\"))
+   )
+}""" ;
+      sp:where (
+          [
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object doc:question ;
+                  sp:predicate rdf:type ;
+                  sp:subject [
+                      sp:varName "qRoot" ;
+                    ] ;
+                ]
+                [
+                  a sp:Filter ;
+                  sp:expression [
+                      a sp:notExists ;
+                      sp:elements (
+                          [
+                            sp:object doc:question ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "qNE" ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "qRoot" ;
+                              ] ;
+                            sp:predicate doc:has_related_question ;
+                            sp:subject [
+                                sp:varName "qNE" ;
+                              ] ;
+                          ]
+                        ) ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Filter ;
+            sp:expression [
+                a sp:not ;
+                sp:arg1 [
+                    a sp:and ;
+                    sp:arg1 [
+                        a sp:bound ;
+                        sp:arg1 [
+                            sp:varName "qRoot" ;
+                          ] ;
+                      ] ;
+                    sp:arg2 [
+                        a sp:regex ;
+                        sp:arg1 [
+                            a sp:str ;
+                            sp:arg1 [
+                                sp:varName "qRoot" ;
+                              ] ;
+                          ] ;
+                        sp:arg2 "^.*-form-.*-q$" ;
+                      ] ;
+                  ] ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "root quesiton is bound but does not have recognizable IRI" ;
+    ] ;
+  sm:next :bind-form-metadata-service-url ;
+  sm:nodeX 766 ;
+  sm:nodeY 370 ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:resultVariables (
+          [
+            sp:varName "executionId" ;
+          ]
+        ) ;
+      sp:text """# bind executionId based on root question or generate new
+SELECT ?executionId
+WHERE {
+     OPTIONAL {
+           ?qRoot a doc:question .
+           FILTER NOT EXISTS {
+                 ?qNE a doc:question .
+                 ?qNE doc:has_related_question ?qRoot
+           }
+           BIND(replace(replace(str(?qRoot), \"^.*form-\", \"\"),\"-q$\",\"\") as ?inferredExecutionId) 
+     }
+     BIND(COALESCE(?inferredExecutionId, STRUUID()) as ?executionId)
+}""" ;
+      sp:where (
+          [
+            a sp:Optional ;
+            sp:elements (
+                [
+                  sp:object doc:question ;
+                  sp:predicate rdf:type ;
+                  sp:subject [
+                      sp:varName "qRoot" ;
+                    ] ;
+                ]
+                [
+                  a sp:Filter ;
+                  sp:expression [
+                      a sp:notExists ;
+                      sp:elements (
+                          [
+                            sp:object doc:question ;
+                            sp:predicate rdf:type ;
+                            sp:subject [
+                                sp:varName "qNE" ;
+                              ] ;
+                          ]
+                          [
+                            sp:object [
+                                sp:varName "qRoot" ;
+                              ] ;
+                            sp:predicate doc:has_related_question ;
+                            sp:subject [
+                                sp:varName "qNE" ;
+                              ] ;
+                          ]
+                        ) ;
+                    ] ;
+                ]
+                [
+                  a sp:Bind ;
+                  sp:expression [
+                      a sp:replace ;
+                      sp:arg1 [
+                          a sp:replace ;
+                          sp:arg1 [
+                              a sp:str ;
+                              sp:arg1 [
+                                  sp:varName "qRoot" ;
+                                ] ;
+                            ] ;
+                          sp:arg2 "^.*form-" ;
+                          sp:arg3 "" ;
+                        ] ;
+                      sp:arg2 "-q$" ;
+                      sp:arg3 "" ;
+                    ] ;
+                  sp:variable [
+                      sp:varName "inferredExecutionId" ;
+                    ] ;
+                ]
+              ) ;
+          ]
+          [
+            a sp:Bind ;
+            sp:expression [
+                a sp:coalesce ;
+                sp:arg1 [
+                    sp:varName "inferredExecutionId" ;
+                  ] ;
+                sp:arg2 [
+                    a sp:struuid ;
+                  ] ;
+              ] ;
+            sp:variable [
+                sp:varName "executionId" ;
+              ] ;
+          ]
+        ) ;
+      rdfs:comment "bind executionId based on root question or generate new" ;
+    ] ;
+  rdfs:label "bind-execution-id" ;
 .
 :bind-form-metadata-service-url
   a sml:BindWithConstant ;
@@ -403,21 +673,6 @@ WHERE {
     ] ;
   sml:replace false ;
 .
-:extract-record-key
-  a sml:BindBySelect ;
-  sm:next :bind-execution-id ;
-  sm:nodeX 826 ;
-  sm:nodeY 193 ;
-  sml:selectQuery [
-      a sp:Select ;
-      sp:text """SELECT ?recordKey
-WHERE {
-     ?r  a    <http://vfn.cz/ontologies/study-manager/patient-record> .
-     ?r  <http://vfn.cz/ontologies/study-manager/key> ?recordKey
-}""" ;
-    ] ;
-  rdfs:label "bind-record-key" ;
-.
 :layout-form
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -609,8 +864,8 @@ WHERE {
 .
 :retrieve-record-graph
   a sml:ApplyConstruct ;
+  sm:next :bind-execution-id ;
   sm:next :bind-form-type ;
-  sm:next :extract-record-key ;
   sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
