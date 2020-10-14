@@ -85,9 +85,9 @@ WHERE {
         ?entity fm:external true .
     } .
     ?question form:has-question-origin ?entity .
-    BIND (CONCAT(str(?sgovServiceUrl), \"&query=\") AS ?dowloadPrefix) .
+    BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
     BIND (REPLACE(?possibleValuesQueryTemplate, \"XXXXX\", str(?entity)) AS ?downloadSuffixRaw) .
-    BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix)
+    BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
     BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString)
 }""" ;
     ] ;
