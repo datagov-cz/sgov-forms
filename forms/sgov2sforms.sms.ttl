@@ -624,7 +624,8 @@ WHERE {
     ?parentRestriction owl:someValuesFrom ?parentEntity .
     ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
     ?childRestriction owl:someValuesFrom ?childEntity .
-    ?parentQ form:has-question-origin ?parentEntity .
+    ?parentQ form:has-question-origin ?directParentEntity .
+    ?directParentEntity rdfs:subClassOf* ?parentEntity .
     BIND (fl:create-q(str(?relator),?executionId) AS ?childQ) .
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
