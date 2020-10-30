@@ -605,6 +605,25 @@ WHERE {
     ] ;
   sml:replace false ;
 .
+:ignore-cycles
+  a sml:ApplyConstruct ;
+  sm:next :construct-subquestions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# Ignore entities that would cause cycles
+CONSTRUCT {
+     ?entity fm:ignore true .
+}
+WHERE {
+    
+} VALUES (?entity) {
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-konec>)
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-začátek>) 
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-lokalizaci>)
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-kontext>)
+}""" ;
+    ] ;
+.
 :layout-form
   a sml:ApplyConstruct ;
   sm:next :merge ;
