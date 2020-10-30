@@ -250,83 +250,14 @@ WHERE {
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
       sp:text """# root quesiton is bound but does not have recognizable IRI
-ASK
-WHERE {
-    OPTIONAL {
-           ?qRoot a doc:question .
-           FILTER NOT EXISTS {
-                 ?qNE a doc:question .
-                 ?qNE doc:has_related_question ?qRoot
-           }
-   }
-   FILTER(
-         !  (bound(?qRoot) && regex(str(?qRoot), \"^.*-form-.*-q$\"))
-   )
+ASK WHERE {
+      ?qRoot a doc:question .
+      FILTER NOT EXISTS {
+            ?qNE a doc:question .
+            ?qNE doc:has_related_question ?qRoot .
+       }
+      FILTER (!regex(str(?qRoot), \"^.*-form-.*-q$\")) .
 }""" ;
-      sp:where (
-          [
-            a sp:Optional ;
-            sp:elements (
-                [
-                  sp:object doc:question ;
-                  sp:predicate rdf:type ;
-                  sp:subject [
-                      sp:varName "qRoot" ;
-                    ] ;
-                ]
-                [
-                  a sp:Filter ;
-                  sp:expression [
-                      a sp:notExists ;
-                      sp:elements (
-                          [
-                            sp:object doc:question ;
-                            sp:predicate rdf:type ;
-                            sp:subject [
-                                sp:varName "qNE" ;
-                              ] ;
-                          ]
-                          [
-                            sp:object [
-                                sp:varName "qRoot" ;
-                              ] ;
-                            sp:predicate doc:has_related_question ;
-                            sp:subject [
-                                sp:varName "qNE" ;
-                              ] ;
-                          ]
-                        ) ;
-                    ] ;
-                ]
-              ) ;
-          ]
-          [
-            a sp:Filter ;
-            sp:expression [
-                a sp:not ;
-                sp:arg1 [
-                    a sp:and ;
-                    sp:arg1 [
-                        a sp:bound ;
-                        sp:arg1 [
-                            sp:varName "qRoot" ;
-                          ] ;
-                      ] ;
-                    sp:arg2 [
-                        a sp:regex ;
-                        sp:arg1 [
-                            a sp:str ;
-                            sp:arg1 [
-                                sp:varName "qRoot" ;
-                              ] ;
-                          ] ;
-                        sp:arg2 "^.*-form-.*-q$" ;
-                      ] ;
-                  ] ;
-              ] ;
-          ]
-        ) ;
-      rdfs:comment "root quesiton is bound but does not have recognizable IRI" ;
     ] ;
   sm:next :bind-form-metadata-service-url ;
   sm:nodeX 766 ;
@@ -731,7 +662,17 @@ ASK WHERE {
     ?q a doc:question .
     ?q doc:has_answer ?a1 .
     ?q doc:has_answer ?a2 .
-    FILTER (?a1 != ?a2) 
+    FILTER (?a1 != ?a2)
+}""" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question with two parent question
+ASK
+WHERE {
+    ?parentQ1 doc:has_related_question ?q .
+    ?parentQ2 doc:has_related_question ?q .
+    FILTER(?parentQ1 != ?parentQ2)
 }""" ;
     ] ;
   kbss-module:has-input-graph-constraint [
@@ -766,21 +707,30 @@ ASK WHERE {
     ] ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
+      sp:text """# there is asserted ordering between questions that does not have same parent
+ASK WHERE {
+    ?q2 form:has-preceding-question ?q1 .
+    FILTER NOT EXISTS {
+        ?qParent doc:has_related_question ?q1 .
+        ?qParent doc:has_related_question ?q2 .
+    } .
+}""" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is cycle in has-preceding-quesiton relation
+ASK WHERE {
+    ?q1 form:has-preceding-question ?q2 .
+    ?q2 (form:has-preceding-question)* ?q1 .
+}""" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
       sp:text """# there is no \"form\" element
 ASK WHERE {
     FILTER NOT EXISTS {
         ?s form-lt:has-layout-class \"form\" .
     }
-}""" ;
-    ] ;
-  kbss-module:has-output-graph-constraint [
-      a sp:Ask ;
-      sp:text """# there is a question with two answers
-ASK WHERE {
-    ?q a doc:question .
-    ?q doc:has_answer ?a1 .
-    ?q doc:has_answer ?a2 .
-    FILTER (?a1 != ?a2)
 }""" ;
     ] ;
   sm:next :transform_Return ;
