@@ -526,8 +526,13 @@ WHERE {
         ?trope skos:altLabel ?tropeAltLabel .
     } .
     BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
-    ?parentQ form:has-question-origin ?parentEntity .
-    BIND (fl:create-q(str(?trope),?executionId) AS ?childQ) .
+    ?parentQ form:has-question-origin ?directParentEntity .
+    ?directParentEntity rdfs:subClassOf* ?parentEntity .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?tropeExecutionId)
+    BIND (fl:create-q(str(?trope),?tropeExecutionId) AS ?childQ) .
+    FILTER NOT EXISTS {
+        ?parentEntity fm:ignore true .
+    } . 
     FILTER NOT EXISTS {
         ?parentEntity fm:external true .
     }
@@ -557,7 +562,8 @@ WHERE {
     ?childRestriction owl:someValuesFrom ?childEntity .
     ?parentQ form:has-question-origin ?directParentEntity .
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
-    BIND (fl:create-q(str(?relator),?executionId) AS ?childQ) .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?relatorExecutionId)
+    BIND (fl:create-q(str(?relator),?relatorExecutionId) AS ?childQ) .
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
         ?relator fm:ignore true .
