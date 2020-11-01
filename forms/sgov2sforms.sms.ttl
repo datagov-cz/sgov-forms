@@ -507,7 +507,7 @@ WHERE {
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "15" ;
+  kbss-module:has-max-iteration-count "8" ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
       a sp:Construct ;
@@ -528,8 +528,11 @@ WHERE {
     BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
     ?parentQ form:has-question-origin ?directParentEntity .
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
-    BIND(md5(concat(str(?parentQ),?executionId)) as ?tropeExecutionId)
-    BIND (fl:create-q(str(?trope),?tropeExecutionId) AS ?childQ) .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+    FILTER NOT EXISTS {
+        ?trope fm:ignore true .
+    } . 
     FILTER NOT EXISTS {
         ?parentEntity fm:ignore true .
     } . 
@@ -562,15 +565,47 @@ WHERE {
     ?childRestriction owl:someValuesFrom ?childEntity .
     ?parentQ form:has-question-origin ?directParentEntity .
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
-    BIND(md5(concat(str(?parentQ),?executionId)) as ?relatorExecutionId)
-    BIND (fl:create-q(str(?relator),?relatorExecutionId) AS ?childQ) .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
         ?relator fm:ignore true .
-    } .
+    } 
+    FILTER NOT EXISTS {
+        ?parentEntity fm:ignore true .
+    }
     FILTER NOT EXISTS {
         ?parentEntity fm:external true .
     }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 3 - add most specific subclasses
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?mostSpecificEntityLabel .
+    ?childQ form:has-question-origin ?mostSpecificEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+     ?parentQ form:has-question-origin ?parentEntity .
+     ?mostSpecificEntity rdfs:subClassOf+ ?parentEntity   .
+     ?mostSpecificEntity skos:prefLabel ?mostSpecificEntityLabel .
+     FILTER NOT EXISTS {
+          ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
+     }
+     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+     BIND (fl:create-q(str(?mostSpecificEntity),?childExecutionId) AS ?childQ) .
+     FILTER NOT EXISTS {
+          ?mostSpecificEntity fm:ignore true .
+      } 
+      FILTER NOT EXISTS {
+          ?parentEntity fm:ignore true .
+       }
+      FILTER NOT EXISTS {
+          ?parentEntity fm:external true .
+      }
 }""" ;
     ] ;
   sml:replace true ;
