@@ -662,6 +662,7 @@ WHERE {
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-začátek>) 
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-lokalizaci>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-kontext>)
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/opakovaná-časová-specifikace>)
 }""" ;
     ] ;
 .
