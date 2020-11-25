@@ -448,7 +448,7 @@ VALUES (?entityType) {
 .
 :bind-root-entity
   a sml:BindBySelect ;
-  sm:next :create-root-question ;
+  sm:next :construct-root-question ;
   sm:next :missing-related-dataset-iris-workaround ;
   sm:next :retrieve-related-dataset-iris ;
   sml:selectQuery [
@@ -506,113 +506,48 @@ WHERE {
         ] ;
     ] ;
 .
-:construct-subquestions
+:construct-question-origins
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "8" ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# question has multipe origins
+ASK
+WHERE {
+     ?q  form:has-question-origin ?qO1 .
+     ?q  form:has-question-origin ?qO2 .
+     FILTER(?qO1 != ?qO2)
+}""" ;
+    ] ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 1 - add intrinsic tropes
+      sp:text """# construct from processed entities
 CONSTRUCT {
-    ?childQ a doc:question .
-    ?childQ rdfs:label ?tropeLabel .
-    ?childQ form:has-question-origin ?trope .
-    ?parentQ doc:has_related_question ?childQ .
+   ?q form:has-question-origin ?qO .
 }
 WHERE {
-    ?trope a z-sgov-pojem:typ-vlastnosti .
-    ?trope rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
-    ?trope skos:prefLabel ?tropePrefLabel .
-    OPTIONAL {
-        ?trope skos:altLabel ?tropeAltLabel .
-    } .
-    BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
-    ?parentQ form:has-question-origin ?directParentEntity .
-    ?directParentEntity rdfs:subClassOf* ?parentEntity .
-    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
-    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
-    FILTER NOT EXISTS {
-        ?trope fm:ignore true .
-    } . 
-    FILTER NOT EXISTS {
-        ?parentEntity fm:ignore true .
-    } . 
-    FILTER NOT EXISTS {
-        ?parentEntity fm:external true .
-    }
+    ?q :has-processed-entity ?qO .
 }""" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 2 - add relators
+      sp:text """# construct from processing entities
 CONSTRUCT {
-    ?childQ a doc:question .
-    ?childQ rdfs:label ?relatorLabel .
-    ?childQ form:has-question-origin ?childEntity .
-    ?parentQ doc:has_related_question ?childQ .
+   ?q form:has-question-origin ?qO .
 }
 WHERE {
-    ?relator a z-sgov-pojem:typ-vztahu .
-    ?relator skos:prefLabel ?relatorPrefLabel .
-    ?relator rdfs:subClassOf ?parentRestriction .
-    ?relator rdfs:subClassOf ?childRestriction .
-    OPTIONAL {
-        ?relator skos:altLabel ?relatorAltLabel .
-    } .
-    BIND (fl:capitalize-first-letter(COALESCE(?relatorAltLabel, ?relatorPrefLabel)) AS ?relatorLabel) .
-    ?parentRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-1 .
-    ?parentRestriction owl:someValuesFrom ?parentEntity .
-    ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
-    ?childRestriction owl:someValuesFrom ?childEntity .
-    ?parentQ form:has-question-origin ?directParentEntity .
-    ?directParentEntity rdfs:subClassOf* ?parentEntity .
-    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
-    BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
-    FILTER (?parentEntity != ?childEntity) .
+    ?q :has-processing-entity ?qO .
     FILTER NOT EXISTS {
-        ?relator fm:ignore true .
-    } 
-    FILTER NOT EXISTS {
-        ?parentEntity fm:ignore true .
+              ?q :has-processing-entity ?qONotExists .
+              ?qO rdfs:subClassOf+ ?qONotExists .
     }
-    FILTER NOT EXISTS {
-        ?parentEntity fm:external true .
-    }
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 3 - add most specific subclasses
-CONSTRUCT {
-    ?childQ a doc:question .
-    ?childQ rdfs:label ?mostSpecificEntityLabel .
-    ?childQ form:has-question-origin ?mostSpecificEntity .
-    ?parentQ doc:has_related_question ?childQ .
-}
-WHERE {
-     ?parentQ form:has-question-origin ?parentEntity .
-     ?mostSpecificEntity rdfs:subClassOf+ ?parentEntity   .
-     ?mostSpecificEntity skos:prefLabel ?mostSpecificEntityLabel .
-     FILTER NOT EXISTS {
-          ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
-     }
-     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
-     BIND (fl:create-q(str(?mostSpecificEntity),?childExecutionId) AS ?childQ) .
-     FILTER NOT EXISTS {
-          ?mostSpecificEntity fm:ignore true .
-      } 
-      FILTER NOT EXISTS {
-          ?parentEntity fm:ignore true .
-       }
-      FILTER NOT EXISTS {
-          ?parentEntity fm:external true .
-      }
 }""" ;
     ] ;
   sml:replace true ;
 .
-:create-root-question
+:construct-root-question
   a sml:ApplyConstruct ;
+  sm:next :construct-question-origins ;
   sm:next :construct-subquestions ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
@@ -621,7 +556,7 @@ WHERE {
 CONSTRUCT {
     ?rootQ a doc:question .
     ?rootQ rdfs:label ?rootEntityLabel .
-    ?rootQ form:has-question-origin ?rootEntity .
+    ?rootQ :has-processing-entity ?rootEntity .
 }
 WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
@@ -642,10 +577,179 @@ WHERE {
     BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
     BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\"),?executionId) AS ?formQ) .
     BIND (CONCAT(str(?rootEntityLabel), \"-form\") AS ?formLabel) .
-    BIND (CONCAT(str(?rootEntity), \"-form\") AS ?formEntity) .
+    BIND (IRI(CONCAT(str(?rootEntity), \"-form\")) AS ?formEntity) .
 }""" ;
     ] ;
   sml:replace false ;
+.
+:construct-subquestions
+  a sml:ApplyConstruct ;
+  kbss-module:has-max-iteration-count "8" ;
+  sm:next :construct-question-origins ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add intrinsic tropes
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?tropeLabel .
+    ?childQ :has-processing-entity ?trope .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+    ?trope a z-sgov-pojem:typ-vlastnosti .
+    ?trope rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
+    ?trope skos:prefLabel ?tropePrefLabel .
+    OPTIONAL {
+        ?trope skos:altLabel ?tropeAltLabel .
+    } .
+    BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
+    ?parentQ :has-processing-entity ?directParentEntity .
+    ?directParentEntity rdfs:subClassOf* ?parentEntity .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+    FILTER NOT EXISTS {
+        ?trope fm:ignore true .
+    } . 
+    FILTER NOT EXISTS {
+        ?parentEntity fm:ignore true .
+    } . 
+    FILTER NOT EXISTS {
+        ?parentEntity fm:external true .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - add relators
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?relatorLabel .
+    ?childQ :has-processing-entity ?childEntity .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+    ?relator a z-sgov-pojem:typ-vztahu .
+    ?relator skos:prefLabel ?relatorPrefLabel .
+    ?relator rdfs:subClassOf ?parentRestriction .
+    ?relator rdfs:subClassOf ?childRestriction .
+    OPTIONAL {
+        ?relator skos:altLabel ?relatorAltLabel .
+    } .
+    BIND (fl:capitalize-first-letter(COALESCE(?relatorAltLabel, ?relatorPrefLabel)) AS ?relatorLabel) .
+    ?parentRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-1 .
+    ?parentRestriction owl:someValuesFrom ?parentEntity .
+    ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
+    ?childRestriction owl:someValuesFrom ?childEntity .
+    ?parentQ :has-processing-entity ?directParentEntity .
+    ?directParentEntity rdfs:subClassOf* ?parentEntity .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
+    FILTER (?parentEntity != ?childEntity) .
+    FILTER NOT EXISTS {
+        ?relator fm:ignore true .
+    } 
+    FILTER NOT EXISTS {
+        ?parentEntity fm:ignore true .
+    }
+    FILTER NOT EXISTS {
+        ?parentEntity fm:external true .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 3 - add questions for most specific subclasses
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?mostSpecificEntityLabel .
+    ?childQ :has-processed-entity ?mostSpecificEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+     ?parentQ :has-processing-entity ?parentEntity .
+     ?mostSpecificEntity rdfs:subClassOf+ ?parentEntity   .
+     ?mostSpecificEntity skos:prefLabel ?mostSpecificEntityLabel .
+     FILTER NOT EXISTS {
+          ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
+     }
+     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+     BIND (fl:create-q(str(?mostSpecificEntity),?childExecutionId) AS ?childQ) .
+     FILTER NOT EXISTS {
+          ?mostSpecificEntity fm:ignore true .
+      } 
+      FILTER NOT EXISTS {
+          ?parentEntity fm:ignore true .
+       }
+      FILTER NOT EXISTS {
+          ?parentEntity fm:external true .
+      }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 4 - propagate processed entities to parent question
+CONSTRUCT {
+     ?parentQ :has-processing-entity ?qO  .     
+}
+WHERE {
+    ?parentQ doc:has_related_question ?childQ .
+    ?childQ :has-processed-entity ?qO .
+}""" ;
+    ] ;
+  sml:replace true ;
+.
+:construct-type-filters
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 -  type filter questions are boolean
+CONSTRUCT {
+         ?q form-lt:has-layout-class \"checkbox\" .
+}
+WHERE {
+        ?q :has-processed-entity ?qO.
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2- filtering of tropes and relators based on type
+CONSTRUCT {
+     ?filteredQ form:is-relevant-if [
+           a form:condition ;
+           form:accepts-answer-value true ;
+           form:has-tested-question ?testedQ ;
+      ] .     
+}
+WHERE {
+    ?q doc:has_related_question ?testedQ  . 
+    ?testedQ :has-processed-entity ?testedEntity .
+
+    ?q doc:has_related_question ?filteredQ . 
+    ?filteredQ :has-processing-entity ?aspect .
+    ?filteredQ :has-related-entity ?filteredEntity .  
+    ?testedEntity rdfs:subClassOf*  ?filteredEntity
+}""" ;
+    ] ;
+  sml:replace false ;
+.
+:has-algorithm-related-property
+  a rdf:Property ;
+.
+:has-processed-entity
+  a rdf:Property ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
+:has-processing-entity
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
+:has-related-entity
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
 .
 :ignore-cycles
   a sml:ApplyConstruct ;
@@ -818,6 +922,7 @@ WHERE {
   sm:next :attach-descriptions ;
   sm:next :attach-possible-values-hook ;
   sm:next :bind-root-question ;
+  sm:next :construct-type-filters ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - make object identifier first
@@ -831,6 +936,9 @@ WHERE {
     ?qParent doc:has_related_question ?q .
     ?qParent doc:has_related_question ?qSibling .
     FILTER (?q != ?qSibling) 
+    FILTER NOT EXISTS {
+            ?qSibling  :has-processed-entity ?qo.
+    }
 }""" ;
     ] ;
   sml:constructQuery [
@@ -871,6 +979,19 @@ WHERE {
     ?qSiblingDescription form:has-question-origin ?description .
     ?description rdfs:subClassOf dc:description .
     FILTER (?q != ?qSiblingDescription)
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 5 - order section filtering question before others
+CONSTRUCT {
+      ?qNotFilteringQ form:has-preceding-question ?qFilteringQ .
+}
+WHERE {
+    ?q doc:has_related_question ?qFilteringQ  . 
+    ?q doc:has_related_question ?qNotFilteringQ . 
+    ?qFilteringQ :has-processed-entity ?qo1 .
+    ?qNotFilteringQ :has-processing-entity ?qo2 .
 }""" ;
     ] ;
   sml:replace false ;
@@ -933,7 +1054,7 @@ WHERE {
 .
 :retrieve-related-datasets
   a sml:ApplyConstruct ;
-  sm:next :create-root-question ;
+  sm:next :construct-root-question ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
