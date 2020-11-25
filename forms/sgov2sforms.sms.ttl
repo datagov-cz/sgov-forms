@@ -584,7 +584,7 @@ WHERE {
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "8" ;
+  kbss-module:has-max-iteration-count "7" ;
   sm:next :construct-question-origins ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
@@ -697,6 +697,32 @@ CONSTRUCT {
 WHERE {
     ?parentQ doc:has_related_question ?childQ .
     ?childQ :has-processed-entity ?qO .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 5 - add question for value of complex trope
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?tropeValueLabel .
+    ?childQ :has-processing-entity ?tropeValue .
+# TODO related-entity cannot be applied
+#  ?childQ :has-related-entity ?trope .
+     ?parentQ doc:has_related_question ?childQ .
+} WHERE {
+     ?trope a z-sgov-pojem:typ-vlastnosti .
+     ?parentQ :has-processing-entity ?trope .
+     ?parentQ doc:has_related_question ?filteringQ . 
+     ?filteringQ :has-processed-entity ?qO . 
+     FILTER NOT EXISTS {
+              ?parentQ :has-processing-entity ?tropeNotExists .
+              ?trope rdfs:subClassOf+ ?tropeNotExists .
+      }
+
+     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+     BIND(IRI(concat(str(?trope),\"-value\")) as ?tropeValue)
+     BIND (fl:create-q(str(?tropeValue),?childExecutionId) AS ?childQ) .
+     BIND(\"Hodnota\" as ?tropeValueLabel)
 }""" ;
     ] ;
   sml:replace true ;
