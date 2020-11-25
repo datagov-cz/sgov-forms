@@ -449,6 +449,7 @@ VALUES (?entityType) {
 :bind-root-entity
   a sml:BindBySelect ;
   sm:next :create-root-question ;
+  sm:next :missing-related-dataset-iris-workaround ;
   sm:next :retrieve-related-dataset-iris ;
   sml:selectQuery [
       a sp:Select ;
@@ -795,6 +796,22 @@ ASK WHERE {
 }""" ;
     ] ;
   sm:next :transform_Return ;
+.
+:missing-related-dataset-iris-workaround
+  a sml:ApplyConstruct ;
+  sm:next :retrieve-related-datasets ;
+  sm:nodeX 1208 ;
+  sm:nodeY 775 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?rootEntity :related-dataset <https://slovník.gov.cz/legislativní/sbírka/111/2009/glosář> .
+    ?rootEntity :related-dataset<https://slovník.gov.cz/legislativní/sbírka/111/2009/model>  .
+}
+WHERE {
+
+}""" ;
+    ] ;
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
