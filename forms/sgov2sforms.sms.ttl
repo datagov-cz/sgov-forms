@@ -937,6 +937,8 @@ ASK WHERE {
       sp:text """CONSTRUCT {
     ?rootEntity :related-dataset <https://slovník.gov.cz/legislativní/sbírka/111/2009/glosář> .
     ?rootEntity :related-dataset<https://slovník.gov.cz/legislativní/sbírka/111/2009/model>  .
+        ?rootEntity :related-dataset<https://slovník.gov.cz/generický/vstupné/glosář>  .
+        ?rootEntity :related-dataset<https://slovník.gov.cz/generický/vstupné/model>  .
 }
 WHERE {
 
