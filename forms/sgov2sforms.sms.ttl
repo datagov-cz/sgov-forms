@@ -22,6 +22,7 @@
 @prefix kbss-spif: <http://onto.fel.cvut.cz/ontologies/lib/spin-function/> .
 @prefix km-rdf4j: <http://onto.fel.cvut.cz/ontologies/lib/module/rdf4j/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix popis-dat-pojem: <http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
@@ -92,6 +93,19 @@ WHERE {
 }""" ;
     ] ;
   sml:replace true ;
+.
+:attach-transitive-vocabulary-dependencies
+  a sml:ApplyConstruct ;
+  sm:next :construct-related-dataset-iris ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+   ?dependantVocab popis-dat-pojem:používá-pojmy-ze-slovníku ?usedVocab .
+}
+WHERE {
+   ?dependantVocab popis-dat-pojem:používá-přímo-pojmy-ze-slovníku+ ?usedVocab .
+}""" ;
+    ] ;
 .
 :attach-value-types
   a sml:ApplyConstruct ;
@@ -448,9 +462,8 @@ VALUES (?entityType) {
 .
 :bind-root-entity
   a sml:BindBySelect ;
+  sm:next :construct-related-dataset-iris ;
   sm:next :construct-root-question ;
-  sm:next :missing-related-dataset-iris-workaround ;
-  sm:next :retrieve-related-dataset-iris ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """SELECT ?rootEntity
@@ -476,7 +489,7 @@ WHERE {
 .
 :bind-sgov-service-url
   a sml:BindWithConstant ;
-  sm:next :retrieve-related-dataset-iris ;
+  sm:next :construct-direct-vocabulary-dependencies ;
   sm:next :retrieve-sgov ;
   sm:outputVariable "sgovServiceUrl" ;
   sml:value [
@@ -504,6 +517,28 @@ WHERE {
                 ] ;
             ] ;
         ] ;
+    ] ;
+.
+:construct-direct-vocabulary-dependencies
+  a sml:ApplyConstruct ;
+  sm:next :attach-transitive-vocabulary-dependencies ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+     ?dependantVocab popis-dat-pojem:používá-přímo-pojmy-ze-slovníku ?usedVocab .
+} WHERE {
+   SERVICE ?sgovServiceUrl {
+      GRAPH ?dependantVocab {
+           ?dependantVocab	a popis-dat-pojem:slovník	.
+           ?s ?p ?usedConcept .
+       }    
+       GRAPH ?usedVocab {    	
+          ?usedVocab a popis-dat-pojem:slovník	.
+          ?usedConcept skos:inScheme ?importedGlosary .
+        }
+        FILTER(?dependantVocab != ?usedVocab)
+   }
+}""" ;
     ] ;
 .
 :construct-question-origins
@@ -545,6 +580,28 @@ WHERE {
     ] ;
   sml:replace true ;
 .
+:construct-related-dataset-iris
+  a sml:ApplyConstruct ;
+  sm:next :retrieve-related-datasets ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?rootEntity :related-dataset ?usedVocab .
+    ?rootEntity :related-dataset ?vocabulary .
+}
+WHERE {
+     SERVICE ?sgovServiceUrl {
+        ?rootEntity skos:inScheme ?glosary .
+        ?vocabulary a-popis-dat-pojem:má-glosář ?glosary .
+        ?vocabulary a-popis-dat-pojem:má-model ?model .
+     }  
+     
+     ?vocabulary popis-dat-pojem:používá-pojmy-ze-slovníku ?usedVocab .      
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "construct-related-dataset-iris" ;
+.
 :construct-root-question
   a sml:ApplyConstruct ;
   sm:next :construct-question-origins ;
@@ -584,7 +641,7 @@ WHERE {
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "7" ;
+  kbss-module:has-max-iteration-count "5" ;
   sm:next :construct-question-origins ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
@@ -927,24 +984,6 @@ ASK WHERE {
     ] ;
   sm:next :transform_Return ;
 .
-:missing-related-dataset-iris-workaround
-  a sml:ApplyConstruct ;
-  sm:next :retrieve-related-datasets ;
-  sm:nodeX 1208 ;
-  sm:nodeY 775 ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """CONSTRUCT {
-    ?rootEntity :related-dataset <https://slovník.gov.cz/legislativní/sbírka/111/2009/glosář> .
-    ?rootEntity :related-dataset<https://slovník.gov.cz/legislativní/sbírka/111/2009/model>  .
-        ?rootEntity :related-dataset<https://slovník.gov.cz/generický/vstupné/glosář>  .
-        ?rootEntity :related-dataset<https://slovník.gov.cz/generický/vstupné/model>  .
-}
-WHERE {
-
-}""" ;
-    ] ;
-.
 :question-siblings-ordering
   a sml:ApplyConstruct ;
   sm:next :attach-descriptions ;
@@ -1056,29 +1095,6 @@ WHERE {
     } .
 }""" ;
     ] ;
-.
-:retrieve-related-dataset-iris
-  a sml:ApplyConstruct ;
-  sm:next :retrieve-related-datasets ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """CONSTRUCT {
-    ?rootEntity :related-dataset ?importedGlosar .
-    ?rootEntity :related-dataset ?importedModel .
-}
-WHERE {
-    SERVICE ?sgovServiceUrl {
-        GRAPH ?glosar {
-            ?rootEntity skos:inScheme ?glosar .
-        } .
-        ?slovnik a-popis-dat-pojem:má-glosář ?glosar .
-        ?slovnik a-popis-dat-pojem:má-model ?model .
-        ?glosar (owl:imports)* ?importedGlosar .
-        ?model (owl:imports)* ?importedModel .
-    } 
-}""" ;
-    ] ;
-  sml:replace true ;
 .
 :retrieve-related-datasets
   a sml:ApplyConstruct ;
