@@ -20,3 +20,19 @@ fm:external a owl:DatatypeProperty .
 
 
 fm:precedes-relatively-in-time a owl:ObjectProperty .
+
+
+# code list mapping
+fm:codelist-mapping a owl:Class .
+fm:has-codelist-service-url 
+	a owl:ObjectProperty ;
+	rdfs:domain fm:mapping ;
+.
+fm:has-codelist-entity 
+	a owl:ObjectProperty ;
+	rdfs:domain fm:mapping ;
+.
+fm:has-internal-entity 
+	a owl:ObjectProperty ;
+	rdfs:domain fm:mapping ;
+.

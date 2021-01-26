@@ -384,13 +384,6 @@ WHERE {
     ] ;
   rdfs:label "bind-execution-id" ;
 .
-:bind-external-codelist-service-url
-  a sml:BindWithConstant ;
-  sm:next :construct-dny-v-tydnu-questions ;
-  sm:outputVariable "externalCodeListServiceUrl" ;
-  sml:value <https://data.gov.cz/sparql> ;
-  rdfs:label "bind-external-code-list-service-url" ;
-.
 :bind-form-metadata-service-url
   a sml:BindWithConstant ;
   sm:next :retrieve-form-metadata ;
@@ -429,13 +422,6 @@ WHERE {
     BIND (str(?formTypeStr) AS ?formType) .
 }""" ;
     ] ;
-.
-:bind-internal-codelist-service-url
-  a sml:BindWithConstant ;
-  sm:next :construct-dny-v-tydnu-questions ;
-  sm:outputVariable "internalCodeListServiceUrl" ;
-  sml:value <https://data.mvcr.gov.cz/sparql> ;
-  rdfs:label "bind-internal-code-list-service-url" ;
 .
 :bind-possible-values-query-template
   a sml:BindWithConstant ;
@@ -579,9 +565,18 @@ CONSTRUCT {
 }
 WHERE {
    #TODO remove constants
-    ?parentQ form:has-question-origin <https://slovník.gov.cz/generický/číselníky/pojem/den-v-týdnu> .
-    SERVICE ?internalCodeListServiceUrl {
-            ?value skos:inScheme <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu> .
+   BIND(<https://slovník.gov.cz/generický/číselníky/pojem/den-v-týdnu> as ?parentEntity)
+
+    ?parentQ form:has-question-origin ?parentEntity .
+
+    ?codelistMapping a fm:codelist-mapping ;
+        fm:has-codelist-service-url ?codeListServiceUrl  ;
+        fm:has-codelist-entity ?codeListEntity ; 
+        fm:has-internal-entity ?parentEntity  ;
+     .
+
+    SERVICE ?codeListServiceUrl {
+            ?value skos:inScheme ?codeListEntity .
             ?value skos:prefLabel ?valueLabel .
     }
    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
