@@ -164,6 +164,15 @@ WHERE {
     ] ;
   sml:replace false ;
 .
+:bind-default-language
+  a sml:BindWithConstant ;
+  sm:next :construct-dny-v-tydnu-questions ;
+  sm:nodeX 164 ;
+  sm:nodeY 1112 ;
+  sm:outputVariable "defaultLanguage" ;
+  sml:value "cs" ;
+  rdfs:label "bind-default-language" ;
+.
 :bind-execution-id
   a sml:BindBySelect ;
   kbss-module:has-input-graph-constraint [
@@ -375,6 +384,13 @@ WHERE {
     ] ;
   rdfs:label "bind-execution-id" ;
 .
+:bind-external-codelist-service-url
+  a sml:BindWithConstant ;
+  sm:next :construct-dny-v-tydnu-questions ;
+  sm:outputVariable "externalCodeListServiceUrl" ;
+  sml:value <https://data.gov.cz/sparql> ;
+  rdfs:label "bind-external-code-list-service-url" ;
+.
 :bind-form-metadata-service-url
   a sml:BindWithConstant ;
   sm:next :retrieve-form-metadata ;
@@ -413,6 +429,13 @@ WHERE {
     BIND (str(?formTypeStr) AS ?formType) .
 }""" ;
     ] ;
+.
+:bind-internal-codelist-service-url
+  a sml:BindWithConstant ;
+  sm:next :construct-dny-v-tydnu-questions ;
+  sm:outputVariable "internalCodeListServiceUrl" ;
+  sml:value <https://data.mvcr.gov.cz/sparql> ;
+  rdfs:label "bind-internal-code-list-service-url" ;
 .
 :bind-possible-values-query-template
   a sml:BindWithConstant ;
@@ -540,6 +563,46 @@ WHERE {
    }
 }""" ;
     ] ;
+.
+:construct-dny-v-tydnu-questions
+  a sml:ApplyConstruct ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# TODO remove layout class 
+CONSTRUCT {  
+      ?childQ a doc:question .
+      ?childQ rdfs:label ?valueLabel .
+      ?childQ form:has-question-origin ?value .
+      ?childQ form-lt:has-layout-class \"checkbox\" .
+      ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+   #TODO remove constants
+    ?parentQ form:has-question-origin <https://slovník.gov.cz/generický/číselníky/pojem/den-v-týdnu> .
+    SERVICE ?internalCodeListServiceUrl {
+            ?value skos:inScheme <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu> .
+            ?value skos:prefLabel ?valueLabel .
+    }
+   BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+   BIND (fl:create-q(str(?value),?childExecutionId) AS ?childQ) .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pondělí> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý>     .
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa>     .
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek>     .
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek>     .
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota>     .
+       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/neděle>     .
+}
+WHERE {
+  
+}""" ;
+    ] ;
+  rdfs:label "construct-dny-v-tydnu-questions" ;
 .
 :construct-question-origins
   a sml:ApplyConstruct ;
@@ -999,6 +1062,7 @@ ASK WHERE {
 .
 :merge-with-origins
   a sml:Merge ;
+  sm:next :construct-dny-v-tydnu-questions ;
   sm:next :question-siblings-ordering ;
   rdfs:label "merge-with-origins" ;
 .
@@ -1077,6 +1141,21 @@ WHERE {
     ?q doc:has_related_question ?qNotFilteringQ . 
     ?qFilteringQ :has-processed-entity ?qo1 .
     ?qNotFilteringQ :has-processing-entity ?qo2 .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 6 - order if entities by time
+# TODO need to model it
+CONSTRUCT {
+     ?laterQ form:has-preceding-question ?earlierQ     .
+}
+WHERE {
+       ?q doc:has_related_question ?earlierQ  . 
+       ?earlierQ form:has-question-origin ?earlierQO . 
+       ?q doc:has_related_question ?laterQ . 
+       ?laterQ form:has-question-origin ?laterQO . 
+       ?earlierQO :precedes-relatively-in-time ?laterQO     .
 }""" ;
     ] ;
   sml:replace false ;
