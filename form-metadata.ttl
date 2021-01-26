@@ -17,3 +17,6 @@ fm:object-identifier-quality a owl:Class .
 fm:root-entity a owl:Class .
 fm:ignore a owl:DatatypeProperty .
 fm:external a owl:DatatypeProperty .
+
+
+fm:precedes-relatively-in-time a owl:ObjectProperty .

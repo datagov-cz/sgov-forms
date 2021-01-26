@@ -588,20 +588,6 @@ WHERE {
    BIND (fl:create-q(str(?value),?childExecutionId) AS ?childQ) .
 }""" ;
     ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """CONSTRUCT {
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pondělí> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý>     .
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa>     .
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek>     .
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek>     .
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota>     .
-       <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota> :precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/neděle>     .
-}
-WHERE {
-  
-}""" ;
-    ] ;
   rdfs:label "construct-dny-v-tydnu-questions" ;
 .
 :construct-question-origins
@@ -1155,7 +1141,7 @@ WHERE {
        ?earlierQ form:has-question-origin ?earlierQO . 
        ?q doc:has_related_question ?laterQ . 
        ?laterQ form:has-question-origin ?laterQO . 
-       ?earlierQO :precedes-relatively-in-time ?laterQO     .
+       ?earlierQO fm:precedes-relatively-in-time ?laterQO     .
 }""" ;
     ] ;
   sml:replace false ;
