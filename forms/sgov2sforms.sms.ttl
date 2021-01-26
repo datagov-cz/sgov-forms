@@ -851,6 +851,19 @@ WHERE {
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-lokalizaci>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-kontext>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/opakovaná-časová-specifikace>)
+    (<https://slovník.gov.cz/generický/částky/pojem/jednotková-částka>)
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# v modelu Částky dvě entity ukazují na stejnou vlastnost se stejnou kardinalitou
+CONSTRUCT {
+     ?entity fm:ignore true .
+}
+WHERE {
+    
+} VALUES (?entity) {
+    (<https://slovník.gov.cz/generický/částky/pojem/jednotková-částka>)
 }""" ;
     ] ;
 .
