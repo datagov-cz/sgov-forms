@@ -553,7 +553,7 @@ WHERE {
      FILTER(?qO1 != ?qO2)
 }""" ;
     ] ;
-  sm:next :question-siblings-ordering ;
+  sm:next :merge-with-origins ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# construct from processed entities
@@ -606,7 +606,7 @@ WHERE {
   a sml:ApplyConstruct ;
   sm:next :construct-question-origins ;
   sm:next :construct-subquestions ;
-  sm:next :question-siblings-ordering ;
+  sm:next :merge-with-origins ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 0 - create root-subquestion question
@@ -643,7 +643,7 @@ WHERE {
   a sml:ApplyConstruct ;
   kbss-module:has-max-iteration-count "5" ;
   sm:next :construct-question-origins ;
-  sm:next :question-siblings-ordering ;
+  sm:next :merge-with-origins ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - add intrinsic tropes
@@ -983,6 +983,11 @@ ASK WHERE {
 }""" ;
     ] ;
   sm:next :transform_Return ;
+.
+:merge-with-origins
+  a sml:Merge ;
+  sm:next :question-siblings-ordering ;
+  rdfs:label "merge-with-origins" ;
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
