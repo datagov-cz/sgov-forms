@@ -77,7 +77,8 @@ WHERE {
   sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """CONSTRUCT {
+      sp:text """# 1 - possible values for internal queries
+CONSTRUCT {
     ?question form:has-possible-values-query ?downloadString .
     ?question form-lt:has-layout-class \"type-ahead\" .
 }
@@ -88,6 +89,30 @@ WHERE {
     ?question form:has-question-origin ?entity .
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
     BIND (REPLACE(?possibleValuesQueryTemplate, \"XXXXX\", str(?entity)) AS ?downloadSuffixRaw) .
+    BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
+    BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString)
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - possible values for external queries
+CONSTRUCT {
+    ?question form:has-possible-values-query ?downloadString .
+    ?question form-lt:has-layout-class \"type-ahead\" .
+}
+WHERE {
+    SERVICE ?formMetadataServiceUrl {
+		 ?codelistMapping a fm:codelist-mapping ;
+              fm:has-codelist-service-url ?codeListServiceUrl  ;
+              fm:has-codelist-entity ?codeListEntity ; 
+              fm:has-internal-entity ?entity  ;
+          .
+    } .
+
+    ?question form:has-question-origin ?entity .
+    BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
+    BIND (REPLACE(?externalPossibleValuesQueryTemplate, \"XXX_SERVICE_XXX\", str(?codeListServiceUrl)) AS ?preparedPossibleValuesQueryTemplate) .
+    BIND (REPLACE(?preparedPossibleValuesQueryTemplate, \"XXXXX\", str(?codeListEntity)) AS ?downloadSuffixRaw) .
     BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
     BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString)
 }""" ;
@@ -383,6 +408,41 @@ WHERE {
       rdfs:comment "bind executionId based on root question or generate new" ;
     ] ;
   rdfs:label "bind-execution-id" ;
+.
+:bind-external-possible-values-query-template
+  a sml:BindWithConstant ;
+  sm:next :attach-possible-values-hook ;
+  sm:nodeX 1750 ;
+  sm:nodeY 1575 ;
+  sm:outputVariable "externalPossibleValuesQueryTemplate" ;
+  sml:value """prefix skos: <http://www.w3.org/2004/02/skos/core#>
+prefix dc: <http://purl.org/dc/terms/>
+
+CONSTRUCT {
+      ?value rdfs:label ?labelStr .
+      ?value rdfs:comment ?explanationStr .
+}
+WHERE {
+  SERVICE   <XXX_SERVICE_XXX>  {
+     SELECT ?value ?labelStr ?explanationStr ?entityType { 
+          ?value skos:inScheme ?entityType .
+
+          ?value skos:prefLabel ?label .
+          FILTER ( lang(?label) = \"cs\" ) 
+          BIND(str(?label) as ?labelStr)
+
+          OPTIONAL {
+              ?value dc:description ?explanation .
+              FILTER ( lang(?explanation) = \"cs\" ) 
+              BIND(str(?explanation) as ?explanationStr)
+          }
+
+      } VALUES (?entityType) {
+        (<XXXXX>)
+      }
+  }
+}""" ;
+  rdfs:label "bind-external-possible-values-query-template" ;
 .
 :bind-form-metadata-service-url
   a sml:BindWithConstant ;
