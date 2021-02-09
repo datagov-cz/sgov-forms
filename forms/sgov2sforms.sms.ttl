@@ -910,6 +910,29 @@ CONSTRUCT {
      BIND(\"Hodnota\" as ?tropeValueLabel)
 }""" ;
     ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 6 - add IRI question of root entity
+# TODO refactor
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?tropeLabel .
+    ?childQ :has-processing-entity ?trope .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+	?parentQ  :has-processing-entity ?parentEntity  .
+    ?parentEntity a fm:root-entity .
+    BIND(fm:iri as ?trope)
+    BIND(\"Iri\" as ?tropeLabel)
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+    FILTER NOT EXISTS {
+        ?trope fm:ignore true .
+    } .
+}""" ;
+    ] ;
   sml:replace true ;
 .
 :construct-type-filters
