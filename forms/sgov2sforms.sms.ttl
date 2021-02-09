@@ -1149,7 +1149,11 @@ WHERE {
     ?entity a fm:object-identifier-quality .
     ?qParent doc:has_related_question ?q .
     ?qParent doc:has_related_question ?qSibling .
+    ?qSibling form:has-question-origin ?siblingEntity .
     FILTER (?q != ?qSibling) 
+    FILTER NOT EXISTS {
+        ?siblingEntity a fm:object-identifier-quality .
+    }
     FILTER NOT EXISTS {
             ?qSibling  :has-processed-entity ?qo.
     }
