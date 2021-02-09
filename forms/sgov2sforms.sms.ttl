@@ -791,6 +791,12 @@ WHERE {
     FILTER NOT EXISTS {
         ?parentEntity fm:external true .
     }
+    FILTER NOT EXISTS {
+        ?ic a fm:ignore-condition ;
+              fm:has-parent-entity ?directParentEntity  ;
+              fm:has-ignored-entity ?trope  ;
+        .
+    }
 }""" ;
     ] ;
   sml:constructQuery [
@@ -829,6 +835,12 @@ WHERE {
     }
     FILTER NOT EXISTS {
         ?parentEntity fm:external true .
+    }
+    FILTER NOT EXISTS {
+        ?ic a fm:ignore-condition ;
+              fm:has-parent-entity ?directParentEntity  ;
+              fm:has-ignored-entity ?childEntity  ;
+        .
     }
 }""" ;
     ] ;
