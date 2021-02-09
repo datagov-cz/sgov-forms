@@ -933,6 +933,29 @@ WHERE {
     } .
 }""" ;
     ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 7 - add multilingual labels
+# TODO refactor
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ rdfs:label ?tropeLabel .
+    ?childQ :has-processing-entity ?trope .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+	?parentQ  :has-processing-entity ?parentEntity  .
+    ?parentEntity a fm:multilingual-quality .
+    ?trope a fm:language .
+    ?trope  skos:prefLabel ?tropeLabel .
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+    FILTER NOT EXISTS {
+        ?trope fm:ignore true .
+    } .
+}""" ;
+    ] ;
   sml:replace true ;
 .
 :construct-type-filters
