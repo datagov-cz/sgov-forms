@@ -119,6 +119,43 @@ WHERE {
     ] ;
   sml:replace true ;
 .
+:attach-root-question
+  a sml:ApplyConstruct ;
+  sm:next :construct-question-origins ;
+  sm:next :construct-subquestions ;
+  sm:next :merge-with-origins ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 0 - create root-subquestion question
+CONSTRUCT {
+    ?rootQ a doc:question .
+    ?rootQ rdfs:label ?rootEntityLabel .
+    ?rootQ :has-processing-entity ?rootEntity .
+}
+WHERE {
+    ?rootEntity skos:prefLabel ?rootEntityLabel .
+    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - create root question
+CONSTRUCT {
+    ?formQ a doc:question .
+    ?formQ rdfs:label ?formLabel .
+    ?formQ form:has-question-origin ?formEntity .
+    ?formQ doc:has_related_question ?rootQ .
+}
+WHERE {
+    ?rootEntity skos:prefLabel ?rootEntityLabel .
+    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
+    BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\"),?executionId) AS ?formQ) .
+    BIND (CONCAT(str(?rootEntityLabel), \"-form\") AS ?formLabel) .
+    BIND (IRI(CONCAT(str(?rootEntity), \"-form\")) AS ?formEntity) .
+}""" ;
+    ] ;
+  sml:replace false ;
+.
 :attach-transitive-vocabulary-dependencies
   a sml:ApplyConstruct ;
   sm:next :construct-related-dataset-iris ;
@@ -543,8 +580,8 @@ VALUES (?entityType) {
 .
 :bind-root-entity
   a sml:BindBySelect ;
+  sm:next :attach-root-question ;
   sm:next :construct-related-dataset-iris ;
-  sm:next :construct-root-question ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """SELECT ?rootEntity
@@ -717,43 +754,6 @@ WHERE {
     ] ;
   sml:replace true ;
   rdfs:label "construct-related-dataset-iris" ;
-.
-:construct-root-question
-  a sml:ApplyConstruct ;
-  sm:next :construct-question-origins ;
-  sm:next :construct-subquestions ;
-  sm:next :merge-with-origins ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 0 - create root-subquestion question
-CONSTRUCT {
-    ?rootQ a doc:question .
-    ?rootQ rdfs:label ?rootEntityLabel .
-    ?rootQ :has-processing-entity ?rootEntity .
-}
-WHERE {
-    ?rootEntity skos:prefLabel ?rootEntityLabel .
-    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 1 - create root question
-CONSTRUCT {
-    ?formQ a doc:question .
-    ?formQ rdfs:label ?formLabel .
-    ?formQ form:has-question-origin ?formEntity .
-    ?formQ doc:has_related_question ?rootQ .
-}
-WHERE {
-    ?rootEntity skos:prefLabel ?rootEntityLabel .
-    BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
-    BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\"),?executionId) AS ?formQ) .
-    BIND (CONCAT(str(?rootEntityLabel), \"-form\") AS ?formLabel) .
-    BIND (IRI(CONCAT(str(?rootEntity), \"-form\")) AS ?formEntity) .
-}""" ;
-    ] ;
-  sml:replace false ;
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
@@ -1310,7 +1310,7 @@ WHERE {
 .
 :retrieve-related-datasets
   a sml:ApplyConstruct ;
-  sm:next :construct-root-question ;
+  sm:next :attach-root-question ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
