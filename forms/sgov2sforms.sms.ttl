@@ -187,6 +187,18 @@ WHERE {
     ?entity a fm:number .
 }""" ;
     ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# time
+CONSTRUCT {
+    ?q form-lt:has-layout-class \"time\" .
+}
+WHERE {
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?entity a fm:time .
+}""" ;
+    ] ;
   sml:replace false ;
 .
 :bind-default-language
