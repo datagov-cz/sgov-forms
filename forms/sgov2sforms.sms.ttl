@@ -258,8 +258,6 @@ WHERE {
 :bind-default-language
   a sml:BindWithConstant ;
   sm:next :construct-dny-v-tydnu-questions ;
-  sm:nodeX 164 ;
-  sm:nodeY 1112 ;
   sm:outputVariable "defaultLanguage" ;
   sml:value "cs" ;
   rdfs:label "bind-default-language" ;
@@ -374,8 +372,6 @@ ASK WHERE {
 }""" ;
     ] ;
   sm:next :bind-form-metadata-service-url ;
-  sm:nodeX 766 ;
-  sm:nodeY 370 ;
   sml:selectQuery [
       a sp:Select ;
       sp:resultVariables (
