@@ -72,6 +72,23 @@ WHERE {
     ] ;
   sml:replace false ;
 .
+:attach-duplicable-questions
+  a sml:ApplyConstruct ;
+  sm:next :construct-duplicate-questions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?q :is-duplicable true .
+}
+WHERE {
+	?q a doc:question .
+    ?q :has-processing-entity ?entity .
+   ?entity   fm:max-cardinality ?cardinality .
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-duplicable-questions" ;
+.
 :attach-possible-values-hook
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -661,6 +678,7 @@ WHERE {
 .
 :construct-dny-v-tydnu-questions
   a sml:ApplyConstruct ;
+  sm:next :attach-duplicable-questions ;
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
       a sp:Construct ;
@@ -692,7 +710,95 @@ WHERE {
    BIND (fl:create-q(str(?value),?childExecutionId) AS ?childQ) .
 }""" ;
     ] ;
+  sml:replace true ;
   rdfs:label "construct-dny-v-tydnu-questions" ;
+.
+:construct-duplicate-questions
+  a sml:ApplyConstruct ;
+  kbss-module:has-max-iteration-count "1" ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - construct deep copy of questions
+# TODO - not systematic
+CONSTRUCT {
+     ?qRootParent doc:has_related_question ?qRootX .
+     ?qDescendantX doc:has_related_question ?qDescendantChildX .
+     ?qDescendantX ?p ?o .
+}
+WHERE {
+
+     VALUES ?card { 1 2 3 4 }
+
+     ?qRoot :is-duplicable true .
+     ?qRoot doc:has_related_question* ?qDescendant .
+
+# attach to root
+     ?qRootParent doc:has_related_question ?qRoot .
+
+# construct doc:has_related_question taxonomy
+     OPTIONAL {
+         ?qDescendant doc:has_related_question ?qDescendantChild .
+     }
+
+# attach specific properties
+     OPTIONAL {
+          ?qDescendant ?p ?o .
+          FILTER(?p != doc:has_related_question )
+     }
+
+     BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
+     BIND(fl:create-q(?qDescendant, ?card) as ?qDescendantX)
+     BIND(fl:create-q(?qDescendantChild, ?card) as ?qDescendantChildX)
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 -  construct hiding logic and ordering
+# todo make is-relevant-if automatic from an attribute
+CONSTRUCT {
+      ?qRoot form-lt:has-layout-class \"answerable\" .
+      ?qRoot form-lt:has-layout-class \"checkbox\" .
+
+      ?qRootX form-lt:has-layout-class \"answerable\" .
+      ?qRootX form-lt:has-layout-class \"checkbox\" .
+
+      ?qDirectDescendant form:is-relevant-if ?cond .
+      ?cond   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qRoot ;
+     .
+
+      ?qDirectDescendantX form:is-relevant-if  ?condX .
+      ?condX   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qRootX ;
+      .
+
+    ?qRootX form:has-preceding-question  ?qRootP .
+
+     ?qRootX form:is-relevant-if  ?condP .
+     ?condP   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qRootP ;
+    .
+}
+WHERE {
+    VALUES ?card { 1 2 3 4 }
+
+    ?qRoot :is-duplicable true .
+    ?qRoot doc:has_related_question ?qDirectDescendant .
+
+    BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
+    BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
+    BIND(fl:create-q(?qDirectDescendant, ?card) as ?qDirectDescendantX)
+
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qDirectDescendant), str(?qRoot))))) as ?cond)
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qDirectDescendantX), str(?qRootX))))) as ?condX)
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
+}""" ;
+    ] ;
+  rdfs:label "construct-duplicate-questions" ;
 .
 :construct-question-origins
   a sml:ApplyConstruct ;
@@ -1173,6 +1279,7 @@ ASK WHERE {
 .
 :merge-with-origins
   a sml:Merge ;
+  sm:next :attach-duplicable-questions ;
   sm:next :construct-dny-v-tydnu-questions ;
   sm:next :question-siblings-ordering ;
   rdfs:label "merge-with-origins" ;
