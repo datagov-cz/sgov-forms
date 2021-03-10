@@ -1,6 +1,8 @@
 # SGoV Forms
 
-The repository contains model and scripts to generate and manage forms based on [SGoV vocabularies](https://github.com/opendata-mvcr/ssp). The scripts can be executed by SPipes engine either using command-line or web interface. For information to run scripts see [SPipes project](https://kbss.felk.cvut.cz/gitblit/summary/s-pipes.git).
+The repository contains model and scripts to generate and manage forms based on [SGoV vocabularies](https://github.com/opendata-mvcr/ssp). 
+The scripts can be executed by SPipes engine either using command-line or web interface. 
+For information to run scripts see [SPipes project](https://kbss.felk.cvut.cz/gitblit/summary/s-pipes.git).
 
 ## Main SPipes functions
 
