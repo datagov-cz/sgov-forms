@@ -526,22 +526,22 @@ WHERE {
               sp:arg1 [
                   a sp:str ;
                   sp:arg1 [
-                      sp:varName "formType" ;
+                      sp:varName "formTemplate" ;
                     ] ;
                 ] ;
             ] ;
         ] ;
     ] ;
 .
-:bind-form-type
+:bind-form-template
   a sml:BindBySelect ;
   sm:next :bind-form-metadata-service-url ;
   sml:selectQuery [
       a sp:Select ;
-      sp:text """SELECT ?formType
+      sp:text """SELECT ?formTemplate
 WHERE {
-    ?r <http://vfn.cz/ontologies/study-manager/formType> ?formTypeStr .
-    BIND (str(?formTypeStr) AS ?formType) .
+    ?r <http://vfn.cz/ontologies/study-manager/formTemplate> ?formTemplateStr .
+    BIND (str(?formTemplateStr) AS ?formTemplate) .
 }""" ;
     ] ;
 .
@@ -1374,7 +1374,7 @@ WHERE {
 :retrieve-record-graph
   a sml:ApplyConstruct ;
   sm:next :bind-execution-id ;
-  sm:next :bind-form-type ;
+  sm:next :bind-form-template ;
   sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
