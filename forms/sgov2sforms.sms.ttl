@@ -540,7 +540,7 @@ WHERE {
       a sp:Select ;
       sp:text """SELECT ?formTemplate
 WHERE {
-    ?r <http://vfn.cz/ontologies/study-manager/formTemplate> ?formTemplateStr .
+    ?r <http://vfn.cz/ontologies/study-manager/has-form-template> ?formTemplateStr .
     BIND (str(?formTemplateStr) AS ?formTemplate) .
 }""" ;
     ] ;
