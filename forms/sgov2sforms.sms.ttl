@@ -478,7 +478,7 @@ WHERE {
   sm:nodeY 1575 ;
   sm:outputVariable "externalPossibleValuesQueryTemplate" ;
   sml:value """prefix skos: <http://www.w3.org/2004/02/skos/core#>
-prefix dc: <http://purl.org/dc/terms/>
+prefix dce: <http://purl.org/dc/elements/1.1/>
 
 CONSTRUCT {
       ?value rdfs:label ?labelStr .
