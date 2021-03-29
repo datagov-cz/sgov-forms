@@ -1324,6 +1324,27 @@ ASK WHERE {
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# 0 - has preceding relation is cyclic
+ASK
+WHERE {
+     ?q doc:has_related_question ?child1Q .
+     ?q doc:has_related_question ?child2Q .
+
+     ?child1Q form:has-preceding-question ?child2Q .
+     ?child2Q form:has-preceding-question* ?child1Q .
+     FILTER(?child1Q != ?child2Q)
+}""" ;
+    ] ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# 1 - has preceding question relation is reflexive
+ASK
+WHERE {
+     ?q form:has-preceding-question ?q .
+}""" ;
+    ] ;
   sm:next :attach-answerable-section-logic ;
   sm:next :attach-descriptions ;
   sm:next :attach-possible-values-hook ;
