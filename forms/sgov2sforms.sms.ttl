@@ -930,7 +930,7 @@ CONSTRUCT {
     ?childQ rdfs:label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
-    ?childQ  fm:is-advanced true .
+    ?childQ  fm:is-advanced ?isAdvanced .
     ?parentQ doc:has_related_question ?childQ .
 }
 WHERE {
@@ -947,6 +947,7 @@ WHERE {
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
     OPTIONAL {
         ?trope fm:is-advanced true .
+         BIND(true as ?isAdvanced)
     }
     FILTER NOT EXISTS {
         ?trope fm:ignore true .
