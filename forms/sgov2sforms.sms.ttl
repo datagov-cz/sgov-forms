@@ -1421,7 +1421,7 @@ WHERE {
       a sp:Construct ;
       sp:text """# 5 - order section filtering question before others
 CONSTRUCT {
-      ?qNotFilteringQ form:has-preceding-question ?qFilteringQ .
+    ?qNotFilteringQ form:has-preceding-question ?qFilteringQ .
 }
 WHERE {
     ?q doc:has_related_question ?qFilteringQ  . 
@@ -1435,7 +1435,7 @@ WHERE {
       sp:text """# 6 - order if entities by time
 # TODO need to model it
 CONSTRUCT {
-     ?laterQ form:has-preceding-question ?earlierQ     .
+      ?laterQ form:has-preceding-question ?earlierQ     .
 }
 WHERE {
        ?q doc:has_related_question ?earlierQ  . 
