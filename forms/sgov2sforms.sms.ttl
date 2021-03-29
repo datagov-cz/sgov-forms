@@ -49,6 +49,30 @@
   owl:imports <http://onto.fel.cvut.cz/ontologies/s-pipes-lib> ;
   owl:imports z-sgov:model ;
 .
+:attach-answerable-section-logic
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sm:nodeX 320 ;
+  sm:nodeY 2097 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# add visibility logic of questions related to answerable section
+CONSTRUCT {     
+      ?qChild form:is-relevant-if ?cond .
+      ?cond   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qAnswerable ;
+     .
+}
+WHERE {
+    ?qAnswerable form-lt:has-layout-class \"answerable\" .
+    ?qAnswerable doc:has_related_question ?qChild .
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qChild), str(?qAnswerable))))) as ?cond)
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-answerable-section-logic" ;
+.
 :attach-descriptions
   a sml:ApplyConstruct ;
   sm:next :attach-value-types ;
@@ -759,18 +783,6 @@ CONSTRUCT {
       ?qRootX form-lt:has-layout-class \"answerable\" .
       ?qRootX form-lt:has-layout-class \"checkbox\" .
 
-      ?qDirectDescendant form:is-relevant-if ?cond .
-      ?cond   a form:condition ;
-             form:accepts-answer-value true ;
-             form:has-tested-question ?qRoot ;
-     .
-
-      ?qDirectDescendantX form:is-relevant-if  ?condX .
-      ?condX   a form:condition ;
-             form:accepts-answer-value true ;
-             form:has-tested-question ?qRootX ;
-      .
-
     ?qRootX form:has-preceding-question  ?qRootP .
 
      ?qRootX form:is-relevant-if  ?condP .
@@ -783,18 +795,66 @@ WHERE {
     VALUES ?card { 1 2 3 4 }
 
     ?qRoot :is-duplicable true .
-    ?qRoot doc:has_related_question ?qDirectDescendant .
 
     BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
     BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
-    BIND(fl:create-q(?qDirectDescendant, ?card) as ?qDirectDescendantX)
 
-    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qDirectDescendant), str(?qRoot))))) as ?cond)
-    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qDirectDescendantX), str(?qRootX))))) as ?condX)
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
 }""" ;
     ] ;
   rdfs:label "construct-duplicate-questions" ;
+.
+:construct-metaquestions
+  a sml:ApplyConstruct ;
+  sm:next :attach-answerable-section-logic ;
+  sm:nodeX 99 ;
+  sm:nodeY 1926 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# construct show advanced quesitons and ordering
+# TODO - remove form-layout
+CONSTRUCT {
+     ?parentQ doc:has_related_question ?showAdvancedQ .
+     ?showAdvancedQ a doc:question ;
+          rdfs:label \"Zobrazit více\" ;
+          dce:description \"Zobrazí/Skryje pokročilé otázky. Otázky,  které jsou zodpovězeny a sekce, které obsahují zodpovězené otázky nelze skrýt.\" ;
+          form-lt:has-layout-class \"checkbox\" ;
+          form:show-advanced-question true ;
+      .
+      ?q form:is-relevant-if ?orCondition .
+      ?orCondition a form:or-condition ;
+             form:has-sub-condition ?condShowAdvanced ;
+             form:has-sub-condition ?condHasAnswer ;
+      .
+      ?condShowAdvanced   a form:condition ;
+             form:has-tested-question ?showAdvancedQ ;
+             form:accepts-answer-value true ;
+      .
+      ?condHasAnswer   a form:condition ;
+             form:has-tested-question ?q ;
+             form:accepts form:answered-question ;
+      .
+
+# TODO  do specific metadata questions ordering
+      ?q form:has-preceding-question ?showAdvancedQ . 
+}
+WHERE {
+    ?parentQ doc:has_related_question ?advancedQ .
+    ?advancedQ fm:is-advanced true .
+    ?parentQ doc:has_related_question ?q  .
+    ?q fm:is-advanced true .
+    
+ 
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(form:show-advanced-question),?childExecutionId) AS ?showAdvancedQ) 
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?parentQ), str(?showAdvancedQ))))) as ?condShowAdvanced)
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?showAdvancedQ), str(?q))))) as ?condHasAnswer)
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?showAdvancedQ), str(?q), str(?parentQ))))) as ?orCondition)
+ 
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "construct-metaquestions" ;
 .
 :construct-question-origins
   a sml:ApplyConstruct ;
@@ -870,6 +930,7 @@ CONSTRUCT {
     ?childQ rdfs:label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
+    ?childQ  fm:is-advanced true .
     ?parentQ doc:has_related_question ?childQ .
 }
 WHERE {
@@ -884,6 +945,9 @@ WHERE {
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+    OPTIONAL {
+        ?trope fm:is-advanced true .
+    }
     FILTER NOT EXISTS {
         ?trope fm:ignore true .
     } . 
@@ -1259,9 +1323,11 @@ ASK WHERE {
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
+  sm:next :attach-answerable-section-logic ;
   sm:next :attach-descriptions ;
   sm:next :attach-possible-values-hook ;
   sm:next :bind-root-question ;
+  sm:next :construct-metaquestions ;
   sm:next :construct-type-filters ;
   sml:constructQuery [
       a sp:Construct ;
