@@ -518,7 +518,7 @@ WHERE {
           BIND(str(?label) as ?labelStr)
 
           OPTIONAL {
-              ?value dc:description ?explanation .
+              ?value dce:description ?explanation .
               FILTER ( lang(?explanation) = \"cs\" ) 
               BIND(str(?explanation) as ?explanationStr)
           }
