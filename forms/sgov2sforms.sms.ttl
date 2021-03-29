@@ -1362,6 +1362,10 @@ WHERE {
     ?qParent doc:has_related_question ?qSection .
     ?qParent doc:has_related_question ?qSimpleSibling .
     ?qSection doc:has_related_question ?qSectionChild .
+     FILTER NOT EXISTS {
+        ?qSection form:has-question-origin ?sectionEntity .
+        ?sectionEntity a fm:object-identifier-quality .
+    }
     FILTER NOT EXISTS {
         ?qSimpleSibling doc:has_related_question ?qSimpleSiblingChild .
     } .
