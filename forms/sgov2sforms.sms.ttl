@@ -950,7 +950,7 @@ WHERE {
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "4" ;
+  kbss-module:has-max-iteration-count "3" ;
   sm:next :construct-question-origins ;
   sm:next :merge-with-origins ;
   sml:constructQuery [
