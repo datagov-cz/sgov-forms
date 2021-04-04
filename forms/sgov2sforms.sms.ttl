@@ -529,8 +529,13 @@ WHERE {
   sm:outputVariable "externalPossibleValuesQueryTemplate" ;
   sml:value """prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix dce: <http://purl.org/dc/elements/1.1/>
+prefix form: <http://onto.fel.cvut.cz/ontologies/form/> 
 
 CONSTRUCT {
+      # TODO remove
+      <https://data.mvcr.gov.cz/zdroj/číselníky/sporty/položky/aerobik> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/CZK> . 
+      <https://data.mvcr.gov.cz/zdroj/číselníky/sporty/položky/aerobik> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/EUR> .
+      <https://data.mvcr.gov.cz/zdroj/číselníky/sporty/položky/aerobik> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/USD> .
       ?value rdfs:label ?labelStr .
       ?value rdfs:comment ?explanationStr .
 }
