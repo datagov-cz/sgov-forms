@@ -14,10 +14,10 @@
 @prefix dce: <http://purl.org/dc/elements/1.1/> .
 @prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
 @prefix fl: <http://onto.fel.cvut.cz/ontologies/form-lib/> .
-@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 @prefix form-ecc-lib: <http://onto.fel.cvut.cz/ontologies/aviation/eccairs-form-lib/> .
 @prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix kbss-module: <http://onto.fel.cvut.cz/ontologies/lib/module/> .
 @prefix kbss-spif: <http://onto.fel.cvut.cz/ontologies/lib/spin-function/> .
 @prefix km-rdf4j: <http://onto.fel.cvut.cz/ontologies/lib/module/rdf4j/> .
@@ -424,100 +424,19 @@ ASK WHERE {
   sm:next :bind-form-template-service-url ;
   sml:selectQuery [
       a sp:Select ;
-      sp:resultVariables (
-          [
-            sp:varName "executionId" ;
-          ]
-        ) ;
       sp:text """# bind executionId based on root question or generate new
 SELECT ?executionId
 WHERE {
-     OPTIONAL {
-           ?qRoot a doc:question .
-           FILTER NOT EXISTS {
-                 ?qNE a doc:question .
-                 ?qNE doc:has_related_question ?qRoot
-           }
-           BIND(replace(replace(str(?qRoot), \"^.*form-\", \"\"),\"-q$\",\"\") as ?inferredExecutionId) 
-     }
-     BIND(COALESCE(?inferredExecutionId, STRUUID()) as ?executionId)
+    OPTIONAL {
+        ?qRoot a doc:question .
+        FILTER NOT EXISTS {
+            ?qNE a doc:question .
+            ?qNE doc:has_related_question ?qRoot .
+        } .
+        BIND (REPLACE(REPLACE(str(?qRoot), \"^.*form-\", \"\"), \"-q$\", \"\") AS ?inferredExecutionId) .
+    } .
+    BIND (COALESCE(?_DexecutionId, ?inferredExecutionId, STRUUID()) AS ?executionId) .
 }""" ;
-      sp:where (
-          [
-            a sp:Optional ;
-            sp:elements (
-                [
-                  sp:object doc:question ;
-                  sp:predicate rdf:type ;
-                  sp:subject [
-                      sp:varName "qRoot" ;
-                    ] ;
-                ]
-                [
-                  a sp:Filter ;
-                  sp:expression [
-                      a sp:notExists ;
-                      sp:elements (
-                          [
-                            sp:object doc:question ;
-                            sp:predicate rdf:type ;
-                            sp:subject [
-                                sp:varName "qNE" ;
-                              ] ;
-                          ]
-                          [
-                            sp:object [
-                                sp:varName "qRoot" ;
-                              ] ;
-                            sp:predicate doc:has_related_question ;
-                            sp:subject [
-                                sp:varName "qNE" ;
-                              ] ;
-                          ]
-                        ) ;
-                    ] ;
-                ]
-                [
-                  a sp:Bind ;
-                  sp:expression [
-                      a sp:replace ;
-                      sp:arg1 [
-                          a sp:replace ;
-                          sp:arg1 [
-                              a sp:str ;
-                              sp:arg1 [
-                                  sp:varName "qRoot" ;
-                                ] ;
-                            ] ;
-                          sp:arg2 "^.*form-" ;
-                          sp:arg3 "" ;
-                        ] ;
-                      sp:arg2 "-q$" ;
-                      sp:arg3 "" ;
-                    ] ;
-                  sp:variable [
-                      sp:varName "inferredExecutionId" ;
-                    ] ;
-                ]
-              ) ;
-          ]
-          [
-            a sp:Bind ;
-            sp:expression [
-                a sp:coalesce ;
-                sp:arg1 [
-                    sp:varName "inferredExecutionId" ;
-                  ] ;
-                sp:arg2 [
-                    a sp:struuid ;
-                  ] ;
-              ] ;
-            sp:variable [
-                sp:varName "executionId" ;
-              ] ;
-          ]
-        ) ;
-      rdfs:comment "bind executionId based on root question or generate new" ;
     ] ;
   rdfs:label "bind-execution-id" ;
 .
@@ -561,6 +480,20 @@ WHERE {
 }""" ;
   rdfs:label "bind-external-possible-values-query-template" ;
 .
+:bind-form-template
+  a sml:BindBySelect ;
+  sm:next :bind-form-template-service-url ;
+  sml:selectQuery [
+      a sp:Select ;
+      sp:text """SELECT ?formTemplate
+WHERE {
+    OPTIONAL {
+         ?r <http://vfn.cz/ontologies/study-manager/has-form-template> ?formTemplateStr .
+    }
+    BIND (COALESCE(?_DformTemplate, str(?formTemplateStr)) AS ?formTemplate) .
+}""" ;
+    ] ;
+.
 :bind-form-template-service-url
   a sml:BindWithConstant ;
   sm:next :retrieve-form-template ;
@@ -586,18 +519,6 @@ WHERE {
                 ] ;
             ] ;
         ] ;
-    ] ;
-.
-:bind-form-template
-  a sml:BindBySelect ;
-  sm:next :bind-form-template-service-url ;
-  sml:selectQuery [
-      a sp:Select ;
-      sp:text """SELECT ?formTemplate
-WHERE {
-    ?r <http://vfn.cz/ontologies/study-manager/has-form-template> ?formTemplateStr .
-    BIND (str(?formTemplateStr) AS ?formTemplate) .
-}""" ;
     ] ;
 .
 :bind-possible-values-query-template
