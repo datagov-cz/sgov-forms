@@ -1,0 +1,22 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix d-sgov-sportoviště: <https://slovník.gov.cz/datový/sportoviště/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix d-sgov-sportoviště-pojem: <https://slovník.gov.cz/datový/sportoviště/pojem/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+
+
+d-sgov-sportoviště:form-template a owl:Ontology .
+
+d-sgov-sportoviště-pojem:sportoviště a ft:root-entity .
+
+
+d-sgov-sportoviště-pojem:název a ft:object-identifier-quality .
+
+#d-sgov-sportoviště-pojem:veřejná-přístupnost a ft:boolean .
+#d-sgov-sportoviště-pojem:kapacita a ft:number .
+#d-sgov-sportoviště-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
+#d-sgov-sportoviště-pojem:nástup-dle-dohody a ft:date .
+
+

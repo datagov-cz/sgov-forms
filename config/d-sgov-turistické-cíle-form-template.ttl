@@ -1,0 +1,28 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+
+
+d-sgov-turistické-cíle:form-template a owl:Ontology .
+
+d-sgov-turistické-cíle-pojem:turistický-cíl a ft:root-entity .
+
+d-sgov-turistické-cíle-pojem:název a ft:object-identifier-quality .
+d-sgov-turistické-cíle-pojem:kouření-povoleno a ft:boolean .
+d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
+d-sgov-turistické-cíle-pojem:kapacita a ft:number .
+
+
+
+#d-sgov-turistické-cíle-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
+
+#d-sgov-turistické-cíle-pojem:nástup-dle-dohody a ft:date .
+
+
+
+
+

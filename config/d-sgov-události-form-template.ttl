@@ -1,0 +1,25 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix d-sgov-události: <https://slovník.gov.cz/datový/události/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix d-sgov-události-pojem: <https://slovník.gov.cz/datový/události/pojem/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+
+
+d-sgov-události:form-template a owl:Ontology .
+
+d-sgov-události-pojem:událost a ft:root-entity .
+
+d-sgov-události-pojem:název a ft:object-identifier-quality .
+d-sgov-události-pojem:vhodné-pro-děti a ft:boolean .
+d-sgov-události-pojem:vhodné-pro-zvířata a ft:boolean .
+d-sgov-události-pojem:registrace a ft:boolean .
+
+#d-sgov-události-pojem:kapacita a ft:number .
+#d-sgov-události-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
+#d-sgov-události-pojem:nástup-dle-dohody a ft:date .
+
+
+
+

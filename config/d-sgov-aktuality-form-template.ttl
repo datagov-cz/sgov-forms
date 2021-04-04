@@ -1,0 +1,25 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix d-sgov-aktuality: <https://slovník.gov.cz/datový/aktuality/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix d-sgov-aktuality-pojem: <https://slovník.gov.cz/datový/aktuality/pojem/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+
+
+d-sgov-aktuality:form-template a owl:Ontology .
+
+d-sgov-aktuality-pojem:aktualita a ft:root-entity .
+
+d-sgov-aktuality-pojem:název a ft:object-identifier-quality .
+d-sgov-aktuality-pojem:zveřejněno a ft:date .
+d-sgov-aktuality-pojem:relevantní-do a ft:date .
+
+#d-sgov-aktuality-pojem:veřejná-přístupnost a ft:boolean .
+#d-sgov-aktuality-pojem:kapacita a ft:number .
+#d-sgov-aktuality-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
+
+
+
+
+
