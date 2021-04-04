@@ -256,13 +256,39 @@ WHERE {
 CONSTRUCT {
     ?q form-lt:has-layout-class \"number\" .
     ?q form:has-datatype xsd:int .
-    ?q xsd:maxInclusive 100 .
-    ?q xsd:minInclusive 0 .
+    ?q xsd:minInclusive ?minInclusive  .
+    ?q xsd:maxInclusive ?maxInclusive .
+    ?q form:step ?step .
 }
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
     ?entity a fm:number .
+    OPTIONAL {
+          ?entity xsd:minInclusive ?minInclusiveOptional .
+    }
+    OPTIONAL {
+          ?entity xsd:maxInclusive ?maxInclusiveOptional .
+    }
+    OPTIONAL {
+          ?entity fm:step ?stepOptional .
+    }
+    BIND(coalesce(?minInclusiveOptional, 0) as ?minInclusive)
+    BIND(coalesce(?maxInclusiveOptional, 10000) as ?maxInclusive)
+    BIND(coalesce(?stepOptional, 1) as ?step)
+
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# textarea
+CONSTRUCT {
+    ?q form-lt:has-layout-class \"textarea\" .
+}
+WHERE {
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?entity a fm:textarea .
 }""" ;
     ] ;
   sml:constructQuery [
