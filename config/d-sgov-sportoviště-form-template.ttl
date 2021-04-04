@@ -1,22 +1,55 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix d-sgov-sportoviště: <https://slovník.gov.cz/datový/sportoviště/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix d-sgov-sportoviště-pojem: <https://slovník.gov.cz/datový/sportoviště/pojem/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+@prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
+@prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
+@prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> . 
+@prefix g-sgov-věci-pojem: <https://slovník.gov.cz/generický/věci/pojem/> .
+@prefix g-sgov-veřejná-místa-pojem: <https://slovník.gov.cz/generický/veřejná-místa/pojem/> .
+@prefix d-sgov-sportoviště: <https://slovník.gov.cz/datový/sportoviště/> .
+@prefix d-sgov-sportoviště-pojem: <https://slovník.gov.cz/datový/sportoviště/pojem/> .
 
 
-d-sgov-sportoviště:form-template a owl:Ontology .
+d-sgov-sportoviště:form-template a owl:Ontology ;
+	skos:prefLabel "Sportoviště".
 
+### shared ###
+g-sgov-věci-pojem:název a ft:object-identifier-quality .
+
+### specific ###
 d-sgov-sportoviště-pojem:sportoviště a ft:root-entity .
 
 
 d-sgov-sportoviště-pojem:název a ft:object-identifier-quality .
 
-#d-sgov-sportoviště-pojem:veřejná-přístupnost a ft:boolean .
-#d-sgov-sportoviště-pojem:kapacita a ft:number .
-#d-sgov-sportoviště-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
-#d-sgov-sportoviště-pojem:nástup-dle-dohody a ft:date .
+
+d-sgov-sportoviště-pojem:doplňková-služba ft:ignore true .
+d-sgov-sportoviště-pojem:podmínky-užívání ft:ignore true .
+d-sgov-sportoviště-pojem:provozní-řád ft:ignore true .
 
 
+g-sgov-věci-pojem:aktualizováno   ft:ignore true .
+g-sgov-věci-pojem:vytvořeno   ft:ignore true .
+g-sgov-věci-pojem:zneplatněno   ft:ignore true .
+
+g-sgov-věci-pojem:má-přílohu ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-kontakt ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-vstupné ft:ignore true .
+
+g-sgov-věci-pojem:relevantní-do ft:ignore true .
+
+# provozovatel/fyzicka osoba
+l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
+l-sgov-111-2009-pojem:má-místo-narození ft:ignore true .
+l-sgov-111-2009-pojem:má-adresu-místa-pobytu ft:ignore true .
+v-sgov-pojem:křestní-jméno ft:ignore true .
+v-sgov-pojem:příjmení ft:ignore true .
+
+# provozovatel/pravnicka osoba
+l-sgov-111-2009-pojem:má-adresu-sídla-osoby ft:ignore true .
+l-sgov-111-2009-pojem:má-datovou-schránku-osoby ft:ignore true .

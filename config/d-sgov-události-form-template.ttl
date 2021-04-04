@@ -1,14 +1,26 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix d-sgov-události: <https://slovník.gov.cz/datový/události/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix d-sgov-události-pojem: <https://slovník.gov.cz/datový/události/pojem/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+@prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
+@prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
+@prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> . 
+@prefix g-sgov-věci-pojem: <https://slovník.gov.cz/generický/věci/pojem/> .
+@prefix g-sgov-veřejná-místa-pojem: <https://slovník.gov.cz/generický/veřejná-místa/pojem/> .
+@prefix d-sgov-události: <https://slovník.gov.cz/datový/události/> .
+@prefix d-sgov-události-pojem: <https://slovník.gov.cz/datový/události/pojem/> .
 
 
-d-sgov-události:form-template a owl:Ontology .
+d-sgov-události:form-template a owl:Ontology ;
+	skos:prefLabel "Událost".
 
+### shared ###
+g-sgov-věci-pojem:název a ft:object-identifier-quality .
+
+
+### specific ###
 d-sgov-události-pojem:událost a ft:root-entity .
 
 d-sgov-události-pojem:název a ft:object-identifier-quality .
@@ -16,10 +28,40 @@ d-sgov-události-pojem:vhodné-pro-děti a ft:boolean .
 d-sgov-události-pojem:vhodné-pro-zvířata a ft:boolean .
 d-sgov-události-pojem:registrace a ft:boolean .
 
-#d-sgov-události-pojem:kapacita a ft:number .
-#d-sgov-události-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
-#d-sgov-události-pojem:nástup-dle-dohody a ft:date .
+
+g-sgov-věci-pojem:aktualizováno   ft:ignore true .
+g-sgov-věci-pojem:vytvořeno   ft:ignore true .
+g-sgov-věci-pojem:zneplatněno   ft:ignore true .
+g-sgov-věci-pojem:relevantní-do ft:ignore true .
+# asi attr
+g-sgov-věci-pojem:má-přílohu ft:ignore true .
 
 
+d-sgov-události-pojem:má-bezbariérový-přístup ft:ignore true .
+d-sgov-události-pojem:má-kontakt ft:ignore true .
+d-sgov-události-pojem:má-hlavního-sponzora ft:ignore true .
+d-sgov-události-pojem:má-mediálního-partnera ft:ignore true .
 
+d-sgov-události-pojem:má-sponzora ft:ignore true .
+d-sgov-události-pojem:má-vstupné ft:ignore true .
+d-sgov-události-pojem:má-záštitu ft:ignore true .
 
+# attributes
+d-sgov-události-pojem:dlouhý-popis ft:ignore true .
+
+d-sgov-události-pojem:vhodné-pro-zvířata ft:ignore true .
+d-sgov-události-pojem:vhodné-pro-děti ft:ignore true .
+d-sgov-události-pojem:má-téma ft:ignore true .
+d-sgov-události-pojem:má-typ-události ft:ignore true .
+d-sgov-události-pojem:registrace ft:ignore true .
+
+# poradatel/fyzicka osoba
+l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
+l-sgov-111-2009-pojem:má-místo-narození ft:ignore true .
+l-sgov-111-2009-pojem:má-adresu-místa-pobytu ft:ignore true .
+v-sgov-pojem:křestní-jméno ft:ignore true .
+v-sgov-pojem:příjmení ft:ignore true .
+
+# poradatel/pravnicka osoba
+l-sgov-111-2009-pojem:má-adresu-sídla-osoby ft:ignore true .
+l-sgov-111-2009-pojem:má-datovou-schránku-osoby ft:ignore true .

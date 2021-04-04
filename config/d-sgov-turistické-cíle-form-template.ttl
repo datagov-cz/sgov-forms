@@ -6,21 +6,45 @@
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
 @prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
+@prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> . 
+@prefix g-sgov-čas-pojem: <https://slovník.gov.cz/generický/čas/pojem/> .
 @prefix g-sgov-věci-pojem: <https://slovník.gov.cz/generický/věci/pojem/> .
+@prefix g-sgov-čásky-pojem: <https://slovník.gov.cz/generický/částky/pojem/> .
+@prefix g-sgov-číselníky-pojem: <https://slovník.gov.cz/generický/číselníky/pojem/> .
+@prefix g-sgov-veřejná-místa-pojem: <https://slovník.gov.cz/generický/veřejná-místa/pojem/> .
+@prefix g-sgov-lidé-pojem: <https://slovník.gov.cz/generický/lidé/pojem/> .
+@prefix g-sgov-vstupné-pojem: <https://slovník.gov.cz/generický/vstupné/pojem/> .
 @prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
 @prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
 
-d-sgov-turistické-cíle:form-template a owl:Ontology .
-	
-d-sgov-turistické-cíle:form-template skos:prefLabel "Turistický cíl - komplexní OFN".
+d-sgov-turistické-cíle:form-template a owl:Ontology ;
+	skos:prefLabel "Turistický cíl".
 
-d-sgov-turistické-cíle-pojem:turistický-cíl a ft:root-entity .
-
+### shared ###
+ft:iri a ft:object-identifier-quality .
 g-sgov-věci-pojem:název a ft:object-identifier-quality .
+g-sgov-lidé-pojem:celé-jméno a ft:object-identifier-quality .
+
+
+g-sgov-věci-pojem:název a ft:multilingual-quality .
+g-sgov-věci-pojem:popis a ft:multilingual-quality .
+g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
+
+
+### specific ###
+d-sgov-turistické-cíle-pojem:turistický-cíl a ft:root-entity .
 
 d-sgov-turistické-cíle-pojem:kouření-povoleno a ft:boolean .
 d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 #d-sgov-turistické-cíle-pojem:kapacita a ft:number .
+
+g-sgov-věci-pojem:popis a ft:textarea .
+
+# vlastnosti u turisitckeho cile
+d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
+d-sgov-turistické-cíle-pojem:kapacita  ft:is-advanced true .
+d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
+d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
 
 
 g-sgov-věci-pojem:aktualizováno   ft:ignore true .
@@ -34,20 +58,107 @@ v-sgov-pojem:má-platnost ft:ignore true .
 # clovek, osoba
 v-sgov-pojem:křesní-jméno ft:ignore true .
 v-sgov-pojem:příjmení ft:ignore true .
-<https://slovník.gov.cz/generický/lidé/pojem/celé-jméno> a ft:object-identifier-quality .
+
 
 
 # vlastnik, provozovatel
-<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-adresu-místa-pobytu> ft:ignore true .
-<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-adresu-narození> ft:ignore true .
-<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-okres-narození> ft:ignore true .
+l-sgov-111-2009-pojem:má-adresu-místa-pobytu ft:ignore true .
+l-sgov-111-2009-pojem:má-adresu-narození ft:ignore true .
+l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
+
+g-sgov-věci-pojem:má-přílohu ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-kontakt ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-provozovatele ft:ignore true .
+g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
+
+g-sgov-věci-pojem:relevantní-do ft:ignore true .
+d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:ignore true .
+
+v-sgov-pojem:eviduje-položku-evidenčního-systému ft:ignore true .
+v-sgov-pojem:eviduje ft:ignore true .
+v-sgov-pojem:pokrývá-oblast ft:ignore true .
+                                                  
+
+# !! kazda sekce by mela podsekci "Aktualizovan" a "Vytvořen"
+v-sgov-pojem:má-čas-vytvoření ft:ignore true .
+v-sgov-pojem:má-čas-poslední-aktualizace ft:ignore true .
 
 
-#d-sgov-turistické-cíle-pojem:má-pracoviště	ft:ignore "true"^^xsd:boolean .
+# vstupne
+g-sgov-vstupné-pojem:vstupné ft:max-cardinality 5 . 
+g-sgov-vstupné-pojem:platnost ft:ignore true .
 
-#d-sgov-turistické-cíle-pojem:nástup-dle-dohody a ft:date .
+# ma oteviraci dobu
+#g-sgov-čas-pojem:časová-specifikace ft:max-cardinality 5 .
+
+g-sgov-čas-pojem:má-časové-období ft:ignore true .
+g-sgov-čas-pojem:má-jinou-časovou-specifikaci ft:ignore true .
+g-sgov-čas-pojem:počet-opakování ft:ignore true .
+g-sgov-čas-pojem:má-frekvenci ft:ignore true .
+g-sgov-čas-pojem:má-specifickou-frekvenci ft:ignore true .
+g-sgov-čas-pojem:má-časový-interval ft:ignore true .
+g-sgov-čas-pojem:má-časový-okamžik ft:ignore true .
+
+g-sgov-čas-pojem:čas ft:ignore true .
+g-sgov-čásky-pojem:výše-částky a ft:number .
+g-sgov-čásky-pojem:výše-částky ft:step 0.01 .
+g-sgov-čásky-pojem:výše-částky xsd:minInclusive 0 .
+g-sgov-čásky-pojem:výše-částky xsd:maxInclusive 1000000 .
 
 
+[] a ft:ignore-condition ;
+	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
+	ft:has-ignored-entity g-sgov-věci-pojem:název ;
+.
 
 
+[] a ft:ignore-condition ;
+	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
+	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné  ;
+	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
+	ft:has-ignored-entity g-sgov-věci-pojem:popis ;
+.
 
+g-sgov-čas-pojem:od a ft:time .
+g-sgov-čas-pojem:do a ft:time .
+
+##############################
+
+
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pondělí> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý>     .
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa>     .
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek>     .
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/čtvrtek> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek>     .
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pátek> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota>     .
+<https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/sobota> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/neděle>     .
+
+g-sgov-čas-pojem:od ft:precedes-relatively-in-time g-sgov-čas-pojem:do .
+
+# entity mapping with internal code list - <https://data.mvcr.gov.cz/sparql> and external code list - <https://data.gov.cz/sparql>
+[] a ft:codelist-mapping ;
+        ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
+        ft:has-codelist-entity <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu> ; 
+        ft:has-internal-entity g-sgov-číselníky-pojem:den-v-týdnu ;
+.
+
+[] a ft:codelist-mapping ;
+        ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
+        ft:has-codelist-entity <http://publications.europa.eu/resource/authority/currency> ; 
+        ft:has-internal-entity g-sgov-číselníky-pojem:měna ;
+.
+
+ft:language-czech a ft:language ;
+	skos:prefLabel "Česky" ;
+.
+
+ft:language-english a ft:language ;
+	skos:prefLabel "Anglicky" ;
+.
+	
+   
+# TODO - refactor
+ft:language-czech ft:precedes-relatively-in-time ft:language-english .
+g-sgov-věci-pojem:popis ft:precedes-relatively-in-time g-sgov-číselníky-pojem:den-v-týdnu .
+g-sgov-věci-pojem:popis ft:precedes-relatively-in-time g-sgov-čas-pojem:časová-doba .
+g-sgov-vstupné-pojem:podmínka ft:precedes-relatively-in-time g-sgov-čásky-pojem:částka .
