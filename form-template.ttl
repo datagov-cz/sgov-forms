@@ -1,0 +1,48 @@
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form> .
+@prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+@prefix spin: <http://spinrdf.org/spin#> .
+@prefix spl: <http://spinrdf.org/spl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://onto.fel.cvut.cz/ontologies/form-template>
+  a owl:Ontology ;
+.
+
+ft:object-identifier-quality a owl:Class .
+ft:root-entity a owl:Class .
+
+ft:ignore a owl:DatatypeProperty ;
+	rdfs:comment "Ignore entity in forms. If true, the entity is excluded from form generation process, so data about it won't be collected."@en ;
+	rdfs:range xsd:boolean ;
+.
+
+ft:is-advanced a owl:DatatypeProperty ;
+	rdfs:comment "Entity is advanced for a user. If true, the entity is by default hidden to user in forms and is shown to only on his/her explicit request."@en ;
+	rdfs:range xsd:boolean ;
+.
+
+ft:external a owl:DatatypeProperty .
+
+
+ft:precedes-relatively-in-time a owl:ObjectProperty .
+
+
+# code list mapping
+ft:codelist-mapping a owl:Class .
+ft:has-codelist-service-url 
+	a owl:ObjectProperty ;
+	rdfs:domain ft:mapping ;
+.
+ft:has-codelist-entity 
+	a owl:ObjectProperty ;
+	rdfs:domain ft:mapping ;
+.
+ft:has-internal-entity 
+	a owl:ObjectProperty ;
+	rdfs:domain ft:mapping ;
+.
