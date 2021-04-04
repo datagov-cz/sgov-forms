@@ -1,7 +1,7 @@
 # baseURI: http://onto.fel.cvut.cz/ontologies/kodi/sgov2sforms
 # imports: http://onto.fel.cvut.cz/ontologies/form-layout
 # imports: http://onto.fel.cvut.cz/ontologies/form-lib
-# imports: http://onto.fel.cvut.cz/ontologies/form-metadata
+# imports: http://onto.fel.cvut.cz/ontologies/form-template
 # imports: http://onto.fel.cvut.cz/ontologies/lib/sm-module-adapter
 # imports: http://onto.fel.cvut.cz/ontologies/lib/spin-function
 # imports: http://onto.fel.cvut.cz/ontologies/s-pipes-lib
@@ -14,7 +14,7 @@
 @prefix dce: <http://purl.org/dc/elements/1.1/> .
 @prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
 @prefix fl: <http://onto.fel.cvut.cz/ontologies/form-lib/> .
-@prefix fm: <http://onto.fel.cvut.cz/ontologies/form-metadata/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 @prefix form-ecc-lib: <http://onto.fel.cvut.cz/ontologies/aviation/eccairs-form-lib/> .
 @prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
@@ -43,7 +43,7 @@
   a owl:Ontology ;
   owl:imports <http://onto.fel.cvut.cz/ontologies/form-layout> ;
   owl:imports <http://onto.fel.cvut.cz/ontologies/form-lib> ;
-  owl:imports <http://onto.fel.cvut.cz/ontologies/form-metadata> ;
+  owl:imports <http://onto.fel.cvut.cz/ontologies/form-template> ;
   owl:imports <http://onto.fel.cvut.cz/ontologies/lib/sm-module-adapter> ;
   owl:imports <http://onto.fel.cvut.cz/ontologies/lib/spin-function> ;
   owl:imports <http://onto.fel.cvut.cz/ontologies/s-pipes-lib> ;
@@ -107,7 +107,7 @@ WHERE {
 WHERE {
 	?q a doc:question .
     ?q :has-processing-entity ?entity .
-   ?entity   fm:max-cardinality ?cardinality .
+   ?entity   ft:max-cardinality ?cardinality .
 }""" ;
     ] ;
   sml:replace false ;
@@ -125,7 +125,7 @@ CONSTRUCT {
 }
 WHERE {
     SERVICE ?formMetadataServiceUrl {
-        ?entity fm:external true .
+        ?entity ft:external true .
     } .
     ?question form:has-question-origin ?entity .
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
@@ -143,10 +143,10 @@ CONSTRUCT {
 }
 WHERE {
     SERVICE ?formMetadataServiceUrl {
-		 ?codelistMapping a fm:codelist-mapping ;
-              fm:has-codelist-service-url ?codeListServiceUrl  ;
-              fm:has-codelist-entity ?codeListEntity ; 
-              fm:has-internal-entity ?entity  ;
+		 ?codelistMapping a ft:codelist-mapping ;
+              ft:has-codelist-service-url ?codeListServiceUrl  ;
+              ft:has-codelist-entity ?codeListEntity ; 
+              ft:has-internal-entity ?entity  ;
           .
     } .
 
@@ -222,7 +222,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:boolean .
+    ?entity a ft:boolean .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -235,7 +235,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:date .
+    ?entity a ft:date .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -247,7 +247,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:datetime .
+    ?entity a ft:datetime .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -263,7 +263,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:number .
+    ?entity a ft:number .
     OPTIONAL {
           ?entity xsd:minInclusive ?minInclusiveOptional .
     }
@@ -271,7 +271,7 @@ WHERE {
           ?entity xsd:maxInclusive ?maxInclusiveOptional .
     }
     OPTIONAL {
-          ?entity fm:step ?stepOptional .
+          ?entity ft:step ?stepOptional .
     }
     BIND(coalesce(?minInclusiveOptional, 0) as ?minInclusive)
     BIND(coalesce(?maxInclusiveOptional, 10000) as ?maxInclusive)
@@ -288,7 +288,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:textarea .
+    ?entity a ft:textarea .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -300,7 +300,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:time .
+    ?entity a ft:time .
 }""" ;
     ] ;
   sml:replace false ;
@@ -421,7 +421,7 @@ ASK WHERE {
       FILTER (!regex(str(?qRoot), \"^.*-form-.*-q$\")) .
 }""" ;
     ] ;
-  sm:next :bind-form-metadata-service-url ;
+  sm:next :bind-form-template-service-url ;
   sml:selectQuery [
       a sp:Select ;
       sp:resultVariables (
@@ -561,9 +561,9 @@ WHERE {
 }""" ;
   rdfs:label "bind-external-possible-values-query-template" ;
 .
-:bind-form-metadata-service-url
+:bind-form-template-service-url
   a sml:BindWithConstant ;
-  sm:next :retrieve-form-metadata ;
+  sm:next :retrieve-form-template ;
   sm:outputVariable "formMetadataServiceUrl" ;
   sml:value [
       a sp:iri ;
@@ -590,7 +590,7 @@ WHERE {
 .
 :bind-form-template
   a sml:BindBySelect ;
-  sm:next :bind-form-metadata-service-url ;
+  sm:next :bind-form-template-service-url ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """SELECT ?formTemplate
@@ -654,7 +654,7 @@ VALUES (?entityType) {
       a sp:Select ;
       sp:text """SELECT ?rootEntity
 WHERE {
-    ?rootEntity a fm:root-entity .
+    ?rootEntity a ft:root-entity .
 }""" ;
     ] ;
 .
@@ -747,10 +747,10 @@ WHERE {
 
     ?parentQ form:has-question-origin ?parentEntity .
 
-    ?codelistMapping a fm:codelist-mapping ;
-        fm:has-codelist-service-url ?codeListServiceUrl  ;
-        fm:has-codelist-entity ?codeListEntity ; 
-        fm:has-internal-entity ?parentEntity  ;
+    ?codelistMapping a ft:codelist-mapping ;
+        ft:has-codelist-service-url ?codeListServiceUrl  ;
+        ft:has-codelist-entity ?codeListEntity ; 
+        ft:has-internal-entity ?parentEntity  ;
      .
 
     SERVICE ?codeListServiceUrl {
@@ -871,9 +871,9 @@ CONSTRUCT {
 }
 WHERE {
     ?parentQ doc:has_related_question ?advancedQ .
-    ?advancedQ fm:is-advanced true .
+    ?advancedQ ft:is-advanced true .
     ?parentQ doc:has_related_question ?q  .
-    ?q fm:is-advanced true .
+    ?q ft:is-advanced true .
     
  
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
@@ -961,7 +961,7 @@ CONSTRUCT {
     ?childQ rdfs:label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
-    ?childQ  fm:is-advanced ?isAdvanced .
+    ?childQ  ft:is-advanced ?isAdvanced .
     ?parentQ doc:has_related_question ?childQ .
 }
 WHERE {
@@ -977,22 +977,22 @@ WHERE {
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
     OPTIONAL {
-        ?trope fm:is-advanced true .
+        ?trope ft:is-advanced true .
          BIND(true as ?isAdvanced)
     }
     FILTER NOT EXISTS {
-        ?trope fm:ignore true .
+        ?trope ft:ignore true .
     } . 
     FILTER NOT EXISTS {
-        ?parentEntity fm:ignore true .
+        ?parentEntity ft:ignore true .
     } . 
     FILTER NOT EXISTS {
-        ?parentEntity fm:external true .
+        ?parentEntity ft:external true .
     }
     FILTER NOT EXISTS {
-        ?ic a fm:ignore-condition ;
-              fm:has-parent-entity ?directParentEntity  ;
-              fm:has-ignored-entity ?trope  ;
+        ?ic a ft:ignore-condition ;
+              ft:has-parent-entity ?directParentEntity  ;
+              ft:has-ignored-entity ?trope  ;
         .
     }
 }""" ;
@@ -1026,18 +1026,18 @@ WHERE {
     BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
-        ?relator fm:ignore true .
+        ?relator ft:ignore true .
     } 
     FILTER NOT EXISTS {
-        ?parentEntity fm:ignore true .
+        ?parentEntity ft:ignore true .
     }
     FILTER NOT EXISTS {
-        ?parentEntity fm:external true .
+        ?parentEntity ft:external true .
     }
     FILTER NOT EXISTS {
-        ?ic a fm:ignore-condition ;
-              fm:has-parent-entity ?directParentEntity  ;
-              fm:has-ignored-entity ?childEntity  ;
+        ?ic a ft:ignore-condition ;
+              ft:has-parent-entity ?directParentEntity  ;
+              ft:has-ignored-entity ?childEntity  ;
         .
     }
 }""" ;
@@ -1061,13 +1061,13 @@ WHERE {
      BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
      BIND (fl:create-q(str(?mostSpecificEntity),?childExecutionId) AS ?childQ) .
      FILTER NOT EXISTS {
-          ?mostSpecificEntity fm:ignore true .
+          ?mostSpecificEntity ft:ignore true .
       } 
       FILTER NOT EXISTS {
-          ?parentEntity fm:ignore true .
+          ?parentEntity ft:ignore true .
        }
       FILTER NOT EXISTS {
-          ?parentEntity fm:external true .
+          ?parentEntity ft:external true .
       }
 }""" ;
     ] ;
@@ -1121,13 +1121,13 @@ CONSTRUCT {
 }
 WHERE {
 	?parentQ  :has-processing-entity ?parentEntity  .
-    ?parentEntity a fm:multilingual-quality .
-    ?trope a fm:language .
+    ?parentEntity a ft:multilingual-quality .
+    ?trope a ft:language .
     ?trope  skos:prefLabel ?tropeLabel .
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
     FILTER NOT EXISTS {
-        ?trope fm:ignore true .
+        ?trope ft:ignore true .
     } .
 }""" ;
     ] ;
@@ -1190,7 +1190,7 @@ WHERE {
       a sp:Construct ;
       sp:text """# Ignore entities that would cause cycles
 CONSTRUCT {
-     ?entity fm:ignore true .
+     ?entity ft:ignore true .
 }
 WHERE {
     
@@ -1207,7 +1207,7 @@ WHERE {
       a sp:Construct ;
       sp:text """# v modelu Částky dvě entity ukazují na stejnou vlastnost se stejnou kardinalitou
 CONSTRUCT {
-     ?entity fm:ignore true .
+     ?entity ft:ignore true .
 }
 WHERE {
     
@@ -1391,13 +1391,13 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:object-identifier-quality .
+    ?entity a ft:object-identifier-quality .
     ?qParent doc:has_related_question ?q .
     ?qParent doc:has_related_question ?qSibling .
     ?qSibling form:has-question-origin ?siblingEntity .
     FILTER (?q != ?qSibling) 
     FILTER NOT EXISTS {
-        ?siblingEntity a fm:object-identifier-quality .
+        ?siblingEntity a ft:object-identifier-quality .
     }
     FILTER NOT EXISTS {
             ?qSibling  :has-processed-entity ?qo.
@@ -1416,7 +1416,7 @@ WHERE {
     ?qSection doc:has_related_question ?qSectionChild .
      FILTER NOT EXISTS {
         ?qSection form:has-question-origin ?sectionEntity .
-        ?sectionEntity a fm:object-identifier-quality .
+        ?sectionEntity a ft:object-identifier-quality .
     }
     FILTER NOT EXISTS {
         ?qSimpleSibling doc:has_related_question ?qSimpleSiblingChild .
@@ -1440,7 +1440,7 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
-    ?entity a fm:object-identifier-quality .
+    ?entity a ft:object-identifier-quality .
     ?qParent doc:has_related_question ?q .
     ?qParent doc:has_related_question ?qSiblingDescription .
     ?qSiblingDescription form:has-question-origin ?description .
@@ -1473,12 +1473,12 @@ WHERE {
        ?earlierQ form:has-question-origin ?earlierQO . 
        ?q doc:has_related_question ?laterQ . 
        ?laterQ form:has-question-origin ?laterQO . 
-       ?earlierQO fm:precedes-relatively-in-time ?laterQO     .
+       ?earlierQO ft:precedes-relatively-in-time ?laterQO     .
 }""" ;
     ] ;
   sml:replace false ;
 .
-:retrieve-form-metadata
+:retrieve-form-template
   a sml:ApplyConstruct ;
   sm:next :bind-root-entity ;
   sml:constructQuery [
