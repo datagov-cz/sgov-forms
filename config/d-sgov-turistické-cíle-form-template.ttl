@@ -108,7 +108,7 @@ g-sgov-čásky-pojem:výše-částky xsd:maxInclusive 1000000 .
 
 [] a ft:ignore-condition ;
 	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
-	ft:has-ignored-entity g-sgov-věci-pojem:název ;
+	ft:has-target-entity g-sgov-věci-pojem:název ;
 .
 
 
@@ -116,7 +116,7 @@ g-sgov-čásky-pojem:výše-částky xsd:maxInclusive 1000000 .
 	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
 	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné  ;
 	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
-	ft:has-ignored-entity g-sgov-věci-pojem:popis ;
+	ft:has-target-entity g-sgov-věci-pojem:popis ;
 .
 
 g-sgov-čas-pojem:od a ft:time .

@@ -913,7 +913,7 @@ WHERE {
     FILTER NOT EXISTS {
         ?ic a ft:ignore-condition ;
               ft:has-parent-entity ?directParentEntity  ;
-              ft:has-ignored-entity ?trope  ;
+              ft:has-target-entity ?trope  ;
         .
     }
 }""" ;
@@ -958,7 +958,7 @@ WHERE {
     FILTER NOT EXISTS {
         ?ic a ft:ignore-condition ;
               ft:has-parent-entity ?directParentEntity  ;
-              ft:has-ignored-entity ?childEntity  ;
+              ft:has-target-entity ?childEntity  ;
         .
     }
 }""" ;
