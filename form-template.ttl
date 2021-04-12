@@ -34,15 +34,12 @@ ft:precedes-relatively-in-time a owl:ObjectProperty .
 
 # code list mapping
 ft:codelist-mapping a owl:Class .
-ft:has-codelist-service-url 
-	a owl:ObjectProperty ;
+ft:has-codelist-service-url a owl:ObjectProperty ;
 	rdfs:domain ft:mapping ;
 .
-ft:has-codelist-entity 
-	a owl:ObjectProperty ;
+ft:has-codelist-entity a owl:ObjectProperty ;
 	rdfs:domain ft:mapping ;
 .
-ft:has-internal-entity 
-	a owl:ObjectProperty ;
+ft:has-internal-entity a owl:ObjectProperty ;
 	rdfs:domain ft:mapping ;
 .
