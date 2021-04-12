@@ -21,7 +21,6 @@ d-sgov-turistické-cíle:form-template a owl:Ontology ;
 	skos:prefLabel "Turistický cíl".
 
 ### shared ###
-ft:iri a ft:object-identifier-quality .
 g-sgov-věci-pojem:název a ft:object-identifier-quality .
 g-sgov-lidé-pojem:celé-jméno a ft:object-identifier-quality .
 
