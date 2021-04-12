@@ -89,7 +89,7 @@ g-sgov-vstupné-pojem:vstupné ft:max-cardinality 5 .
 g-sgov-vstupné-pojem:platnost ft:ignore true .
 
 # ma oteviraci dobu
-#g-sgov-čas-pojem:časová-specifikace ft:max-cardinality 5 .
+g-sgov-čas-pojem:časová-specifikace ft:max-cardinality 5 .
 
 g-sgov-čas-pojem:má-časové-období ft:ignore true .
 g-sgov-čas-pojem:má-jinou-časovou-specifikaci ft:ignore true .
