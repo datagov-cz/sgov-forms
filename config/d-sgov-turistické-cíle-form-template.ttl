@@ -39,11 +39,66 @@ d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 
 g-sgov-věci-pojem:popis a ft:textarea .
 
+
+
+### importance ####
+
+#_	název[M]
+[] a ft:importance-condition ;
+	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
+	ft:has-target-entity g-sgov-věci-pojem:název ;
+	ft:has-importance ft:important ;
+.
+
+#_	umístění
+d-sgov-turistické-cíle-pojem:má-umístění ft:has-importance ft:important .
+
+#_	vstupné / název[M], podmínka[M], cena
+g-sgov-veřejná-místa-pojem:má-vstupné ft:has-importance ft:important .
+
+[] a ft:importance-condition ;
+	ft:has-parent-entity d-sgov-turistické-cíle-pojem:vstupné ;
+	ft:has-target-entity g-sgov-věci-pojem:název ;
+	ft:has-importance ft:important ;
+.
+
+g-sgov-vstupné-pojem:podmínka ft:has-importance ft:important .
+g-sgov-čásky-pojem:má-cenu ft:has-importance ft:important .
+
+#	.. cena / výše, měna
+g-sgov-čásky-pojem:výše-částky ft:has-importance ft:important .
+g-sgov-čásky-pojem:má-měnu ft:has-importance ft:important .
+
+#_	otevírací_doba / název[M], popis[M], časová_doba[M], den_v_týdnu
+
+g-sgov-veřejná-místa-pojem:má-otevírací-dobu  ft:has-importance ft:important .
+[] a ft:importance-condition ;
+	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
+	ft:has-target-entity g-sgov-věci-pojem:název ;
+	ft:has-importance ft:important ;
+.
+[] a ft:importance-condition ;
+	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
+	ft:has-target-entity g-sgov-věci-pojem:popis ;
+	ft:has-importance ft:important ;
+.
+g-sgov-čas-pojem:má-časovou-dobu ft:has-importance ft:important .
+
+g-sgov-čas-pojem:má-den-v-týdnu ft:has-importance ft:important .
+
+#_	... časová_doba / od, do 
+[] a ft:importance-condition ;
+	ft:has-parent-entity g-sgov-čas-pojem:časová-doba  ;
+	ft:has-target-entity g-sgov-čas-pojem:od ;
+	ft:has-target-entity g-sgov-čas-pojem:do ;
+	ft:has-importance ft:important ;
+.
+
 # vlastnosti u turisitckeho cile
 d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
-d-sgov-turistické-cíle-pojem:kapacita  ft:is-advanced true .
-d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
-d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
+#d-sgov-turistické-cíle-pojem:kapacita  ft:is-advanced true .
+#d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
+#d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
 
 
 g-sgov-věci-pojem:aktualizováno   ft:ignore true .
@@ -67,7 +122,7 @@ l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
 
 g-sgov-věci-pojem:má-přílohu ft:ignore true .
 g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ft:ignore true .
-g-sgov-veřejná-místa-pojem:má-kontakt ft:ignore true .
+#g-sgov-veřejná-místa-pojem:má-kontakt ft:ignore true .
 g-sgov-veřejná-místa-pojem:má-provozovatele ft:ignore true .
 g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
 
