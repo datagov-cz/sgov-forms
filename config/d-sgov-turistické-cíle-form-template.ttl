@@ -40,53 +40,46 @@ d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 g-sgov-věci-pojem:popis a ft:textarea .
 
 
-
 ### importance ####
 
-#_	název[M]
+#_	turisticky cil
 [] a ft:importance-condition ;
 	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
+	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
+	ft:has-target-relator d-sgov-turistické-cíle-pojem:má-umístění ;
+	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-vstupné ;
 	ft:has-importance ft:important ;
 .
 
-#_	umístění
-d-sgov-turistické-cíle-pojem:má-umístění ft:has-importance ft:important .
-
-#_	vstupné / název[M], podmínka[M], cena
-g-sgov-veřejná-místa-pojem:má-vstupné ft:has-importance ft:important .
-
+#_	.. vstupné
 [] a ft:importance-condition ;
-	ft:has-parent-entity d-sgov-turistické-cíle-pojem:vstupné ;
+	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
+	ft:has-target-entity g-sgov-vstupné-pojem:podmínka ;
+	ft:has-target-relator g-sgov-vstupné-pojem:má-cenu ;
 	ft:has-importance ft:important ;
 .
 
-g-sgov-vstupné-pojem:podmínka ft:has-importance ft:important .
-g-sgov-čásky-pojem:má-cenu ft:has-importance ft:important .
+#_	.... cena
+[] a ft:importance-condition ;
+	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
+	ft:has-target-entity g-sgov-čásky-pojem:výše-částky ;
+	ft:has-target-relator g-sgov-čásky-pojem:má-měnu ;
+	ft:has-importance ft:important ;
+.
 
-#	.. cena / výše, měna
-g-sgov-čásky-pojem:výše-částky ft:has-importance ft:important .
-g-sgov-čásky-pojem:má-měnu ft:has-importance ft:important .
-
-#_	otevírací_doba / název[M], popis[M], časová_doba[M], den_v_týdnu
-
-g-sgov-veřejná-místa-pojem:má-otevírací-dobu  ft:has-importance ft:important .
+#_	.. otevírací_doba
 [] a ft:importance-condition ;
 	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
-	ft:has-importance ft:important ;
-.
-[] a ft:importance-condition ;
-	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
 	ft:has-target-entity g-sgov-věci-pojem:popis ;
+	ft:has-target-relator g-sgov-čas-pojem:má-časovou-dobu ;
+	ft:has-target-relator g-sgov-čas-pojem:má-den-v-týdnu ;
 	ft:has-importance ft:important ;
 .
-g-sgov-čas-pojem:má-časovou-dobu ft:has-importance ft:important .
 
-g-sgov-čas-pojem:má-den-v-týdnu ft:has-importance ft:important .
-
-#_	... časová_doba / od, do 
+#_	.... časová_doba 
 [] a ft:importance-condition ;
 	ft:has-parent-entity g-sgov-čas-pojem:časová-doba  ;
 	ft:has-target-entity g-sgov-čas-pojem:od ;
