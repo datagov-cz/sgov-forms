@@ -49,6 +49,27 @@
   owl:imports <http://onto.fel.cvut.cz/ontologies/s-pipes-lib> ;
   owl:imports z-sgov:model ;
 .
+:attach-advanced
+  a sml:ApplyConstruct ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """#1 - add advanced questions if not important
+CONSTRUCT {
+     ?q  ft:has-importance ft:advanced .
+}
+WHERE {
+    ?q a doc:question .
+    FILTER NOT EXISTS {
+        ?q ft:has-importance ft:important .
+    }
+    FILTER NOT EXISTS {
+        ?q ft:has-importance ft:required .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-advanced" ;
 :attach-answerable-section-logic
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -112,6 +133,101 @@ WHERE {
     ] ;
   sml:replace false ;
   rdfs:label "attach-duplicable-questions" ;
+.
+:attach-importance
+  a sml:ApplyConstruct ;
+  sm:next :attach-importance-closure ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - make root question important
+CONSTRUCT {
+     ?rootQ  ft:has-importance ft:important .
+}
+WHERE {
+    ?formQ a doc:question .
+    ?formQ doc:has_related_question ?rootQ .
+    FILTER NOT EXISTS {
+        ?notExistsQ doc:has_related_question ?formQ .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 3 - add  question importance from processing entity
+CONSTRUCT {
+     ?q  ft:has-importance ?importance .
+}
+WHERE {
+    ?q a doc:question .
+    ?q :has-processing-entity ?processingEntity .
+    OPTIONAL {
+        ?processingEntity ft:has-importance ?importance .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 4 - add question importance from processing relator
+CONSTRUCT {
+     ?q  ft:has-importance ?importance .
+}
+WHERE {
+    ?q a doc:question .
+    ?q :has-processing-relator ?processingRelator .
+    OPTIONAL {
+        ?processingRelator ft:has-importance ?importance .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 5 - add question importance from importance conditions
+CONSTRUCT {
+     ?q  ft:has-importance ?importance .
+}
+WHERE {
+    ?qParent doc:has_related_question ?q .
+    ?ic a ft:importance-condition  ;
+          ft:has-importance ?importance ;
+    .
+    {
+          ?qParent :has-processing-entity ?parentProcessingEntity .
+          ?ic ft:has-parent-entity ?parentProcessingRelator .
+    } UNION {
+          ?qParent :has-processing-relator ?parentProcessingRelator .
+          ?ic ft:has-parent-relator ?parentProcessingRelator .
+    }
+    {
+           ?q :has-processing-entity ?processingEntity .
+           ?ic ft:has-target-entity ?processingEntity .
+    } UNION {
+           ?q :has-processing-relator ?processingRelator .
+           ?ic ft:has-target-relator ?processingRelator .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-importance" ;
+.
+:attach-importance-closure
+  a sml:ApplyConstruct ;
+  sm:next :attach-advanced ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# make all sibling question important by default
+CONSTRUCT {
+     ?q  ft:has-importance ft:important .
+}
+WHERE {
+    ?qParent doc:has_related_question ?q .
+    FILTER NOT EXISTS {
+        ?qParent doc:has_related_question ?qNotExists .
+        ?qNotExists  ft:has-importance ?importance .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-importance-closure" ;
 .
 :attach-possible-values-hook
   a sml:ApplyConstruct ;
@@ -688,7 +804,7 @@ WHERE {
 :construct-duplicate-questions
   a sml:ApplyConstruct ;
   kbss-module:has-max-iteration-count "1" ;
-  sm:next :question-siblings-ordering ;
+  sm:next :attach-importance ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - construct deep copy of questions
@@ -771,6 +887,7 @@ CONSTRUCT {
           rdfs:label \"Zobrazit více\" ;
           dce:description \"Zobrazí/Skryje pokročilé otázky. Otázky,  které jsou zodpovězeny a sekce, které obsahují zodpovězené otázky nelze skrýt.\" ;
           form-lt:has-layout-class \"checkbox\" ;
+          form:has-question-origin form:show-advanced-question ;
           form:show-advanced-question true ;
       .
       ?q form:is-relevant-if ?orCondition .
@@ -787,14 +904,15 @@ CONSTRUCT {
              form:accepts form:answered-question ;
       .
 
+     ?q form-lt:has-layout-class \"emphasise-on-relevant\" .
 # TODO  do specific metadata questions ordering
       ?q form:has-preceding-question ?showAdvancedQ . 
 }
 WHERE {
     ?parentQ doc:has_related_question ?advancedQ .
-    ?advancedQ ft:is-advanced true .
+    ?advancedQ ft:has-importance ft:advanced .
     ?parentQ doc:has_related_question ?q  .
-    ?q ft:is-advanced true .
+    ?q ft:has-importance ft:advanced .
     
  
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
@@ -882,7 +1000,6 @@ CONSTRUCT {
     ?childQ rdfs:label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
-    ?childQ  ft:is-advanced ?isAdvanced .
     ?parentQ doc:has_related_question ?childQ .
 }
 WHERE {
@@ -897,10 +1014,6 @@ WHERE {
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
-    OPTIONAL {
-        ?trope ft:is-advanced true .
-         BIND(true as ?isAdvanced)
-    }
     FILTER NOT EXISTS {
         ?trope ft:ignore true .
     } . 
@@ -925,6 +1038,7 @@ CONSTRUCT {
     ?childQ a doc:question .
     ?childQ rdfs:label ?relatorLabel .
     ?childQ :has-processing-entity ?childEntity .
+    ?childQ :has-processing-relator ?relator .
     ?childQ :has-related-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
 }
@@ -1100,6 +1214,10 @@ WHERE {
   a owl:ObjectProperty ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
+:has-processing-relator
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
 :has-related-entity
   a owl:ObjectProperty ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
@@ -1270,8 +1388,8 @@ ASK WHERE {
 :merge-with-origins
   a sml:Merge ;
   sm:next :attach-duplicable-questions ;
+  sm:next :attach-importance ;
   sm:next :construct-dny-v-tydnu-questions ;
-  sm:next :question-siblings-ordering ;
   rdfs:label "merge-with-origins" ;
 .
 :question-siblings-ordering

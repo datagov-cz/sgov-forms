@@ -33,7 +33,10 @@ ft:precedes-relatively-in-time a owl:ObjectProperty .
 
 
 ### condition
-ft:condition a owl:Class .
+
+ft:condition a owl:Class ;
+	rdfs:comment "Each condition is evaluated to true if parents (entity or relator) are matched and at least one target (entity or relator) is matched."@en ;
+.
 ft:has-target-entity a owl:ObjectProperty  ;
 	rdfs:domain ft:condition ;
 .
@@ -71,6 +74,8 @@ ft:has-importance a owl:ObjectProperty ;
 ft:ignore-condition a owl:Class ;
 	rdfs:subClassOf ft:condition ;
 .
+
+
 
 # code list mapping
 ft:codelist-mapping a owl:Class .
