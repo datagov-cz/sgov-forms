@@ -14,6 +14,7 @@
 @prefix g-sgov-veřejná-místa-pojem: <https://slovník.gov.cz/generický/veřejná-místa/pojem/> .
 @prefix g-sgov-lidé-pojem: <https://slovník.gov.cz/generický/lidé/pojem/> .
 @prefix g-sgov-vstupné-pojem: <https://slovník.gov.cz/generický/vstupné/pojem/> .
+@prefix g-sgov-množství-pojem: <https://slovník.gov.cz/generický/množství/pojem/> .
 @prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
 @prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
 
@@ -79,6 +80,13 @@ g-sgov-věci-pojem:popis a ft:textarea .
 	ft:has-importance ft:important ;
 .
 
+#_	.... den-v-týdnu
+[] a ft:importance-condition ;
+	ft:has-parent-entity g-sgov-číselníky-pojem:den-v-týdnu ;
+	ft:has-target-relator rdf:type ;
+	ft:has-importance ft:important ;
+.
+
 #_	.... časová_doba 
 [] a ft:importance-condition ;
 	ft:has-parent-entity g-sgov-čas-pojem:časová-doba  ;
@@ -87,6 +95,12 @@ g-sgov-věci-pojem:popis a ft:textarea .
 	ft:has-importance ft:important ;
 .
 
+#_	.... množství 
+[] a ft:importance-condition ;
+	ft:has-parent-entity g-sgov-množství-pojem:množství  ;
+	ft:has-target-entity g-sgov-množství-pojem:hodnota ;
+	ft:has-target-relator g-sgov-množství-pojem:má-jednotku ;
+	ft:has-importance ft:important ;
 # vlastnosti u turisitckeho cile
 d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 #d-sgov-turistické-cíle-pojem:kapacita  ft:is-advanced true .
