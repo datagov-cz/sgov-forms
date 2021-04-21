@@ -1206,6 +1206,29 @@ WHERE {
     ] ;
   sml:replace false ;
 .
+:construct-unit-of-measure-questions
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sm:nodeX -219 ;
+  sm:nodeY 2319 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# add reference to unit of measure from quality question
+CONSTRUCT {
+     ?qQualityValue form:has-unit-of-measure-question ?qUnitOfMeasure . 
+}
+WHERE {
+    ?qualityValueEntity ft:has-unit-of-measure ?unitOfMeasureEntity .
+    
+    ?qParent doc:has_related_question ?qUnitOfMeasure .
+    ?qUnitOfMeasure  :has-processing-entity ?unitOfMeasureEntity .
+    ?qParent doc:has_related_question ?qQualityValue .
+    ?qQualityValue  :has-processing-entity ?qualityValueEntity .
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "construct-unit-of-measure-questions" ;
+.
 :has-algorithm-related-property
   a rdf:Property ;
 .
@@ -1424,6 +1447,7 @@ WHERE {
   sm:next :bind-root-question ;
   sm:next :construct-metaquestions ;
   sm:next :construct-type-filters ;
+  sm:next :construct-unit-of-measure-questions ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - make object identifier first
