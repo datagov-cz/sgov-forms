@@ -577,6 +577,11 @@ CONSTRUCT {
 WHERE {
   SERVICE   <XXX_SERVICE_XXX>  {
      SELECT ?value ?labelStr ?explanationStr ?entityType { 
+
+          VALUES (?entityType) {
+               (<XXXXX>)
+          }
+
           ?value skos:inScheme ?entityType .
 
           ?value skos:prefLabel ?label .
@@ -589,9 +594,7 @@ WHERE {
               BIND(str(?explanation) as ?explanationStr)
           }
 
-      } VALUES (?entityType) {
-        (<XXXXX>)
-      }
+      } 
   }
 }""" ;
   rdfs:label "bind-external-possible-values-query-template" ;
