@@ -192,7 +192,7 @@ WHERE {
     .
     {
           ?qParent :has-processing-entity ?parentProcessingEntity .
-          ?ic ft:has-parent-entity ?parentProcessingRelator .
+          ?ic ft:has-parent-entity ?parentProcessingEntity .
     } UNION {
           ?qParent :has-processing-relator ?parentProcessingRelator .
           ?ic ft:has-parent-relator ?parentProcessingRelator .
@@ -778,6 +778,7 @@ CONSTRUCT {
       ?childQ a doc:question .
       ?childQ rdfs:label ?valueLabel .
       ?childQ form:has-question-origin ?value .
+      ?childQ  :has-processing-relator rdf:type .
       ?childQ form-lt:has-layout-class \"checkbox\" .
       ?parentQ doc:has_related_question ?childQ .
 }
