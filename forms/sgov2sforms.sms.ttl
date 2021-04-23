@@ -73,8 +73,6 @@ WHERE {
 :attach-answerable-section-logic
   a sml:ApplyConstruct ;
   sm:next :merge ;
-  sm:nodeX 320 ;
-  sm:nodeY 2097 ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# add visibility logic of questions related to answerable section
@@ -538,6 +536,7 @@ ASK WHERE {
 }""" ;
     ] ;
   sm:next :bind-form-template-service-url ;
+  sm:next :bind-sample-form-uri ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """# bind executionId based on root question or generate new
@@ -559,8 +558,6 @@ WHERE {
 :bind-external-possible-values-query-template
   a sml:BindWithConstant ;
   sm:next :attach-possible-values-hook ;
-  sm:nodeX 1750 ;
-  sm:nodeY 1575 ;
   sm:outputVariable "externalPossibleValuesQueryTemplate" ;
   sml:value """prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix dce: <http://purl.org/dc/elements/1.1/>
@@ -602,6 +599,7 @@ WHERE {
 :bind-form-template
   a sml:BindBySelect ;
   sm:next :bind-form-template-service-url ;
+  sm:next :bind-sample-form-uri ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """SELECT ?formTemplate
@@ -713,6 +711,54 @@ WHERE {
 }""" ;
     ] ;
 .
+:bind-sample-form-service-url
+  a sml:BindWithConstant ;
+  sm:next :retrieve-sample-form ;
+  sm:outputVariable "sampleFormServiceUrl" ;
+  sml:value [
+      a sp:iri ;
+      sp:arg1 [
+          a sp:concat ;
+          sp:arg1 [
+              a sp:str ;
+              sp:arg1 [
+                  sp:varName "formGenRepositoryUrl" ;
+                ] ;
+            ] ;
+          sp:arg2 "?default-graph-uri=" ;
+          sp:arg3 [
+              a sp:encode_for_uri ;
+              sp:arg1 [
+                  a sp:str ;
+                  sp:arg1 [
+                      sp:varName "sampleFormUri" ;
+                    ] ;
+                ] ;
+            ] ;
+        ] ;
+    ] ;
+  rdfs:label "bind-sample-form-service-url" ;
+.
+:bind-sample-form-uri
+  a sml:BindWithConstant ;
+  sm:next :bind-sample-form-service-url ;
+  sm:next :deploy-sample-form ;
+  sm:outputVariable "sampleFormUri" ;
+  sml:value [
+      a sp:iri ;
+      sp:arg1 [
+          a sp:concat ;
+          sp:arg1 [
+              a sp:str ;
+              sp:arg1 [
+                  sp:varName "formTemplate" ;
+                ] ;
+            ] ;
+          sp:arg2 "--sample-form" ;
+        ] ;
+    ] ;
+  rdfs:label "bind-sample-form-uri" ;
+.
 :bind-sgov-service-url
   a sml:BindWithConstant ;
   sm:next :construct-direct-vocabulary-dependencies ;
@@ -744,6 +790,15 @@ WHERE {
             ] ;
         ] ;
     ] ;
+.
+:clone
+  a sm:Function ;
+  sm:returnModule :clone_Return ;
+  rdfs:subClassOf sm:Functions ;
+.
+:clone_Return
+  a sml:ReturnRDF ;
+  sml:serialization sml:Turtle ;
 .
 :construct-direct-vocabulary-dependencies
   a sml:ApplyConstruct ;
@@ -879,8 +934,6 @@ WHERE {
 :construct-metaquestions
   a sml:ApplyConstruct ;
   sm:next :attach-answerable-section-logic ;
-  sm:nodeX 99 ;
-  sm:nodeY 1926 ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# construct show advanced quesitons and ordering
@@ -929,6 +982,22 @@ WHERE {
     ] ;
   sml:replace true ;
   rdfs:label "construct-metaquestions" ;
+.
+:construct-question-based-origins
+  a sml:ApplyConstruct ;
+  sm:next :filter-out-form-template-configuration ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?q form:has-question-origin ?qo .
+}
+WHERE {
+    ?q a doc:question .
+    BIND(fl:create-qo(?q) as ?qo)
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-question-based-origins" ;
 .
 :construct-question-origins
   a sml:ApplyConstruct ;
@@ -1210,8 +1279,6 @@ WHERE {
 :construct-unit-of-measure-questions
   a sml:ApplyConstruct ;
   sm:next :merge ;
-  sm:nodeX -219 ;
-  sm:nodeY 2319 ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# add reference to unit of measure from quality question
@@ -1229,6 +1296,75 @@ WHERE {
     ] ;
   sml:replace true ;
   rdfs:label "construct-unit-of-measure-questions" ;
+.
+:deploy-sample
+  a sm:Function ;
+  sm:returnModule :deploy-sample_Return ;
+  rdfs:subClassOf sm:Functions ;
+.
+:deploy-sample-form
+  a kbss-module:deploy ;
+  km-rdf4j:p-is-replace true ;
+  km-rdf4j:p-rdf4j-context-iri [
+      a sp:str ;
+      sp:arg1 [
+          sp:varName "sampleFormUri" ;
+        ] ;
+    ] ;
+  km-rdf4j:p-rdf4j-repository-name [
+      a sp:replace ;
+      sp:arg1 [
+          sp:varName "formGenRepositoryUrl" ;
+        ] ;
+      sp:arg2 ".*/repositories/" ;
+      sp:arg3 "" ;
+    ] ;
+  km-rdf4j:p-rdf4j-server-url [
+      a sp:replace ;
+      sp:arg1 [
+          sp:varName "formGenRepositoryUrl" ;
+        ] ;
+      sp:arg2 "/repositories/.*" ;
+      sp:arg3 "" ;
+    ] ;
+  sm:next :deploy-sample_Return ;
+  rdfs:label "deploy-sample-form" ;
+.
+:deploy-sample_Return
+  a sml:ReturnRDF ;
+  sml:serialization sml:Turtle ;
+.
+:filter-out-form-template-configuration
+  a sml:ApplyConstruct ;
+  sm:next :deploy-sample-form ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?s ?p ?o
+}
+WHERE {
+     ?s ?p ?o .
+     FILTER(?o !=  ft:root-entity)
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "filter-out-form-template-configuration" ;
+.
+:filter-out-question-origins
+  a sml:ApplyConstruct ;
+  sm:next :construct-question-based-origins ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+     ?s ?p ?o .
+}
+WHERE {
+     ?s ?p ?o .
+     FILTER(?p != form:has-question-origin)
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "filter-out-question-origins" ;
 .
 :has-algorithm-related-property
   a rdf:Property ;
@@ -1334,6 +1470,16 @@ ASK WHERE {
     ] ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
+      sp:text """# there a sibling parents having same origin
+ASK WHERE {
+#    ?qParent doc:has_related_question ?q1 .
+#   ?qParent doc:has_related_question ?q2 .    
+#    ?q1 form:has-question-origin ?qO1 .
+#    ?q2 form:has-question-origin ?qO2 .
+}""" ;
+    ] ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
       sp:text """# there is a question with more than one answer
 ASK WHERE {
     ?q a doc:question .
@@ -1410,7 +1556,17 @@ ASK WHERE {
     }
 }""" ;
     ] ;
+  sm:next :filter-out-question-origins ;
   sm:next :transform_Return ;
+.
+:merge-form-metadata
+  a kbss-module:merge-form-metadata ;
+  kbss-module:execution-id [
+      sp:varName "executionId" ;
+    ] ;
+  sm:next :clone_Return ;
+  sml:replace true ;
+  rdfs:label "merge-form-metadata" ;
 .
 :merge-with-origins
   a sml:Merge ;
@@ -1540,7 +1696,7 @@ WHERE {
        ?earlierQ form:has-question-origin ?earlierQO . 
        ?q doc:has_related_question ?laterQ . 
        ?laterQ form:has-question-origin ?laterQO . 
-       ?earlierQO ft:precedes-relatively-in-time ?laterQO     .
+       ?earlierQO ft:precedes-relatively-in-time ?laterQO .
 }""" ;
     ] ;
   sml:replace false ;
@@ -1596,6 +1752,23 @@ WHERE {
 }""" ;
     ] ;
   sml:replace true ;
+.
+:retrieve-sample-form
+  a sml:ApplyConstruct ;
+  sm:next :merge-form-metadata ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?s ?p ?o.
+}
+WHERE {
+    SERVICE ?sampleFormServiceUrl {
+          ?s ?p ?o .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-sample-form" ;
 .
 :retrieve-sgov
   a sml:ApplyConstruct ;
