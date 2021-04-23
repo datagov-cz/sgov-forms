@@ -70,6 +70,7 @@ WHERE {
     ] ;
   sml:replace false ;
   rdfs:label "attach-advanced" ;
+.
 :attach-answerable-section-logic
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -94,7 +95,7 @@ WHERE {
 .
 :attach-descriptions
   a sml:ApplyConstruct ;
-  sm:next :attach-value-types ;
+  sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# create descriptions
@@ -326,7 +327,19 @@ WHERE {
 .
 :attach-value-types
   a sml:ApplyConstruct ;
-  sm:next :merge ;
+  sm:next :attach-descriptions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# answer size
+CONSTRUCT {
+    ?q  form:has-answer-size ?answerSize .
+}
+WHERE {
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?entity ft:has-answer-size ?answerSize .
+}""" ;
+    ] ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# boolean
@@ -1256,6 +1269,7 @@ WHERE {
 .
 :construct-type-filters
   a sml:ApplyConstruct ;
+  sm:next :attach-value-types ;
   sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
@@ -1612,8 +1626,8 @@ WHERE {
 }""" ;
     ] ;
   sm:next :attach-answerable-section-logic ;
-  sm:next :attach-descriptions ;
   sm:next :attach-possible-values-hook ;
+  sm:next :attach-value-types ;
   sm:next :bind-root-question ;
   sm:next :construct-metaquestions ;
   sm:next :construct-type-filters ;
