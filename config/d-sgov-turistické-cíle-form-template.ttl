@@ -186,6 +186,8 @@ g-sgov-čas-pojem:do a ft:time .
 
 ##############################
 
+g-sgov-čásky-pojem:výše-částky ft:has-unit-of-measure g-sgov-číselníky-pojem:měna .
+g-sgov-množství-pojem:hodnota ft:has-unit-of-measure g-sgov-číselníky-pojem:jednotka .
 
 <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/pondělí> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý>     .
 <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/úterý> ft:precedes-relatively-in-time <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu/položky/středa>     .
