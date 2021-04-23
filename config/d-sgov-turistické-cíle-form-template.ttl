@@ -107,12 +107,21 @@ d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 #d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
 #d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
 
+# !! kazda sekce by mela podsekci "Aktualizovan" a "Vytvořen"
+v-sgov-pojem:má-čas-vytvoření ft:ignore true .
+v-sgov-pojem:má-čas-poslední-aktualizace ft:ignore true .
 
+# napr. TC, TC -> kontakt, TC -> bezbarierovy vstup 
 g-sgov-věci-pojem:aktualizováno   ft:ignore true .
 g-sgov-věci-pojem:vytvořeno   ft:ignore true .
 g-sgov-věci-pojem:zneplatněno   ft:ignore true .
+g-sgov-věci-pojem:relevantní-do ft:ignore true .
+#g-sgov-věci-pojem:má-přílohu ft:ignore true .
  
-v-sgov-pojem:subjekt-práva ft:ignore true .
+# napr. ciselniky (napr. TC -> typ turistickeho cile, TC -> dostupny jazyk)
+v-sgov-pojem:eviduje-položku-evidenčního-systému ft:ignore true .
+v-sgov-pojem:eviduje ft:ignore true .
+v-sgov-pojem:pokrývá-oblast ft:ignore true .
 v-sgov-pojem:má-platnost ft:ignore true .
 
 
@@ -122,44 +131,42 @@ v-sgov-pojem:příjmení ft:ignore true .
 
 
 
+#v-sgov-pojem:subjekt-práva ft:ignore true .
+
+# clovek, osoba
+#v-sgov-pojem:křesní-jméno ft:ignore true .
+#v-sgov-pojem:příjmení ft:ignore true .
+
 # vlastnik, provozovatel
-l-sgov-111-2009-pojem:má-adresu-místa-pobytu ft:ignore true .
-l-sgov-111-2009-pojem:má-adresu-narození ft:ignore true .
-l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
+#l-sgov-111-2009-pojem:má-adresu-místa-pobytu ft:ignore true .
+#l-sgov-111-2009-pojem:má-adresu-narození ft:ignore true .
+#l-sgov-111-2009-pojem:má-okres-narození ft:ignore true .
 
-g-sgov-věci-pojem:má-přílohu ft:ignore true .
-g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ft:ignore true .
+#g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ft:ignore true .
 #g-sgov-veřejná-místa-pojem:má-kontakt ft:ignore true .
-g-sgov-veřejná-místa-pojem:má-provozovatele ft:ignore true .
-g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
+#g-sgov-veřejná-místa-pojem:má-provozovatele ft:ignore true .
+#g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
 
-g-sgov-věci-pojem:relevantní-do ft:ignore true .
-d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:ignore true .
+#d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:ignore true .
 
-v-sgov-pojem:eviduje-položku-evidenčního-systému ft:ignore true .
-v-sgov-pojem:eviduje ft:ignore true .
-v-sgov-pojem:pokrývá-oblast ft:ignore true .
                                                   
 
-# !! kazda sekce by mela podsekci "Aktualizovan" a "Vytvořen"
-v-sgov-pojem:má-čas-vytvoření ft:ignore true .
-v-sgov-pojem:má-čas-poslední-aktualizace ft:ignore true .
 
 
 # vstupne
 g-sgov-vstupné-pojem:vstupné ft:max-cardinality 5 . 
-g-sgov-vstupné-pojem:platnost ft:ignore true .
+#g-sgov-vstupné-pojem:platnost ft:ignore true .
 
 # ma oteviraci dobu
 g-sgov-čas-pojem:časová-specifikace ft:max-cardinality 5 .
 
-g-sgov-čas-pojem:má-časové-období ft:ignore true .
-g-sgov-čas-pojem:má-jinou-časovou-specifikaci ft:ignore true .
-g-sgov-čas-pojem:počet-opakování ft:ignore true .
-g-sgov-čas-pojem:má-frekvenci ft:ignore true .
-g-sgov-čas-pojem:má-specifickou-frekvenci ft:ignore true .
-g-sgov-čas-pojem:má-časový-interval ft:ignore true .
-g-sgov-čas-pojem:má-časový-okamžik ft:ignore true .
+#g-sgov-čas-pojem:má-časové-období ft:ignore true .
+#g-sgov-čas-pojem:má-jinou-časovou-specifikaci ft:ignore true .
+#g-sgov-čas-pojem:počet-opakování ft:ignore true .
+#g-sgov-čas-pojem:má-frekvenci ft:ignore true .
+#g-sgov-čas-pojem:má-specifickou-frekvenci ft:ignore true .
+#g-sgov-čas-pojem:má-časový-interval ft:ignore true .
+#g-sgov-čas-pojem:má-časový-okamžik ft:ignore true .
 
 g-sgov-čas-pojem:čas ft:ignore true .
 g-sgov-čásky-pojem:výše-částky a ft:number .
@@ -168,18 +175,20 @@ g-sgov-čásky-pojem:výše-částky xsd:minInclusive 0 .
 g-sgov-čásky-pojem:výše-částky xsd:maxInclusive 1000000 .
 
 
-[] a ft:ignore-condition ;
-	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
-	ft:has-target-entity g-sgov-věci-pojem:název ;
-.
+#[] a ft:ignore-condition ;
+#	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
+#	ft:has-target-entity g-sgov-věci-pojem:název ;
+#.
 
 
-[] a ft:ignore-condition ;
-	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
-	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné  ;
-	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
-	ft:has-target-entity g-sgov-věci-pojem:popis ;
-.
+#[] a ft:ignore-condition ;
+#	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
+#	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné  ;
+#	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
+#	ft:has-target-entity g-sgov-věci-pojem:popis ;
+#.
+
+
 
 g-sgov-čas-pojem:od a ft:time .
 g-sgov-čas-pojem:do a ft:time .
