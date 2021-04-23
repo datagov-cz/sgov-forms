@@ -125,9 +125,7 @@ v-sgov-pojem:pokrývá-oblast ft:ignore true .
 v-sgov-pojem:má-platnost ft:ignore true .
 
 
-# clovek, osoba
-v-sgov-pojem:křesní-jméno ft:ignore true .
-v-sgov-pojem:příjmení ft:ignore true .
+
 
 
 
