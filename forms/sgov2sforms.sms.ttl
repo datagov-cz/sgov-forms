@@ -407,6 +407,19 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
+      sp:text """# textarea for multilingual TODO
+CONSTRUCT {
+    ?qChild form-lt:has-layout-class \"textarea\" .
+}
+WHERE {
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?q doc:has_related_question ?qChild .
+    ?entity a ft:textarea .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
       sp:text """# time
 CONSTRUCT {
     ?q form-lt:has-layout-class \"time\" .
