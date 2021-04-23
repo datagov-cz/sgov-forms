@@ -88,3 +88,7 @@ ft:has-codelist-entity a owl:ObjectProperty ;
 ft:has-internal-entity a owl:ObjectProperty ;
 	rdfs:domain ft:mapping ;
 .
+
+# unit-of-measure
+ft:has-unit-of-measure a owl:ObjectProperty ;
+.
