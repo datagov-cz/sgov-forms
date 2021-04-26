@@ -136,7 +136,10 @@ v-sgov-pojem:má-platnost ft:ignore true .
 #d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:ignore true .
 
 
-#g-sgov-vstupné-pojem:platnost ft:ignore true .
+# TODO - error multiple questions of a parent !!!
+g-sgov-vstupné-pojem:platnost ft:ignore true .
+
+
 
 #g-sgov-čas-pojem:má-časové-období ft:ignore true .
 #g-sgov-čas-pojem:má-jinou-časovou-specifikaci ft:ignore true .
