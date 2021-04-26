@@ -275,6 +275,46 @@ WHERE {
     ] ;
   sml:replace true ;
 .
+:attach-relevant-tested-questions
+  a sml:ApplyConstruct ;
+  sm:next :construct-type-filters ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - attach relevant tested questions based on type
+CONSTRUCT {
+     ?filteredQ :has-relevant-tested-question ?testedQ .
+}
+WHERE {
+    ?q doc:has_related_question ?testedQ  .
+    ?testedQ :has-processed-entity ?testedEntity .
+
+    ?q doc:has_related_question ?filteredQ .
+    ?filteredQ :has-processing-entity ?aspect .
+    ?filteredQ :has-related-entity ?filteredEntity .
+    ?testedEntity rdfs:subClassOf*  ?filteredEntity .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - attach not relevant tested questions based on type
+CONSTRUCT {
+     ?filteredQ :has-not-relevant-tested-question ?testedQ .
+}
+WHERE {
+    ?q doc:has_related_question ?testedQ  .
+    ?testedQ :has-processed-entity ?testedEntity .
+
+    ?q doc:has_related_question ?filteredQ .
+    ?filteredQ :has-processing-entity ?aspect .
+    ?filteredQ :has-related-entity ?filteredEntity .
+    FILTER NOT EXISTS {
+         ?testedEntity rdfs:subClassOf*  ?filteredEntity .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-relevant-tested-questions" ;
+.
 :attach-root-question
   a sml:ApplyConstruct ;
   sm:next :construct-question-origins ;
@@ -1285,20 +1325,25 @@ WHERE {
       a sp:Construct ;
       sp:text """# 2- filtering of tropes and relators based on type
 CONSTRUCT {
-     ?filteredQ form:is-relevant-if [
-           a form:condition ;
+     ?filteredQ form:is-relevant-if  ?orCondition .
+     ?filteredQ form-lt:has-layout-class \"emphasise-on-relevant\" .
+     ?orCondition a form:or-condition ;
+             form:has-sub-condition ?testedQCondition ;
+      .
+      ?testedQCondition a form:condition ;
            form:accepts-answer-value true ;
            form:has-tested-question ?testedQ ;
-      ] .     
+      .
 }
 WHERE {
     ?q doc:has_related_question ?testedQ  . 
-    ?testedQ :has-processed-entity ?testedEntity .
-
     ?q doc:has_related_question ?filteredQ . 
-    ?filteredQ :has-processing-entity ?aspect .
-    ?filteredQ :has-related-entity ?filteredEntity .  
-    ?testedEntity rdfs:subClassOf*  ?filteredEntity
+
+    ?filteredQ :has-relevant-tested-question ?testedQ .
+
+    ?filteredQ :has-not-relevant-tested-question ?otherTestedQ .
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), \"filtering-based-on-type\")))) as ?orCondition)
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), str(?testedQ), \"filtering-based-on-type\")))) as ?testedQCondition)
 }""" ;
     ] ;
   sml:replace false ;
@@ -1627,10 +1672,10 @@ WHERE {
     ] ;
   sm:next :attach-answerable-section-logic ;
   sm:next :attach-possible-values-hook ;
+  sm:next :attach-relevant-tested-questions ;
   sm:next :attach-value-types ;
   sm:next :bind-root-question ;
   sm:next :construct-metaquestions ;
-  sm:next :construct-type-filters ;
   sm:next :construct-unit-of-measure-questions ;
   sml:constructQuery [
       a sp:Construct ;
