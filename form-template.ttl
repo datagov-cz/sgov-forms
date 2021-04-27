@@ -92,3 +92,11 @@ ft:has-internal-entity a owl:ObjectProperty ;
 # unit-of-measure
 ft:has-unit-of-measure a owl:ObjectProperty ;
 .
+
+ft:has-initial-input-length a owl:DatatypeProperty ;
+	rdfs:range xsd:positiveInteger ;
+.
+
+ft:step a owl:DatatypeProperty ;
+	rdfs:range xsd:decimal ;
+.
