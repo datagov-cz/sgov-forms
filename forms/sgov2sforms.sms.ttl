@@ -370,18 +370,6 @@ WHERE {
   sm:next :attach-descriptions ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# answer size
-CONSTRUCT {
-    ?q  form:has-answer-size ?answerSize .
-}
-WHERE {
-    ?q a doc:question .
-    ?q form:has-question-origin ?entity .
-    ?entity ft:has-answer-size ?answerSize .
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
       sp:text """# boolean
 CONSTRUCT {
     ?q form-lt:has-layout-class \"checkbox\" .
@@ -415,6 +403,18 @@ WHERE {
     ?q a doc:question .
     ?q form:has-question-origin ?entity .
     ?entity a ft:datetime .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# initial lenght of input text field
+CONSTRUCT {
+    ?q  form-lt:has-initial-input-length ?answerSize .
+}
+WHERE {
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?entity ft:has-initial-input-length ?answerSize .
 }""" ;
     ] ;
   sml:constructQuery [

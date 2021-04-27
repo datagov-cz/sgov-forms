@@ -42,8 +42,8 @@ d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 .
 
 
-### field size ###
-#d-sgov-turistické-cíle-pojem:kapacita ft:has-answer-size 20 .
+### field size ### 	(default is 65)
+#d-sgov-turistické-cíle-pojem:kapacita ft:has-initial-input-length 6 .
 
 
 # vlastnosti u turisitckeho cile
