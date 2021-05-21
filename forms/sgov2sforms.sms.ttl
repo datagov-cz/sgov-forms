@@ -1520,6 +1520,7 @@ WHERE {
 CONSTRUCT {
     ?topSectionQuestion form-lt:has-layout-class \"wizard-step\" .
     ?topSectionQuestion form-lt:has-layout-class \"section\" .
+    ?topSectionQuestion form-lt:has-layout-class \"sticky\" .
 }
 WHERE {
     ?rootQuestion doc:has_related_question ?topSectionQuestion .
