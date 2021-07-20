@@ -133,6 +133,42 @@ WHERE {
   sml:replace false ;
   rdfs:label "attach-duplicable-questions" ;
 .
+:attach-identifier-to-section
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 -  add simple identifier to parent question
+CONSTRUCT {
+    ?q form:has-identifying-question ?IdQ .
+}
+WHERE {
+    ?q doc:has_related_question ?idQ  .
+    ?idQ form:has-question-origin ?entity .
+    ?entity a ft:object-identifier-quality .
+    FILTER NOT EXISTS {
+           ?idQ doc:has_related_question ?notExistsQ  .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - add multilingual identifier to parent question
+CONSTRUCT {
+    ?q form:has-identifying-question ?I8nIdQ .
+}
+WHERE {
+    ?q doc:has_related_question ?idQ  .
+    ?idQ form:has-question-origin ?entity .
+    ?entity a ft:object-identifier-quality .
+
+    ?idQ doc:has_related_question ?I8nIdQ  .
+    ?I8nIdQ  form:has-question-origin ft:language-czech .
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "attach-identifier-to-section" ;
+.
 :attach-importance
   a sml:ApplyConstruct ;
   sm:next :attach-importance-closure ;
@@ -1672,6 +1708,7 @@ WHERE {
 }""" ;
     ] ;
   sm:next :attach-answerable-section-logic ;
+  sm:next :attach-identifier-to-section ;
   sm:next :attach-possible-values-hook ;
   sm:next :attach-relevant-tested-questions ;
   sm:next :attach-value-types ;
