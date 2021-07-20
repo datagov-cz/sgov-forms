@@ -4,6 +4,7 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+@prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
 @prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
 @prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
 @prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> .
@@ -205,6 +206,23 @@ g-sgov-věci-pojem:popis ft:precedes-relatively-in-time g-sgov-číselníky-poje
 g-sgov-věci-pojem:popis ft:precedes-relatively-in-time g-sgov-čas-pojem:časová-doba .
 g-sgov-vstupné-pojem:podmínka ft:precedes-relatively-in-time g-sgov-čásky-pojem:částka .
 
+##############################
+
+form:language-variant-precedence form:has-higher-priority-precedence form:direct-precedence .
+
+form:relator-multiplicity-precedence form:has-higher-priority-precedence form:language-variant-precedence .
+
+form:meta-question-precedence form:has-higher-priority-precedence form:relator-multiplicity-precedence .
+
+form:object-identification-precedence form:has-higher-priority-precedence form:meta-question-precedence .
+
+form:object-description-precedence form:has-higher-priority-precedence form:object-identification-precedence .
+
+form:aspect-type-precedence form:has-higher-priority-precedence form:object-description-precedence .
+
+form:temporal-precedence form:has-higher-priority-precedence form:aspect-type-precedence .
+
+form:alphabethical-precedence form:has-higher-priority-precedence form:temporal-precedence .
 
 
 ##############################

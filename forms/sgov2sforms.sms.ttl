@@ -1070,7 +1070,13 @@ CONSTRUCT {
       ?qRootX form-lt:has-layout-class \"answerable\" .
       ?qRootX form-lt:has-layout-class \"checkbox\" .
 
-    ?qRootX form:has-preceding-question  ?qRootP .
+     ?qRootX a form:relator-multiplicity-question .
+     ?qRootP a form:relator-multiplicity-question .
+     ?precedenceP a form:relator-multiplicity-precedence ;
+             form:has-first-question ?qRootP ;
+             form:has-second-question ?qRootX ;
+     .
+     ?qRootX form:has-preceding-question  ?qRootP .
 
      ?qRootX form:is-relevant-if  ?condP .
      ?condP   a form:condition ;
@@ -1087,6 +1093,7 @@ WHERE {
     BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
 
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
+    BIND(IRI(concat(str(form:relator-multiplicity-precedence), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?precedenceP)
 }""" ;
     ] ;
   rdfs:label "construct-duplicate-questions" ;
@@ -1123,6 +1130,7 @@ CONSTRUCT {
 
      ?q form-lt:has-layout-class \"emphasise-on-relevant\" .
 # TODO  do specific metadata questions ordering
+      ?showAdvancedQ a form:meta-question .
       ?q form:has-preceding-question ?showAdvancedQ . 
 }
 WHERE {
@@ -1749,6 +1757,7 @@ ASK WHERE {
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
+  kbss-module:has-max-iteration-count 10 ;
   kbss-module:has-output-graph-constraint [
       a sp:Ask ;
       sp:text """# 0 - has preceding relation is cyclic
@@ -1780,9 +1789,164 @@ WHERE {
   sm:next :construct-unit-of-measure-questions ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 1 - make object identifier first
+      sp:text """# 1 - start with direct-precedence
+CONSTRUCT {
+    form:direct-precedence :is-processed true .
+}
+WHERE {
+
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.2 language-variant-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:language-variant-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+ 
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.3 realtor-multiplicity-precedence
+CONSTRUCT {
+      ?q2 form:has-preceding-question  ?q1 .
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:relator-multiplicity-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+
+     ?p a ?currentP  ;
+                form:has-first-question ?q1 ;
+                form:has-second-question ?q2 ;
+      .
+     FILTER NOT EXISTS {
+           ?q1  form:has-preceding-question  ?q2 .
+     }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.4 meta-question-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:meta-question-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.5 object-identification-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:object-identification-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.6 object-description-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+
+#TODO does not work
+       ?qSiblingDescription form:has-preceding-question ?q .
+}
+WHERE {
+     BIND(form:object-description-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+
+    ?q a doc:question .
+    ?q form:has-question-origin ?entity .
+    ?entity a ft:object-identifier-quality .
+    ?qParent doc:has_related_question ?q .
+    ?qParent doc:has_related_question ?qSiblingDescription .
+    ?qSiblingDescription form:has-question-origin ?description .
+    ?description rdfs:subClassOf dc:description .
+    FILTER (?q != ?qSiblingDescription)
+
+    FILTER NOT EXISTS {
+          ?q form:has-preceding-question ?qSiblingDescription .
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.7 aspect-type-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:aspect-type-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1.8 temporal-precedence
+CONSTRUCT {
+      ?currentP  :is-processed true .
+}
+WHERE {
+     BIND(form:temporal-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+     ?currentP  form:has-higher-priority-precedence ?previousP .
+     ?previousP  :is-processed true .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 3 - make object identifier first
 CONSTRUCT {
     ?qSibling form:has-preceding-question ?q .
+    ?q a form:object-identification-question .
 }
 WHERE {
     ?q a doc:question .
@@ -1791,7 +1955,7 @@ WHERE {
     ?qParent doc:has_related_question ?q .
     ?qParent doc:has_related_question ?qSibling .
     ?qSibling form:has-question-origin ?siblingEntity .
-    FILTER (?q != ?qSibling) 
+    FILTER (?q != ?qSibling)
     FILTER NOT EXISTS {
         ?siblingEntity a ft:object-identifier-quality .
     }
@@ -1802,7 +1966,7 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 2 - make sections after regular questions
+      sp:text """# 4 - make sections after regular questions
 CONSTRUCT {
     ?qSection form:has-preceding-question ?qSimpleSibling .
 }
@@ -1821,7 +1985,7 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 3 - make relators after other types of questions TODO
+      sp:text """# 5 - make relators after other types of questions TODO
 CONSTRUCT {
 }
 WHERE {
@@ -1829,46 +1993,31 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 4 - description should be after identifier (TODO does not work)
-CONSTRUCT {
-    ?qSiblingDescription form:has-preceding-question ?q .
-}
-WHERE {
-    ?q a doc:question .
-    ?q form:has-question-origin ?entity .
-    ?entity a ft:object-identifier-quality .
-    ?qParent doc:has_related_question ?q .
-    ?qParent doc:has_related_question ?qSiblingDescription .
-    ?qSiblingDescription form:has-question-origin ?description .
-    ?description rdfs:subClassOf dc:description .
-    FILTER (?q != ?qSiblingDescription)
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 5 - order section filtering question before others
+      sp:text """# 7 - order section filtering question before others
 CONSTRUCT {
     ?qNotFilteringQ form:has-preceding-question ?qFilteringQ .
 }
 WHERE {
-    ?q doc:has_related_question ?qFilteringQ  . 
-    ?q doc:has_related_question ?qNotFilteringQ . 
+    ?q doc:has_related_question ?qFilteringQ  .
+    ?q doc:has_related_question ?qNotFilteringQ .
     ?qFilteringQ :has-processed-entity ?qo1 .
     ?qNotFilteringQ :has-processing-entity ?qo2 .
 }""" ;
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 6 - order if entities by time
+      sp:text """# 8 - order if entities by time
 # TODO need to model it
 CONSTRUCT {
       ?laterQ form:has-preceding-question ?earlierQ     .
+      ?laterQ a form:temporally-related-question .
+      ?earlierQ a form:form:temporally-related-question .
 }
 WHERE {
-       ?q doc:has_related_question ?earlierQ  . 
-       ?earlierQ form:has-question-origin ?earlierQO . 
-       ?q doc:has_related_question ?laterQ . 
-       ?laterQ form:has-question-origin ?laterQO . 
+       ?q doc:has_related_question ?earlierQ  .
+       ?earlierQ form:has-question-origin ?earlierQO .
+       ?q doc:has_related_question ?laterQ .
+       ?laterQ form:has-question-origin ?laterQO .
        ?earlierQO ft:precedes-relatively-in-time ?laterQO .
 }""" ;
     ] ;
