@@ -133,6 +133,36 @@ WHERE {
   sml:replace false ;
   rdfs:label "attach-duplicable-questions" ;
 .
+:attach-duplicate-type-questions
+  a sml:ApplyConstruct ;
+  sm:next :attach-importance ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - construct copy of type questions
+# TODO - not systematic, compute cardinality first
+CONSTRUCT {
+     ?parentQ doc:has_related_question ?duplicateChildQ .
+     ?parentQ form:has-type-question ?duplicateChildQ .
+     ?duplicateChildQ ?p ?o .
+}
+WHERE {
+
+     VALUES ?card { 1 2 3 4 }
+
+     ?parentQ form:has-type-question ?childQ .
+
+# attach specific properties
+     OPTIONAL {
+          ?childQ ?p ?o .
+          FILTER(?p != doc:has_related_question )
+     }
+
+     BIND(fl:create-q(?childQ, ?card) as ?duplicateChildQ)
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "attach-duplicate-type-questions" ;
+.
 :attach-identifier-to-section
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -313,7 +343,6 @@ WHERE {
 .
 :attach-relevant-tested-questions
   a sml:ApplyConstruct ;
-  sm:next :construct-type-filters ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - attach relevant tested questions based on type
@@ -400,6 +429,35 @@ WHERE {
    ?dependantVocab popis-dat-pojem:používá-přímo-pojmy-ze-slovníku+ ?usedVocab .
 }""" ;
     ] ;
+.
+:attach-type-questions-possible-values
+  a sml:ApplyConstruct ;
+  sm:next :attach-value-types ;
+  sm:next :construct-type-filters ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# construct possible values for parent of type question
+# TODO revise
+CONSTRUCT {
+    ?q form:has-possible-value ?subTypeEntity .
+    ?subTypeEntity rdfs:label ?subTypeEntityLabel .
+    ?q form-lt:has-layout-class \"answerable\" .
+    ?q form-lt:has-layout-class \"type-question\" .
+
+    ?q form:has-possible-value ?typeEntity .
+    ?typeEntity rdfs:label ?typeEntityLabel .
+}
+WHERE {
+     ?q form:has-type-question ?typeQ .
+     ?typeQ :has-processed-entity ?typeEntity .
+     ?subTypeEntity rdfs:subClassOf+  ?typeEntity .
+     ?subTypeEntity skos:prefLabel ?subTypeEntityLabel .
+
+      ?typeEntity skos:prefLabel ?typeEntityLabel .
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-type-questions-possible-values" ;
 .
 :attach-value-types
   a sml:ApplyConstruct ;
@@ -1254,24 +1312,22 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 3 - add questions for most specific subclasses
+      sp:text """# 3 - add questions for more specific subclasses
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label ?mostSpecificEntityLabel .
-    ?childQ :has-processed-entity ?mostSpecificEntity .
+    ?childQ rdfs:label \"Typ\"  .
+    ?childQ :has-processed-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
+    # TODO should not be here
+    ?parentQ form:has-type-question ?childQ .
 }
 WHERE {
      ?parentQ :has-processing-entity ?parentEntity .
-     ?mostSpecificEntity rdfs:subClassOf+ ?parentEntity   .
-     ?mostSpecificEntity skos:prefLabel ?mostSpecificEntityLabel .
-     FILTER NOT EXISTS {
-          ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
-     }
+     ?moreSpecificEntity rdfs:subClassOf+ ?parentEntity   .
      BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
-     BIND (fl:create-q(str(?mostSpecificEntity),?childExecutionId) AS ?childQ) .
+     BIND (fl:create-q(concat(str(?parentEntity),\"-type-\"), ?childExecutionId) AS ?childQ) .
      FILTER NOT EXISTS {
-          ?mostSpecificEntity ft:ignore true .
+          ?moreSpecificEntity ft:ignore true .
       } 
       FILTER NOT EXISTS {
           ?parentEntity ft:ignore true .
@@ -1341,22 +1397,25 @@ WHERE {
     } .
 }""" ;
     ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 8 - extend question processing entities by most specific subclasses
+CONSTRUCT {
+     ?q :has-processing-entity ?mostSpecificEntity .
+} WHERE {
+     ?q :has-processing-entity ?entity .
+     ?mostSpecificEntity rdfs:subClassOf+ ?entity   .
+     FILTER NOT EXISTS {
+       ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
+     }
+}
+""" ;
+    ] ;
   sml:replace true ;
 .
 :construct-type-filters
   a sml:ApplyConstruct ;
   sm:next :attach-value-types ;
-  sm:next :merge ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 1 -  type filter questions are boolean
-CONSTRUCT {
-         ?q form-lt:has-layout-class \"checkbox\" .
-}
-WHERE {
-        ?q :has-processed-entity ?qO.
-}""" ;
-    ] ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 2- filtering of tropes and relators based on type
@@ -1367,22 +1426,24 @@ CONSTRUCT {
              form:has-sub-condition ?testedQCondition ;
       .
       ?testedQCondition a form:condition ;
-           form:accepts-answer-value true ;
+           form:accepts-answer-value ?testedEntity ;
            form:has-tested-question ?testedQ ;
       .
 }
 WHERE {
-    ?q doc:has_related_question ?testedQ  . 
+    ?q form:has-type-question ?testedQ .
     ?q doc:has_related_question ?filteredQ . 
+    ?q form:has-possible-value ?testedEntity .
 
-    ?filteredQ :has-relevant-tested-question ?testedQ .
+    ?filteredQ :has-processing-entity ?aspect .
+    ?filteredQ :has-related-entity ?filteredEntity .
+    ?testedEntity rdfs:subClassOf*  ?filteredEntity .
 
-    ?filteredQ :has-not-relevant-tested-question ?otherTestedQ .
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), \"filtering-based-on-type\")))) as ?orCondition)
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), str(?testedQ), \"filtering-based-on-type\")))) as ?testedQCondition)
 }""" ;
     ] ;
-  sml:replace false ;
+  sml:replace true ;
 .
 :construct-unit-of-measure-questions
   a sml:ApplyConstruct ;
@@ -1585,6 +1646,7 @@ ASK WHERE {
 #   ?qParent doc:has_related_question ?q2 .    
 #    ?q1 form:has-question-origin ?qO1 .
 #    ?q2 form:has-question-origin ?qO2 .
+     FILTER(false) # TODO
 }""" ;
     ] ;
   kbss-module:has-input-graph-constraint [
@@ -1680,6 +1742,7 @@ ASK WHERE {
 :merge-with-origins
   a sml:Merge ;
   sm:next :attach-duplicable-questions ;
+  sm:next :attach-duplicate-type-questions ;
   sm:next :attach-importance ;
   sm:next :construct-dny-v-tydnu-questions ;
   rdfs:label "merge-with-origins" ;
@@ -1711,7 +1774,7 @@ WHERE {
   sm:next :attach-identifier-to-section ;
   sm:next :attach-possible-values-hook ;
   sm:next :attach-relevant-tested-questions ;
-  sm:next :attach-value-types ;
+  sm:next :attach-type-questions-possible-values ;
   sm:next :bind-root-question ;
   sm:next :construct-metaquestions ;
   sm:next :construct-unit-of-measure-questions ;
