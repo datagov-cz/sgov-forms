@@ -33,6 +33,7 @@ g-sgov-čásky-pojem:výše-částky xsd:maxInclusive 1000000 .
 # věci
 g-sgov-věci-pojem:název a ft:object-identifier-quality .
 g-sgov-věci-pojem:název a ft:multilingual-quality .
+g-sgov-věci-pojem:popis a ft:object-description-quality .
 g-sgov-věci-pojem:popis a ft:textarea .
 g-sgov-věci-pojem:popis a ft:multilingual-quality .
 
