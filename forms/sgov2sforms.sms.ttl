@@ -433,6 +433,7 @@ WHERE {
 :attach-type-questions-possible-values
   a sml:ApplyConstruct ;
   sm:next :attach-value-types ;
+  sm:next :construct-possible-value-broader-relations ;
   sm:next :construct-type-filters ;
   sml:constructQuery [
       a sp:Construct ;
@@ -1150,6 +1151,26 @@ WHERE {
     ] ;
   sml:replace true ;
   rdfs:label "construct-metaquestions" ;
+.
+:construct-possible-value-broader-relations
+  a sml:ApplyConstruct ;
+  sm:next :construct-type-filters ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# construct possible values for parent of type question
+# TODO revise
+CONSTRUCT {
+    ?subTypeEntity skos:broader  ?superTypeEntity  .
+}
+WHERE {
+     ?q form:has-type-question ?typeQ .
+     ?q form:has-possible-value ?subTypeEntity .
+     ?q form:has-possible-value ?superTypeEntity .
+
+     ?subTypeEntity rdfs:subClassOf  ?superTypeEntity .
+}""" ;
+    ] ;
+  rdfs:label "construct-possible-value-broader-relations" ;
 .
 :construct-question-based-origins
   a sml:ApplyConstruct ;
