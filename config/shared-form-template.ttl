@@ -36,6 +36,7 @@ g-sgov-věci-pojem:název a ft:multilingual-quality .
 g-sgov-věci-pojem:popis a ft:textarea .
 g-sgov-věci-pojem:popis a ft:multilingual-quality .
 
+
 # lidé
 g-sgov-lidé-pojem:celé-jméno a ft:object-identifier-quality .
 
@@ -224,6 +225,11 @@ form:temporal-precedence form:has-higher-priority-precedence form:aspect-type-pr
 
 form:alphabethical-precedence form:has-higher-priority-precedence form:temporal-precedence .
 
+
+##############################
+
+# https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel
+<https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-fyzická-osoba> owl:disjointWith <https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-právnická-osoba> .
 
 ##############################
 
