@@ -77,7 +77,7 @@ WHERE {
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# add visibility logic of questions related to answerable section
-CONSTRUCT {     
+CONSTRUCT {
       ?qChild form:is-relevant-if ?cond .
       ?cond   a form:condition ;
              form:accepts-answer-value true ;
@@ -326,7 +326,7 @@ WHERE {
     SERVICE ?formMetadataServiceUrl {
 		 ?codelistMapping a ft:codelist-mapping ;
               ft:has-codelist-service-url ?codeListServiceUrl  ;
-              ft:has-codelist-entity ?codeListEntity ; 
+              ft:has-codelist-entity ?codeListEntity ;
               ft:has-internal-entity ?entity  ;
           .
     } .
@@ -722,11 +722,11 @@ WHERE {
   sm:outputVariable "externalPossibleValuesQueryTemplate" ;
   sml:value """prefix skos: <http://www.w3.org/2004/02/skos/core#>
 prefix dce: <http://purl.org/dc/elements/1.1/>
-prefix form: <http://onto.fel.cvut.cz/ontologies/form/> 
+prefix form: <http://onto.fel.cvut.cz/ontologies/form/>
 
 CONSTRUCT {
       # TODO remove
-      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/CZK> . 
+      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/CZK> .
       <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/EUR> .
       <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/USD> .
       ?value rdfs:label ?labelStr .
@@ -734,7 +734,7 @@ CONSTRUCT {
 }
 WHERE {
   SERVICE   <XXX_SERVICE_XXX>  {
-     SELECT ?value ?labelStr ?explanationStr ?entityType { 
+     SELECT ?value ?labelStr ?explanationStr ?entityType {
 
           VALUES (?entityType) {
                (<XXXXX>)
@@ -743,16 +743,16 @@ WHERE {
           ?value skos:inScheme ?entityType .
 
           ?value skos:prefLabel ?label .
-          FILTER ( lang(?label) = \"cs\" ) 
+          FILTER ( lang(?label) = \"cs\" )
           BIND(str(?label) as ?labelStr)
 
           OPTIONAL {
               ?value dce:description ?explanation .
-              FILTER ( lang(?explanation) = \"cs\" ) 
+              FILTER ( lang(?explanation) = \"cs\" )
               BIND(str(?explanation) as ?explanationStr)
           }
 
-      } 
+      }
   }
 }""" ;
   rdfs:label "bind-external-possible-values-query-template" ;
@@ -973,7 +973,7 @@ WHERE {
       GRAPH ?dependantVocab {
            ?dependantVocab	a popis-dat-pojem:slovník	.
            ?s ?p ?usedConcept .
-       }    
+       }
        GRAPH ?usedVocab {    	
           ?usedVocab a popis-dat-pojem:slovník	.
           ?usedConcept skos:inScheme ?importedGlosary .
@@ -989,8 +989,8 @@ WHERE {
   sm:next :question-siblings-ordering ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# TODO remove layout class 
-CONSTRUCT {  
+      sp:text """# TODO remove layout class
+CONSTRUCT {
       ?childQ a doc:question .
       ?childQ rdfs:label ?valueLabel .
       ?childQ form:has-question-origin ?value .
@@ -1006,7 +1006,7 @@ WHERE {
 
     ?codelistMapping a ft:codelist-mapping ;
         ft:has-codelist-service-url ?codeListServiceUrl  ;
-        ft:has-codelist-entity ?codeListEntity ; 
+        ft:has-codelist-entity ?codeListEntity ;
         ft:has-internal-entity ?parentEntity  ;
      .
 
@@ -1132,21 +1132,21 @@ CONSTRUCT {
      ?q form-lt:has-layout-class \"emphasise-on-relevant\" .
 # TODO  do specific metadata questions ordering
       ?showAdvancedQ a form:meta-question .
-      ?q form:has-preceding-question ?showAdvancedQ . 
+      ?q form:has-preceding-question ?showAdvancedQ .
 }
 WHERE {
     ?parentQ doc:has_related_question ?advancedQ .
     ?advancedQ ft:has-importance ft:advanced .
     ?parentQ doc:has_related_question ?q  .
     ?q ft:has-importance ft:advanced .
-    
- 
+
+
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
-    BIND (fl:create-q(str(form:show-advanced-question),?childExecutionId) AS ?showAdvancedQ) 
+    BIND (fl:create-q(str(form:show-advanced-question),?childExecutionId) AS ?showAdvancedQ)
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?parentQ), str(?showAdvancedQ))))) as ?condShowAdvanced)
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?showAdvancedQ), str(?q))))) as ?condHasAnswer)
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?showAdvancedQ), str(?q), str(?parentQ))))) as ?orCondition)
- 
+
 }""" ;
     ] ;
   sml:replace true ;
@@ -1241,9 +1241,9 @@ WHERE {
         ?rootEntity skos:inScheme ?glosary .
         ?vocabulary a-popis-dat-pojem:má-glosář ?glosary .
         ?vocabulary a-popis-dat-pojem:má-model ?model .
-     }  
-     
-     ?vocabulary popis-dat-pojem:používá-pojmy-ze-slovníku ?usedVocab .      
+     }
+
+     ?vocabulary popis-dat-pojem:používá-pojmy-ze-slovníku ?usedVocab .
 }""" ;
     ] ;
   sml:replace true ;
@@ -1279,10 +1279,10 @@ WHERE {
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
     FILTER NOT EXISTS {
         ?trope ft:ignore true .
-    } . 
+    } .
     FILTER NOT EXISTS {
         ?parentEntity ft:ignore true .
-    } . 
+    } .
     FILTER NOT EXISTS {
         ?parentEntity ft:external true .
     }
@@ -1326,7 +1326,7 @@ WHERE {
     FILTER (?parentEntity != ?childEntity) .
     FILTER NOT EXISTS {
         ?relator ft:ignore true .
-    } 
+    }
     FILTER NOT EXISTS {
         ?parentEntity ft:ignore true .
     }
@@ -1359,7 +1359,7 @@ WHERE {
      BIND (fl:create-q(concat(str(?parentEntity),\"-type-\"), ?childExecutionId) AS ?childQ) .
      FILTER NOT EXISTS {
           ?moreSpecificEntity ft:ignore true .
-      } 
+      }
       FILTER NOT EXISTS {
           ?parentEntity ft:ignore true .
        }
@@ -1372,7 +1372,7 @@ WHERE {
       a sp:Construct ;
       sp:text """# 4 - propagate processed entities to parent question
 CONSTRUCT {
-     ?parentQ :has-processing-entity ?qO  .     
+     ?parentQ :has-processing-entity ?qO  .
 }
 WHERE {
     ?parentQ doc:has_related_question ?childQ .
@@ -1392,8 +1392,8 @@ CONSTRUCT {
 } WHERE {
      ?trope a z-sgov-pojem:typ-vlastnosti .
      ?parentQ :has-processing-entity ?trope .
-     ?parentQ doc:has_related_question ?filteringQ . 
-     ?filteringQ :has-processed-entity ?qO . 
+     ?parentQ doc:has_related_question ?filteringQ .
+     ?filteringQ :has-processed-entity ?qO .
      FILTER NOT EXISTS {
               ?parentQ :has-processing-entity ?tropeNotExists .
               ?trope rdfs:subClassOf+ ?tropeNotExists .
@@ -1463,7 +1463,7 @@ CONSTRUCT {
 }
 WHERE {
     ?q form:has-type-question ?testedQ .
-    ?q doc:has_related_question ?filteredQ . 
+    ?q doc:has_related_question ?filteredQ .
     ?q form:has-possible-value ?testedEntity .
 
     ?filteredQ :has-processing-entity ?aspect .
@@ -1483,11 +1483,11 @@ WHERE {
       a sp:Construct ;
       sp:text """# add reference to unit of measure from quality question
 CONSTRUCT {
-     ?qQualityValue form:has-unit-of-measure-question ?qUnitOfMeasure . 
+     ?qQualityValue form:has-unit-of-measure-question ?qUnitOfMeasure .
 }
 WHERE {
     ?qualityValueEntity ft:has-unit-of-measure ?unitOfMeasureEntity .
-    
+
     ?qParent doc:has_related_question ?qUnitOfMeasure .
     ?qUnitOfMeasure  :has-processing-entity ?unitOfMeasureEntity .
     ?qParent doc:has_related_question ?qQualityValue .
@@ -1595,10 +1595,10 @@ CONSTRUCT {
      ?entity ft:ignore true .
 }
 WHERE {
-    
+
 } VALUES (?entity) {
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-konec>)
-    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-začátek>) 
+    (<https://slovník.gov.cz/veřejný-sektor/pojem/má-začátek>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-lokalizaci>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/má-kontext>)
     (<https://slovník.gov.cz/veřejný-sektor/pojem/opakovaná-časová-specifikace>)
@@ -1612,7 +1612,7 @@ CONSTRUCT {
      ?entity ft:ignore true .
 }
 WHERE {
-    
+
 } VALUES (?entity) {
     (<https://slovník.gov.cz/generický/částky/pojem/jednotková-částka>)
 }""" ;
@@ -1674,7 +1674,7 @@ ASK WHERE {
       sp:text """# there a sibling parents having same origin
 ASK WHERE {
 #    ?qParent doc:has_related_question ?q1 .
-#   ?qParent doc:has_related_question ?q2 .    
+#   ?qParent doc:has_related_question ?q2 .
 #    ?q1 form:has-question-origin ?qO1 .
 #    ?q2 form:has-question-origin ?qO2 .
      FILTER(false) # TODO
@@ -1832,7 +1832,7 @@ WHERE {
      FILTER NOT EXISTS {
           ?currentP  :is-processed true .
      }
- 
+
      ?currentP  form:has-higher-priority-precedence ?previousP .
      ?previousP  :is-processed true .
 }""" ;
@@ -2120,7 +2120,7 @@ WHERE {
 WHERE {
     SERVICE ?formMetadataServiceUrl {
         ?s ?p ?o .
-    } 
+    }
 }""" ;
     ] ;
   sml:replace true ;
@@ -2156,7 +2156,7 @@ WHERE {
         GRAPH ?g {
             ?s ?p ?o .
         } .
-    } 
+    }
 }""" ;
     ] ;
   sml:replace true ;
@@ -2188,7 +2188,7 @@ WHERE {
 WHERE {
     SERVICE ?sgovServiceUrl {
         ?s ?p ?o .
-    } 
+    }
 }""" ;
     ] ;
   sml:replace true ;
