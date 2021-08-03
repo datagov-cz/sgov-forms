@@ -432,9 +432,7 @@ WHERE {
 .
 :attach-type-questions-possible-values
   a sml:ApplyConstruct ;
-  sm:next :attach-value-types ;
   sm:next :construct-possible-value-broader-relations ;
-  sm:next :construct-type-filters ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# construct possible values for parent of type question
@@ -1170,7 +1168,8 @@ WHERE {
      ?subTypeEntity rdfs:subClassOf  ?superTypeEntity .
 }""" ;
     ] ;
-  rdfs:label "construct-possible-value-broader-relations" ;
+  sml:replace false ;
+  rdfs:label "attach-possible-value-broader-relations" ;
 .
 :construct-question-based-origins
   a sml:ApplyConstruct ;
