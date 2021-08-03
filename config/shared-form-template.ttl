@@ -230,7 +230,7 @@ form:alphabethical-precedence form:has-higher-priority-precedence form:temporal-
 ##############################
 
 # https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel
-<https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-fyzická-osoba> owl:disjointWith <https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-právnická-osoba> .
+<https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-osoba> owl:disjointWith <https://slovník.gov.cz/generický/veřejná-místa/pojem/provozovatel-jako-člověk> .
 
 ##############################
 
