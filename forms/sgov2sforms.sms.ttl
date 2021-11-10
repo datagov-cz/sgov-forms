@@ -589,98 +589,22 @@ WHERE {
   a sml:BindBySelect ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
-      sp:text """# multiple root questions exists
-ASK
-WHERE {
-           ?qRoot1 a doc:question .
-           FILTER NOT EXISTS {
-                 ?qNE1 a doc:question .
-                 ?qNE1 doc:has_related_question ?qRoot1 .
-           }
-           ?qRoot2 a doc:question .
-           FILTER NOT EXISTS {
-                 ?qNE2 a doc:question .
-                 ?qNE2 doc:has_related_question ?qRoot2 .
-           }
-           FILTER(?qRoot1 != ?qRoot2)
+      sp:text """# (disabled) multiple root questions exists 
+# TODO  as the constraint is too slow to execute
+ASK WHERE {
+#    ?qRoot1 a doc:question .
+#   FILTER NOT EXISTS {
+#        ?qNE1 a doc:question .
+#        ?qNE1 doc:has_related_question ?qRoot1 .
+#    } .
+#   ?qRoot2 a doc:question .
+#    FILTER NOT EXISTS {
+#        ?qNE2 a doc:question .
+#        ?qNE2 doc:has_related_question ?qRoot2 .
+#    } .
+#    FILTER (?qRoot1 != ?qRoot2) .
+    FILTER(false)
 }""" ;
-      sp:where (
-          [
-            sp:object doc:question ;
-            sp:predicate rdf:type ;
-            sp:subject [
-                sp:varName "qRoot1" ;
-              ] ;
-          ]
-          [
-            a sp:Filter ;
-            sp:expression [
-                a sp:notExists ;
-                sp:elements (
-                    [
-                      sp:object doc:question ;
-                      sp:predicate rdf:type ;
-                      sp:subject [
-                          sp:varName "qNE1" ;
-                        ] ;
-                    ]
-                    [
-                      sp:object [
-                          sp:varName "qRoot1" ;
-                        ] ;
-                      sp:predicate doc:has_related_question ;
-                      sp:subject [
-                          sp:varName "qNE1" ;
-                        ] ;
-                    ]
-                  ) ;
-              ] ;
-          ]
-          [
-            sp:object doc:question ;
-            sp:predicate rdf:type ;
-            sp:subject [
-                sp:varName "qRoot2" ;
-              ] ;
-          ]
-          [
-            a sp:Filter ;
-            sp:expression [
-                a sp:notExists ;
-                sp:elements (
-                    [
-                      sp:object doc:question ;
-                      sp:predicate rdf:type ;
-                      sp:subject [
-                          sp:varName "qNE2" ;
-                        ] ;
-                    ]
-                    [
-                      sp:object [
-                          sp:varName "qRoot2" ;
-                        ] ;
-                      sp:predicate doc:has_related_question ;
-                      sp:subject [
-                          sp:varName "qNE2" ;
-                        ] ;
-                    ]
-                  ) ;
-              ] ;
-          ]
-          [
-            a sp:Filter ;
-            sp:expression [
-                a sp:ne ;
-                sp:arg1 [
-                    sp:varName "qRoot1" ;
-                  ] ;
-                sp:arg2 [
-                    sp:varName "qRoot2" ;
-                  ] ;
-              ] ;
-          ]
-        ) ;
-      rdfs:comment "multiple root questions exists" ;
     ] ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
