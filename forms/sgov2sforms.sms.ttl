@@ -135,7 +135,7 @@ WHERE {
 .
 :attach-duplicate-type-questions
   a sml:ApplyConstruct ;
-  sm:next :attach-importance ;
+  sm:next :attach-duplicable-questions ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - construct copy of type questions
@@ -156,11 +156,11 @@ WHERE {
           ?childQ ?p ?o .
           FILTER(?p != doc:has_related_question )
      }
-
-     BIND(fl:create-q(?childQ, ?card) as ?duplicateChildQ)
+     BIND(concat(\"type-duplicate-\", str(?card)) as ?duplicateId)
+     BIND(fl:create-q(?childQ, ?duplicateId) as ?duplicateChildQ)
 }""" ;
     ] ;
-  sml:replace true ;
+  sml:replace false ;
   rdfs:label "attach-duplicate-type-questions" ;
 .
 :attach-identifier-to-section
@@ -1381,7 +1381,7 @@ CONSTRUCT {
 }
 """ ;
     ] ;
-  sml:replace true ;
+  sml:replace false ;
 .
 :construct-type-filters
   a sml:ApplyConstruct ;
@@ -1413,7 +1413,7 @@ WHERE {
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), str(?testedQ), \"filtering-based-on-type\")))) as ?testedQCondition)
 }""" ;
     ] ;
-  sml:replace true ;
+  sml:replace false ;
 .
 :construct-unit-of-measure-questions
   a sml:ApplyConstruct ;
@@ -1740,7 +1740,6 @@ WHERE {
 .
 :merge-with-origins
   a sml:Merge ;
-  sm:next :attach-duplicable-questions ;
   sm:next :attach-duplicate-type-questions ;
   sm:next :attach-importance ;
   sm:next :construct-dny-v-tydnu-questions ;
