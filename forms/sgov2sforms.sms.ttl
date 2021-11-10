@@ -691,7 +691,7 @@ ASK WHERE {
             ?qNE a doc:question .
             ?qNE doc:has_related_question ?qRoot .
        }
-      FILTER (!regex(str(?qRoot), \"^.*-form-.*-q$\")) .
+      FILTER(!regex(str(?qRoot),concat(\"^\", ?questionInstancePrefix,\"[0-9a-f]{32}-[0-9a-f]{32}$\")))
 }""" ;
     ] ;
   sm:next :bind-form-template-service-url ;
@@ -707,9 +707,9 @@ WHERE {
             ?qNE a doc:question .
             ?qNE doc:has_related_question ?qRoot .
         } .
-        BIND (REPLACE(REPLACE(str(?qRoot), \"^.*form-\", \"\"), \"-q$\", \"\") AS ?inferredExecutionId) .
+          BIND(replace(str(?qRoot),concat(\"^\", ?questionInstancePrefix,\"[0-9a-f]{32}-\"),\"\")  AS ?inferredExecutionId) .
     } .
-    BIND (COALESCE(?_DexecutionId, ?inferredExecutionId, STRUUID()) AS ?executionId) .
+    BIND (COALESCE(?_DexecutionId, ?inferredExecutionId, md5(STRUUID())) AS ?executionId) .
 }""" ;
     ] ;
   rdfs:label "bind-execution-id" ;
@@ -815,6 +815,22 @@ WHERE {
 VALUES (?entityType) {
       (<XXXXX>)
 }""" ;
+.
+:bind-question-instance-prefix
+  a sml:BindWithConstant ;
+  sm:next :bind-execution-id ;
+  sm:nodeX 1680 ;
+  sm:nodeY 41 ;
+  sm:outputVariable "questionInstancePrefix" ;
+  sml:value [
+      a sp:concat ;
+      sp:arg1 [
+          a sp:str ;
+          sp:arg1 doc:question ;
+        ] ;
+      sp:arg2 "-" ;
+    ] ;
+  rdfs:label "bind-question-instance-prefix" ;
 .
 :bind-record-service-url
   a sml:BindWithConstant ;
@@ -1764,6 +1780,16 @@ ASK WHERE {
   a kbss-module:merge-form-metadata ;
   kbss-module:execution-id [
       sp:varName "executionId" ;
+    ] ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# question contains two parent questions
+ASK
+WHERE {
+    ?qParent1 doc:has_related_question ?q .
+    ?qParent2 doc:has_related_question ?q .
+    FILTER(?qParent1 != ?qParent2)
+}""" ;
     ] ;
   sm:next :clone_Return ;
   sml:replace true ;
