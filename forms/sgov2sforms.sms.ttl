@@ -1489,6 +1489,26 @@ WHERE {
   sml:replace true ;
   rdfs:label "filter-out-form-template-configuration" ;
 .
+:filter-out-ontology-references
+  a sml:ApplyConstruct ;
+  sm:next :filter-out-question-origins ;
+  sm:next :transform_Return ;
+  sm:nodeX 1180 ;
+  sm:nodeY 2915 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+     ?s ?p ?o .
+}
+WHERE {
+     ?s ?p ?o .
+     FILTER( (?p != rdf:type) || (?o != owl:Ontology) )
+     FILTER( ?p != owl:imports )
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "filter-out-ontology-references" ;
+.
 :filter-out-question-origins
   a sml:ApplyConstruct ;
   sm:next :construct-question-based-origins ;
@@ -1697,8 +1717,7 @@ ASK WHERE {
     }
 }""" ;
     ] ;
-  sm:next :filter-out-question-origins ;
-  sm:next :transform_Return ;
+  sm:next :filter-out-ontology-references ;
 .
 :merge-form-metadata
   a kbss-module:merge-form-metadata ;
