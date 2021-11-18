@@ -1,6 +1,8 @@
-@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
+# baseURI: http://onto.fel.cvut.cz/ontologies/form-template
+
 @prefix form: <http://onto.fel.cvut.cz/ontologies/form> .
 @prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
+@prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -12,92 +14,98 @@
 <http://onto.fel.cvut.cz/ontologies/form-template>
   a owl:Ontology ;
 .
-
-ft:object-identifier-quality a owl:Class .
-ft:object-description-quality a owl:Class .
-ft:root-entity a owl:Class .
-
-ft:ignore a owl:DatatypeProperty ;
-	rdfs:comment "Ignore entity in forms. If true, the entity is excluded from form generation process, so data about it won't be collected."@en ;
-	rdfs:range xsd:boolean ;
+ft:advanced
+  a ft:importance ;
+  a owl:NamedIndividual ;
 .
-
-ft:is-advanced a owl:DatatypeProperty ;
-	rdfs:comment "Entity is advanced for a user. If true, the entity is by default hidden to user in forms and is shown to only on his/her explicit request."@en ;
-	rdfs:range xsd:boolean ;
+ft:condition
+  a owl:Class ;
+  rdfs:comment "Each condition is evaluated to true if parents (entity or relator) are matched and at least one target (entity or relator) is matched."@en ;
 .
-
-ft:external a owl:DatatypeProperty .
-
-
-ft:precedes-relatively-in-time a owl:ObjectProperty .
-
-
-### condition
-
-ft:condition a owl:Class ;
-	rdfs:comment "Each condition is evaluated to true if parents (entity or relator) are matched and at least one target (entity or relator) is matched."@en ;
+ft:external
+  a owl:DatatypeProperty ;
 .
-ft:has-target-entity a owl:ObjectProperty  ;
-	rdfs:domain ft:condition ;
+ft:has-codelist-entity
+  a owl:ObjectProperty ;
+  rdfs:domain ft:mapping ;
 .
-ft:has-target-relator a owl:ObjectProperty ;
-	rdfs:domain ft:condition ;
+ft:has-codelist-service-url
+  a owl:ObjectProperty ;
+  rdfs:domain ft:mapping ;
 .
-ft:has-parent-entity a owl:ObjectProperty  ;
-	rdfs:domain ft:condition ;
+ft:has-importance
+  a owl:ObjectProperty ;
+  rdfs:range ft:importance ;
 .
-ft:has-parent-relator a owl:ObjectProperty ;
-	rdfs:domain ft:condition ;
+ft:has-initial-input-length
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:positiveInteger ;
 .
-
-
-### importance
-ft:importance a owl:Class .
-ft:required a owl:NamedIndividual ;
-	a ft:importance ;
+ft:has-internal-entity
+  a owl:ObjectProperty ;
+  rdfs:domain ft:mapping ;
 .
-ft:important a owl:NamedIndividual ;
-	a ft:importance ;
+ft:has-parent-entity
+  a owl:ObjectProperty ;
+  rdfs:domain ft:condition ;
 .
-ft:advanced a owl:NamedIndividual ;
-	a ft:importance ;
+ft:has-parent-relator
+  a owl:ObjectProperty ;
+  rdfs:domain ft:condition ;
 .
-
-ft:importance-condition a owl:Class ;
-	rdfs:subClassOf ft:condition ;
+ft:has-target-entity
+  a owl:ObjectProperty ;
+  rdfs:domain ft:condition ;
 .
-ft:has-importance a owl:ObjectProperty ;
-	rdfs:range ft:importance 
+ft:has-target-relator
+  a owl:ObjectProperty ;
+  rdfs:domain ft:condition ;
 .
-
-### ignore
-ft:ignore-condition a owl:Class ;
-	rdfs:subClassOf ft:condition ;
+ft:has-unit-of-measure
+  a owl:ObjectProperty ;
 .
-
-
-
-# code list mapping
-ft:codelist-mapping a owl:Class .
-ft:has-codelist-service-url a owl:ObjectProperty ;
-	rdfs:domain ft:mapping ;
+ft:ignore
+  a owl:DatatypeProperty ;
+  rdfs:comment "Ignore entity in forms. If true, the entity is excluded from form generation process, so data about it won't be collected."@en ;
+  rdfs:range xsd:boolean ;
 .
-ft:has-codelist-entity a owl:ObjectProperty ;
-	rdfs:domain ft:mapping ;
+ft:ignore-condition
+  a owl:Class ;
+  rdfs:subClassOf ft:condition ;
 .
-ft:has-internal-entity a owl:ObjectProperty ;
-	rdfs:domain ft:mapping ;
+ft:importance
+  a owl:Class ;
 .
-
-# unit-of-measure
-ft:has-unit-of-measure a owl:ObjectProperty ;
+ft:importance-condition
+  a owl:Class ;
+  rdfs:subClassOf ft:condition ;
 .
-
-ft:has-initial-input-length a owl:DatatypeProperty ;
-	rdfs:range xsd:positiveInteger ;
+ft:important
+  a ft:importance ;
+  a owl:NamedIndividual ;
 .
-
-ft:step a owl:DatatypeProperty ;
-	rdfs:range xsd:decimal ;
+ft:is-advanced
+  a owl:DatatypeProperty ;
+  rdfs:comment "Entity is advanced for a user. If true, the entity is by default hidden to user in forms and is shown to only on his/her explicit request."@en ;
+  rdfs:range xsd:boolean ;
+.
+ft:object-description-quality
+  a owl:Class ;
+.
+ft:object-identifier-quality
+  a owl:Class ;
+.
+ft:precedes-relatively-in-time
+  a owl:ObjectProperty ;
+.
+ft:required
+  a ft:importance ;
+  a owl:NamedIndividual ;
+.
+ft:root-entity
+  a owl:Class ;
+.
+ft:step
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:decimal ;
 .
