@@ -19,8 +19,8 @@
 @prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
 @prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
 
+
 # čas
-g-sgov-čas-pojem:časová-specifikace ft:max-cardinality 5 .
 g-sgov-čas-pojem:od a ft:time .
 g-sgov-čas-pojem:do a ft:time .
 
@@ -37,13 +37,15 @@ g-sgov-věci-pojem:popis a ft:object-description-quality .
 g-sgov-věci-pojem:popis a ft:textarea .
 g-sgov-věci-pojem:popis a ft:multilingual-quality .
 
-
 # lidé
 g-sgov-lidé-pojem:celé-jméno a ft:object-identifier-quality .
 
+# veřejná místa
+g-sgov-veřejná-místa-pojem:má-otevírací-dobu ft:max-cardinality 5 .
+g-sgov-veřejná-místa-pojem:má-vstupné ft:max-cardinality 5 .
+
 # vstupné
 g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
-g-sgov-vstupné-pojem:vstupné ft:max-cardinality 5 .
 
 
 ### importance ####
