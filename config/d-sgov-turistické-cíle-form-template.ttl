@@ -56,6 +56,20 @@ d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 #d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
 #d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
 
+
+### umistneni
+
+:umístnění-aspect-classifier a ft:direct-entity-aspect-classifier  ;
+	skos:prefLabel "Umístnění"@cs ;
+	ft:classifies-aspects-of-entity g-sgov-umístění-pojem:místo ;
+.
+
+[] a ft:aspect-classifier-condition ;
+	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
+	ft:targets-aspects-by-classifier :umístnění-aspect-classifier ;
+.
+
+
 ### ma-bezbarierovost
 
 [] a ft:aspect-classifier-condition ;
