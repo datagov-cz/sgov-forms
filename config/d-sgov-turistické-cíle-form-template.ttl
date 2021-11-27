@@ -6,7 +6,7 @@
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix z-sgov-pojem: <https://slovník.gov.cz/základní/pojem/> .
 @prefix v-sgov-pojem: <https://slovník.gov.cz/veřejný-sektor/pojem/> .
-@prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> . 
+@prefix l-sgov-111-2009-pojem: <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/> .
 @prefix g-sgov-čas-pojem: <https://slovník.gov.cz/generický/čas/pojem/> .
 @prefix g-sgov-věci-pojem: <https://slovník.gov.cz/generický/věci/pojem/> .
 @prefix g-sgov-čásky-pojem: <https://slovník.gov.cz/generický/částky/pojem/> .
@@ -15,8 +15,12 @@
 @prefix g-sgov-lidé-pojem: <https://slovník.gov.cz/generický/lidé/pojem/> .
 @prefix g-sgov-vstupné-pojem: <https://slovník.gov.cz/generický/vstupné/pojem/> .
 @prefix g-sgov-množství-pojem: <https://slovník.gov.cz/generický/množství/pojem/> .
+@prefix g-sgov-bezbariérové-přístupy-pojem: <https://slovník.gov.cz/generický/bezbariérové-přístupy/pojem/> .
+@prefix g-sgov-umístění-pojem: <https://slovník.gov.cz/generický/umístění/pojem/> .
+
 @prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
 @prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
+@prefix : <https://slovník.gov.cz/datový/turistické-cíle/form-template/> .
 
 d-sgov-turistické-cíle:form-template a owl:Ontology ;
 	skos:prefLabel "Turistický cíl".
@@ -52,3 +56,82 @@ d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 #d-sgov-turistické-cíle-pojem:kouření-povoleno  ft:is-advanced true .
 #d-sgov-turistické-cíle-pojem:veřejná-přístupnost  ft:is-advanced true .
 
+### ma-bezbarierovost
+
+[] a ft:aspect-classifier-condition ;
+	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-bezbariérový-přístup ;
+	ft:targets-aspects-by-classifier :obecné-vlastnosti-classifier ;
+	ft:targets-aspects-by-classifier :hlavní-vstup-classifier ;
+	ft:targets-aspects-by-classifier :vedlejší-vstup-classifier ;
+	ft:targets-aspects-by-classifier :interiér-classifier ;
+	ft:targets-aspects-by-classifier :toaleta-classifier ;
+	ft:targets-aspects-by-classifier :přístupnost-pro-zrakově-postižené-classifier ;
+.
+:obecné-vlastnosti-classifier
+	skos:prefLabel "Obecné vlastnosti"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:okamžik-mapování ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:mapování-dle-metodiky-přístupnosti ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:má-mapující-subjekt ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístupnost-pro-děti-s-doprovodem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístupnost-pro-seniory ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístupnost-objektu-pro-tělesně-postižené ;
+.
+:hlavní-vstup-classifier
+	skos:prefLabel "Hlavní vstup"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:vyhrazené-parkovací-stání ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:obtížný-povrch-před-objektem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:obtížný-sklon-před-objektem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:objekt-přístupný-hlavním-vchodem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:počet-schodů-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:nájezd-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:plošina-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:výtah-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-u-hlavního-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-u-hlavního-vstupu ;
+.
+:vedlejší-vstup-classifier
+	skos:prefLabel "Vedlejší vstup"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:objekt-přístupný-vedlejším-vchodem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:počet-schodů-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:nájezd-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:plošina-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:výtah-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-u-vedlejšího-vstupu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-u-vedlejšího-vstupu ;
+.
+:interiér-classifier
+	skos:prefLabel "Interiér"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:počet-schodů-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:minimální-průchod-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:maximální-výška-prahů-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístupný-interiér ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:nájezd-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:plošina-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:výtah-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-v-interiéru ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:točité-schodiště-v-interiéru ;
+.
+:toaleta-classifier
+	skos:prefLabel "Toaleta"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-na-toaletu ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené-euroklíčem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:dostatečný-rozměr-kabiny-toalety ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:signalizační-tlačítko-na-toaletě ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístup-k-wc-z-boku ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:dostatečná-výška-sedátka-wc ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:madlo-u-wc ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:dostatečný-prostor-pod-umyvadlem ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přebalovací-pult-na-toaletě ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:přístupnost-toalety-pro-tělesně-postižené ;
+.
+:přístupnost-pro-zrakově-postižené-classifier
+	skos:prefLabel "Přístupnost pro zrakově postižené"@cs ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:braillovo-písmo ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:hlasový-asistent ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:vodící-linie ;
+	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:vodící-pes ;
+.
