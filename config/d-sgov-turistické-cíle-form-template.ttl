@@ -81,6 +81,71 @@ d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 	ft:targets-aspects-by-classifier :toaleta-classifier ;
 	ft:targets-aspects-by-classifier :přístupnost-pro-zrakově-postižené-classifier ;
 .
+
+
+### bezbarierovost / Obecné vlastnosti
+# g-sgov-bezbariérové-přístupy-pojem:okamžik-mapování
+g-sgov-bezbariérové-přístupy-pojem:mapování-dle-metodiky-přístupnosti a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:má-mapující-subjekt
+# g-sgov-bezbariérové-přístupy-pojem:přístupnost-pro-děti-s-doprovodem
+# g-sgov-bezbariérové-přístupy-pojem:přístupnost-pro-seniory
+# g-sgov-bezbariérové-přístupy-pojem:přístupnost-objektu-pro-tělesně-postižené
+
+### bezbarierovost / Hlavní vstup
+g-sgov-bezbariérové-přístupy-pojem:vyhrazené-parkovací-stání a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:obtížný-povrch-před-objektem a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:obtížný-sklon-před-objektem a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:objekt-přístupný-hlavním-vchodem a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:počet-schodů-u-hlavního-vstupu
+g-sgov-bezbariérové-přístupy-pojem:nájezd-u-hlavního-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:plošina-u-hlavního-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:výtah-u-hlavního-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-u-hlavního-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-u-hlavního-vstupu a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-u-hlavního-vstupu
+
+
+### bezbarierovost / Vedlejší vstup
+g-sgov-bezbariérové-přístupy-pojem:objekt-přístupný-vedlejším-vchodem a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:počet-schodů-u-vedlejšího-vstupu
+g-sgov-bezbariérové-přístupy-pojem:nájezd-u-vedlejšího-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:plošina-u-vedlejšího-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:výtah-u-vedlejšího-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-u-vedlejšího-vstupu a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-u-vedlejšího-vstupu a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-u-vedlejšího-vstupu
+
+### bezbarierovost / Interiér
+# g-sgov-bezbariérové-přístupy-pojem:počet-schodů-v-interiéru
+# g-sgov-bezbariérové-přístupy-pojem:minimální-průchod-v-interiéru
+# g-sgov-bezbariérové-přístupy-pojem:maximální-výška-prahů-v-interiéru
+g-sgov-bezbariérové-přístupy-pojem:přístupný-interiér a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:nájezd-v-interiéru a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:plošina-v-interiéru a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:výtah-v-interiéru a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:sedátko-ve-výtahu-v-interiéru a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-v-interiéru a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:točité-schodiště-v-interiéru a ft:boolean .
+
+### bezbarierovost / Toaleta
+# g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-na-toaletu
+g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené-euroklíčem a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:dostatečný-rozměr-kabiny-toalety a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:signalizační-tlačítko-na-toaletě a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:přístup-k-wc-z-boku
+g-sgov-bezbariérové-přístupy-pojem:dostatečná-výška-sedátka-wc a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:madlo-u-wc a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:dostatečný-prostor-pod-umyvadlem a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:přebalovací-pult-na-toaletě a ft:boolean .
+# g-sgov-bezbariérové-přístupy-pojem:přístupnost-toalety-pro-tělesně-postižené
+
+### bezbarierovost / Přístupnost pro zrakově postižené
+g-sgov-bezbariérové-přístupy-pojem:braillovo-písmo a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:hlasový-asistent a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:vodící-linie a ft:boolean .
+g-sgov-bezbariérové-přístupy-pojem:vodící-pes a ft:boolean .
+
 :obecné-vlastnosti-classifier
 	skos:prefLabel "Obecné vlastnosti"@cs ;
 	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:okamžik-mapování ;
