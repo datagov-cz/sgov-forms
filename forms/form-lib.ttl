@@ -74,7 +74,7 @@ WHERE {
   spin:constraint [
       a spl:Argument ;
       spl:predicate sp:arg2 ;
-      rdfs:comment "Additional identifier that makes this quesiton unique. This parameter is optional." ;
+      rdfs:comment "Additional identifier that makes this question unique. This parameter is optional." ;
     ] ;
   rdfs:comment "Generate question based on object it originates from." ;
   rdfs:subClassOf spin:Functions ;
@@ -103,7 +103,8 @@ fl:create-qt
       a sp:Select ;
       sp:text """SELECT ?questionTemplate
 WHERE {
-    BIND (URI(CONCAT(str(?arg1), \"-\", \"qt\")) AS ?questionTemplate) .
+    BIND(IF(?arg2, CONCAT(str(?arg2),\"-\"),\"\") as ?uniqueId)
+    BIND (URI(CONCAT(str(?arg1), \"-\", ?uniqueId, \"qt\")) AS ?questionTemplate) .
 }""" ;
     ] ;
   spin:constraint [
@@ -111,6 +112,11 @@ WHERE {
       spl:predicate sp:arg1 ;
       spl:valueType rdfs:Resource ;
       rdfs:comment "Entity that this question template describes." ;
+    ] ;
+  spin:constraint [
+      a spl:Argument ;
+      spl:predicate sp:arg2 ;
+      rdfs:comment "Additional identifier that makes this question template unique. This parameter is optional." ;
     ] ;
   rdfs:comment "Generate question template based on entity it originates from." ;
   rdfs:subClassOf spin:Functions ;
