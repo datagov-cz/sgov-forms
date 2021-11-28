@@ -147,10 +147,10 @@ WHERE {
           ft:targets-aspects-by-classifier ?aspectClassifier  ;
     .
     {
-          ?qParent :has-processing-entity ?parentProcessingEntity .
+          ?qParent :has-processing-aspect-target ?parentProcessingEntity .
           ?ic ft:has-parent-entity ?parentProcessingEntity .
     } UNION {
-          ?qParent :has-processing-relator ?parentProcessingRelator .
+          ?qParent :is-question-of-relator ?parentProcessingRelator .
           ?ic ft:has-parent-relator ?parentProcessingRelator .
     }
 }""" ;
@@ -170,11 +170,11 @@ WHERE {
     ?aspectGroupQ a doc:question .
     ?aspectGroupQ a form:aspect-group-question .
     ?aspectGroupQ :has-label ?aspectClassifierLabel .
-    ?aspectGroupQ :has-main-processing-entity ?aspectClassifier .
+    ?aspectGroupQ :has-main-processing-aspect-target ?aspectClassifier .
 }
 WHERE {
     ?parentQ :has-ufo-related-question ?childQ .
-    ?childQ :has-processing-aspect ?aspect .
+    ?childQ :is-question-of-aspect ?aspect .
 
     ?parentQ :has-aspect-classifier ?aspectClassifier .
     ?aspectClassifier ft:classifies-aspect ?aspect .
@@ -262,7 +262,7 @@ WHERE {
 }
 WHERE {
 	?q a doc:question .
-    ?q :has-processing-aspect ?aspect .
+    ?q :is-question-of-aspect ?aspect .
    ?aspect   ft:max-cardinality ?cardinality .
 }""" ;
     ] ;
@@ -458,7 +458,7 @@ CONSTRUCT {
 }
 WHERE {
     ?q a doc:question .
-    ?q :has-processing-entity ?processingEntity .
+    ?q :has-processing-aspect-target ?processingEntity .
     OPTIONAL {
         ?processingEntity ft:has-importance ?importance .
     }
@@ -472,7 +472,7 @@ CONSTRUCT {
 }
 WHERE {
     ?q a doc:question .
-    ?q :has-processing-relator ?processingRelator .
+    ?q :is-question-of-relator ?processingRelator .
     OPTIONAL {
         ?processingRelator ft:has-importance ?importance .
     }
@@ -490,17 +490,17 @@ WHERE {
           ft:has-importance ?importance ;
     .
     {
-          ?qParent :has-processing-entity ?parentProcessingEntity .
+          ?qParent :has-processing-aspect-target ?parentProcessingEntity .
           ?ic ft:has-parent-entity ?parentProcessingEntity .
     } UNION {
-          ?qParent :has-processing-relator ?parentProcessingRelator .
+          ?qParent :is-question-of-relator ?parentProcessingRelator .
           ?ic ft:has-parent-relator ?parentProcessingRelator .
     }
     {
-           ?q :has-processing-entity ?processingEntity .
+           ?q :has-processing-aspect-target ?processingEntity .
            ?ic ft:has-target-entity ?processingEntity .
     } UNION {
-           ?q :has-processing-relator ?processingRelator .
+           ?q :is-question-of-relator ?processingRelator .
            ?ic ft:has-target-relator ?processingRelator .
     }
 }""" ;
@@ -622,7 +622,7 @@ CONSTRUCT {
    ?q form:has-question-origin ?qO .
 }
 WHERE {
-    ?q :has-processing-aspect ?qO .
+    ?q :is-question-of-aspect ?qO .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -633,7 +633,7 @@ CONSTRUCT {
 }
 WHERE {
     ?q a form:aspect-group-question .
-    ?q :has-main-processing-entity ?aspectClassifier .
+    ?q :has-main-processing-aspect-target ?aspectClassifier .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -643,9 +643,9 @@ CONSTRUCT {
 #   ?q form:has-question-origin ?qO .
 }
 WHERE {
-#    ?q :has-processing-entity ?qO .
+#    ?q :has-processing-aspect-target ?qO .
 #    FILTER NOT EXISTS {
-#              ?q :has-processing-entity ?qONotExists .
+#              ?q :has-processing-aspect-target ?qONotExists .
 #              ?qO rdfs:subClassOf+ ?qONotExists .
 #    }
 }""" ;
@@ -694,11 +694,11 @@ CONSTRUCT {
 }
 WHERE {
     ?q doc:has_related_question ?testedQ  .
-    ?testedQ :has-processed-entity ?testedEntity .
+    ?testedQ :has-processed-aspect-target ?testedEntity .
 
     ?q doc:has_related_question ?filteredQ .
-    ?filteredQ :has-processing-entity ?aspect .
-    ?filteredQ :has-related-entity ?filteredEntity .
+    ?filteredQ :has-processing-aspect-target ?aspect .
+    ?filteredQ :has-parent-question-entity ?filteredEntity .
     ?testedEntity rdfs:subClassOf*  ?filteredEntity .
 }""" ;
     ] ;
@@ -710,11 +710,11 @@ CONSTRUCT {
 }
 WHERE {
     ?q doc:has_related_question ?testedQ  .
-    ?testedQ :has-processed-entity ?testedEntity .
+    ?testedQ :has-processed-aspect-target ?testedEntity .
 
     ?q doc:has_related_question ?filteredQ .
-    ?filteredQ :has-processing-entity ?aspect .
-    ?filteredQ :has-related-entity ?filteredEntity .
+    ?filteredQ :has-processing-aspect-target ?aspect .
+    ?filteredQ :has-parent-question-entity ?filteredEntity .
     FILTER NOT EXISTS {
          ?testedEntity rdfs:subClassOf*  ?filteredEntity .
     }
@@ -732,8 +732,8 @@ WHERE {
 CONSTRUCT {
     ?rootQ a doc:question .
     ?rootQ :has-label ?rootEntityLabel .
-    ?rootQ :has-main-processing-entity ?rootEntity .
-# TODO we should not use question-origin here? rather do it through artifial has-processing-relator ?
+    ?rootQ :has-main-processing-aspect-target ?rootEntity .
+# TODO we should not use question-origin here? rather do it through artifial is-question-of-relator ?
     ?rootQ form:has-question-origin ?rootEntity .
 }
 WHERE {
@@ -792,7 +792,7 @@ CONSTRUCT {
 }
 WHERE {
      ?q form:has-type-question ?typeQ .
-     ?typeQ :has-processed-entity ?typeEntity .
+     ?typeQ :has-processed-aspect-target ?typeEntity .
      ?subTypeEntity rdfs:subClassOf+  ?typeEntity .
      ?subTypeEntity skos:prefLabel ?subTypeEntityLabel .
 
@@ -1300,7 +1300,7 @@ CONSTRUCT {
       ?childQ a doc:question .
       ?childQ :has-label ?valueLabel .
       ?childQ form:has-question-origin ?value .
-      ?childQ  :has-processing-relator rdf:type .
+      ?childQ  :is-question-of-relator rdf:type .
       ?childQ form-lt:has-layout-class \"checkbox\" .
       ?parentQ doc:has_related_question ?childQ .
 }
@@ -1448,8 +1448,8 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?tropeLabel .
-    ?childQ :has-processing-entity ?trope .
-    ?childQ :has-related-entity ?parentEntity .
+    ?childQ :has-processing-aspect-target ?trope .
+    ?childQ :has-parent-question-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
     ?childQ a form:trope-question .
 }
@@ -1461,7 +1461,7 @@ WHERE {
         ?trope skos:altLabel ?tropeAltLabel .
     } .
     BIND (fl:capitalize-first-letter(COALESCE(?tropeAltLabel, ?tropePrefLabel)) AS ?tropeLabel) .
-    ?parentQ :has-processing-entity ?directParentEntity .
+    ?parentQ :has-processing-aspect-target ?directParentEntity .
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
@@ -1488,9 +1488,9 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?relatorLabel .
-    ?childQ :has-processing-entity ?childEntity .
-    ?childQ :has-processing-relator ?relator .
-    ?childQ :has-related-entity ?parentEntity .
+    ?childQ :has-processing-aspect-target ?childEntity .
+    ?childQ :is-question-of-relator ?relator .
+    ?childQ :has-parent-question-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
     ?childQ a form:relator-question .
 }
@@ -1507,7 +1507,7 @@ WHERE {
     ?parentRestriction owl:someValuesFrom ?parentEntity .
     ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
     ?childRestriction owl:someValuesFrom ?childEntity .
-    ?parentQ :has-processing-entity ?directParentEntity .
+    ?parentQ :has-processing-aspect-target ?directParentEntity .
     ?directParentEntity rdfs:subClassOf* ?parentEntity .
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
@@ -1535,13 +1535,13 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label \"Typ\"  .
-    ?childQ :has-processed-entity ?parentEntity .
+    ?childQ :has-processed-aspect-target ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
     # TODO should not be here
     ?parentQ form:has-type-question ?childQ .
 }
 WHERE {
-     ?parentQ :has-processing-entity ?parentEntity .
+     ?parentQ :has-processing-aspect-target ?parentEntity .
      ?moreSpecificEntity rdfs:subClassOf+ ?parentEntity   .
      BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
      BIND (fl:create-q(concat(str(?parentEntity),\"-type-\"), ?childExecutionId) AS ?childQ) .
@@ -1560,11 +1560,11 @@ WHERE {
       a sp:Construct ;
       sp:text """# 4 - propagate processed entities to parent question
 CONSTRUCT {
-     ?parentQ :has-processing-entity ?qO  .
+     ?parentQ :has-processing-aspect-target ?qO  .
 }
 WHERE {
     ?parentQ doc:has_related_question ?childQ .
-    ?childQ :has-processed-entity ?qO .
+    ?childQ :has-processed-aspect-target ?qO .
 }""" ;
     ] ;
   sml:constructQuery [
@@ -1573,17 +1573,17 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?tropeValueLabel .
-    ?childQ :has-processing-entity ?tropeValue .
+    ?childQ :has-processing-aspect-target ?tropeValue .
 # TODO related-entity cannot be applied
-#  ?childQ :has-related-entity ?trope .
+#  ?childQ :has-parent-question-entity ?trope .
      ?parentQ doc:has_related_question ?childQ .
 } WHERE {
      ?trope a z-sgov-pojem:typ-vlastnosti .
-     ?parentQ :has-processing-entity ?trope .
+     ?parentQ :has-processing-aspect-target ?trope .
      ?parentQ doc:has_related_question ?filteringQ .
-     ?filteringQ :has-processed-entity ?qO .
+     ?filteringQ :has-processed-aspect-target ?qO .
      FILTER NOT EXISTS {
-              ?parentQ :has-processing-entity ?tropeNotExists .
+              ?parentQ :has-processing-aspect-target ?tropeNotExists .
               ?trope rdfs:subClassOf+ ?tropeNotExists .
       }
 
@@ -1600,12 +1600,12 @@ CONSTRUCT {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?tropeLabel .
-    ?childQ :has-processing-entity ?trope .
-    ?childQ :has-related-entity ?parentEntity .
+    ?childQ :has-processing-aspect-target ?trope .
+    ?childQ :has-parent-question-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
 }
 WHERE {
-	?parentQ  :has-processing-entity ?parentEntity  .
+	?parentQ  :has-processing-aspect-target ?parentEntity  .
     ?parentEntity a ft:multilingual-quality .
     ?trope a ft:language .
     ?trope  skos:prefLabel ?tropeLabel .
@@ -1620,9 +1620,9 @@ WHERE {
       a sp:Construct ;
       sp:text """# 8 - extend question processing entities by most specific subclasses
 CONSTRUCT {
-     ?q :has-processing-entity ?mostSpecificEntity .
+     ?q :has-processing-aspect-target ?mostSpecificEntity .
 } WHERE {
-     ?q :has-processing-entity ?entity .
+     ?q :has-processing-aspect-target ?entity .
      ?mostSpecificEntity rdfs:subClassOf+ ?entity   .
      FILTER NOT EXISTS {
        ?notExistMoreSpecificEntity rdfs:subClassOf ?mostSpecificEntity .
@@ -1654,8 +1654,8 @@ WHERE {
     ?q doc:has_related_question ?filteredQ .
     ?q form:has-possible-value ?testedEntity .
 
-    ?filteredQ :has-processing-entity ?aspect .
-    ?filteredQ :has-related-entity ?filteredEntity .
+    ?filteredQ :has-processing-aspect-target ?aspect .
+    ?filteredQ :has-parent-question-entity ?filteredEntity .
     ?testedEntity rdfs:subClassOf*  ?filteredEntity .
 
     BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?filteredQ), \"filtering-based-on-type\")))) as ?orCondition)
@@ -1677,9 +1677,9 @@ WHERE {
     ?qualityValueEntity ft:has-unit-of-measure ?unitOfMeasureEntity .
 
     ?qParent doc:has_related_question ?qUnitOfMeasure .
-    ?qUnitOfMeasure  :has-processing-entity ?unitOfMeasureEntity .
+    ?qUnitOfMeasure  :has-processing-aspect-target ?unitOfMeasureEntity .
     ?qParent doc:has_related_question ?qQualityValue .
-    ?qQualityValue  :has-processing-entity ?qualityValueEntity .
+    ?qQualityValue  :has-processing-aspect-target ?qualityValueEntity .
 }""" ;
     ] ;
   sml:replace true ;
@@ -1694,14 +1694,14 @@ WHERE {
       a sp:Construct ;
       sp:text """# 1 - add processing entities
 CONSTRUCT {
-    ?q :has-processing-entity ?aspectTarget .
-    ?q :has-processing-entity ?aspectTargetSubClass .
-    ?q :has-processing-entity ?aspectTargetSuperClass .
+    ?q :has-processing-aspect-target ?aspectTarget .
+    ?q :has-processing-aspect-target ?aspectTargetSubClass .
+    ?q :has-processing-aspect-target ?aspectTargetSuperClass .
 }
 WHERE {
-    ?q :has-main-processing-entity ?aspectTarget .
+    ?q :has-main-processing-aspect-target ?aspectTarget .
 
-# TODO test FILTER NOT EXISTS { ?q :has-processing-entity ?aspectTarget . }
+# TODO test FILTER NOT EXISTS { ?q :has-processing-aspect-target ?aspectTarget . }
     OPTIONAL {
           {
               ?aspectTargetSubClass rdfs:subClassOf+ ?aspectTarget .
@@ -1720,10 +1720,10 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?tropeLabel .
-    ?childQ :has-main-processing-entity ?trope .
-    ?childQ :has-processing-aspect ?trope .   #TODO maybe infer in separate module
-    ?childQ :has-processing-intrinsic-mode ?trope .
-    ?childQ :has-related-entity ?parentEntity .
+    ?childQ :has-main-processing-aspect-target ?trope .
+    ?childQ :is-question-of-aspect ?trope .   #TODO maybe infer in separate module
+    ?childQ :is-question-of-intrinsic-mode ?trope .
+    ?childQ :has-parent-question-entity ?parentEntity .
     ?parentQ :has-ufo-related-question ?childQ .
     ?childQ a form:trope-question .
 }
@@ -1731,7 +1731,7 @@ WHERE {
     ?parentEntity :has-trope ?trope .
     ?trope :has-label ?tropeLabel .
 
-    ?parentQ :has-processing-entity ?parentEntity .
+    ?parentQ :has-processing-aspect-target ?parentEntity .
 
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
@@ -1750,7 +1750,7 @@ WHERE {
 
 # TODO do we need it ?
 #    FILTER NOT EXISTS {
-#        ?parentQ :has-main-processing-entity ?mainParentEntity .
+#        ?parentQ :has-main-processing-aspect-target ?mainParentEntity .
 #        ?ic a ft:ignore-condition ;
 #              ft:has-parent-entity ?mainParentEntity  ;
 #              ft:has-target-entity ?trope  ;
@@ -1764,10 +1764,10 @@ WHERE {
 CONSTRUCT {
     ?childQ a doc:question .
     ?childQ :has-label ?relatorLabel .
-    ?childQ :has-main-processing-entity ?childEntity .
-    ?childQ :has-processing-aspect ?relator .
-    ?childQ :has-processing-relator ?relator .
-    ?childQ :has-related-entity ?parentEntity .
+    ?childQ :has-main-processing-aspect-target ?childEntity .
+    ?childQ :is-question-of-aspect ?relator .
+    ?childQ :is-question-of-relator ?relator .
+    ?childQ :has-parent-question-entity ?parentEntity .
     ?parentQ :has-ufo-related-question ?childQ .
     ?childQ a form:relator-question .
 }
@@ -1776,7 +1776,7 @@ WHERE {
     ?relator :mediates-2 ?childEntity .
     ?relator :has-label ?relatorLabel .
 
-    ?parentQ :has-processing-entity ?parentEntity .
+    ?parentQ :has-processing-aspect-target ?parentEntity .
 
     BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
     BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
@@ -1795,7 +1795,7 @@ WHERE {
 
 # TODO do we need it ?
 #    FILTER NOT EXISTS {
-#        ?parentQ :has-main-processing-entity ?mainParentEntity .
+#        ?parentQ :has-main-processing-aspect-target ?mainParentEntity .
 #        ?ic a ft:ignore-condition ;
 #              ft:has-parent-entity ?mainParentEntity  ;
 #              ft:has-target-entity ?trope  ;
@@ -1917,44 +1917,32 @@ WHERE {
   rdfs:label "has-local-id" ;
   rdfs:subPropertyOf :has-question-related-property ;
 .
-:has-main-processing-entity
+:has-main-processing-aspect-target
   a owl:ObjectProperty ;
   rdfs:comment """Entity that is \"aspect target\" of this question.
 
 Note, we consider here that every question asks about an aspect of parent question. The main processing entity is so called \"aspect target\" of this aspect.  If the aspect is relator, aspect target is its second argument. Otherwise, aspect target is intrinsicAspect.
 """ ;
   rdfs:label "has-main-processing-entity" ;
-  rdfs:subPropertyOf :has-processing-entity ;
+  rdfs:subPropertyOf :has-processing-aspect-target ;
 .
-:has-processed-entity
-  a rdf:Property ;
-  rdfs:subPropertyOf :has-algorithm-related-property ;
-.
-:has-processing-aspect
+:has-parent-question-entity
   a owl:ObjectProperty ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
-:has-processing-entity
+:has-processed-aspect-target
+  a rdf:Property ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
+:has-processing-aspect-target
   a owl:ObjectProperty ;
   rdfs:comment "Entity whose aspects should be processed within subquestions of this question." ;
   rdfs:domain doc:question ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
-:has-processing-intrinsic-mode
-  a owl:ObjectProperty ;
-  rdfs:subPropertyOf :has-processing-aspect ;
-.
-:has-processing-relator
-  a owl:ObjectProperty ;
-  rdfs:subPropertyOf :has-processing-aspect ;
-.
 :has-question-related-property
   a rdf:Property ;
   rdfs:label "has-question-related-property" ;
-.
-:has-related-entity
-  a owl:ObjectProperty ;
-  rdfs:subPropertyOf :has-algorithm-related-property ;
 .
 :has-related-question-level
   a rdf:Property ;
@@ -2054,6 +2042,18 @@ WHERE {
   a rdf:Property ;
   rdfs:label "is-duplicable" ;
   rdfs:subPropertyOf :has-question-related-property ;
+.
+:is-question-of-aspect
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
+:is-question-of-intrinsic-mode
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :is-question-of-aspect ;
+.
+:is-question-of-relator
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :is-question-of-aspect ;
 .
 :layout-form
   a sml:ApplyConstruct ;
@@ -2400,7 +2400,7 @@ WHERE {
          ?otherSiblingEntity a ft:object-identifier-quality .
      }
      FILTER NOT EXISTS {
-         ?q2  :has-processed-entity ?qo.
+         ?q2  :has-processed-aspect-target ?qo.
      }
 
 
@@ -2448,7 +2448,7 @@ WHERE {
          ?otherSiblingEntity a ft:object-description-quality .
      }
      FILTER NOT EXISTS {
-         ?q2  :has-processed-entity ?qo.
+         ?q2  :has-processed-aspect-target ?qo.
      }
 
 
@@ -2576,8 +2576,8 @@ CONSTRUCT {
 WHERE {
     ?q doc:has_related_question ?qFilteringQ  .
     ?q doc:has_related_question ?qNotFilteringQ .
-    ?qFilteringQ :has-processed-entity ?qo1 .
-    ?qNotFilteringQ :has-processing-entity ?qo2 .
+    ?qFilteringQ :has-processed-aspect-target ?qo1 .
+    ?qNotFilteringQ :has-processing-aspect-target ?qo2 .
 }""" ;
     ] ;
   sml:replace false ;
