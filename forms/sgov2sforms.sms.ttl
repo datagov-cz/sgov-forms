@@ -49,9 +49,13 @@
   owl:imports <http://onto.fel.cvut.cz/ontologies/s-pipes-lib> ;
   owl:imports z-sgov:model ;
 .
+:TODO
+  a sml:Merge ;
+  sm:next :attach-importance-closure ;
+  rdfs:label "TODO" ;
+.
 :attach-advanced
   a sml:ApplyConstruct ;
-  sm:next :question-siblings-ordering ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """#1 - add advanced questions if not important
@@ -93,6 +97,138 @@ WHERE {
   sml:replace false ;
   rdfs:label "attach-answerable-section-logic" ;
 .
+:attach-aspect-classifier-label
+  a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# 1 - there is classifier of a question without label
+ASK
+WHERE {
+   ?q :has-aspect-classifier ?aspectClassifier .
+   FILTER NOT EXISTS {
+        ?aspectClassifier :has-label ?aspectClassifierLabel .
+   }
+}""" ;
+    ] ;
+  sm:next :attach-aspect-group-questions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+     ?aspectClassifier :has-label ?aspectClassifierLabel .
+}
+WHERE {
+   ?q :has-aspect-classifier ?aspectClassifier .
+
+   OPTIONAL {
+        ?aspectClassifier skos:prefLabel ?acLabel .
+   }
+   OPTIONAL {
+          ?aspectClassifier ft:classifies-aspects-of-entity ?entity .
+          ?entity skos:prefLabel  ?entityLabel .
+   }
+
+   BIND (COALESCE(?acLabel, ?entityLabel) as ?aspectClassifierLabel)
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-aspect-classifier-label" ;
+.
+:attach-aspect-classifiers-to-question
+  a sml:ApplyConstruct ;
+  sm:next :attach-aspect-classifier-label ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?qParent :has-aspect-classifier ?aspectClassifier .
+}
+WHERE {
+    ?qParent :has-ufo-related-question ?q .
+    ?ic a ft:aspect-classifier-condition  ;
+          ft:targets-aspects-by-classifier ?aspectClassifier  ;
+    .
+    {
+          ?qParent :has-processing-entity ?parentProcessingEntity .
+          ?ic ft:has-parent-entity ?parentProcessingEntity .
+    } UNION {
+          ?qParent :has-processing-relator ?parentProcessingRelator .
+          ?ic ft:has-parent-relator ?parentProcessingRelator .
+    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-aspect-classifiers-to-question" ;
+.
+:attach-aspect-group-questions
+  a sml:ApplyConstruct ;
+  sm:next :infer-ufo-based-questions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?parentQ doc:has_related_question ?aspectGroupQ .
+    ?aspectGroupQ doc:has_related_question ?childQ .
+
+    ?aspectGroupQ a doc:question .
+    ?aspectGroupQ a form:aspect-group-question .
+    ?aspectGroupQ :has-label ?aspectClassifierLabel .
+    ?aspectGroupQ :has-main-processing-entity ?aspectClassifier .
+}
+WHERE {
+    ?parentQ :has-ufo-related-question ?childQ .
+    ?childQ :has-processing-aspect ?aspect .
+
+    ?parentQ :has-aspect-classifier ?aspectClassifier .
+    ?aspectClassifier ft:classifies-aspect ?aspect .
+     ?aspectClassifier :has-label ?aspectClassifierLabel .
+
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?aspectClassifier),?childExecutionId) AS ?aspectGroupQ) .
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-aspect-group-questions" ;
+.
+:attach-aspect-model
+  a sml:ApplyConstruct ;
+  sm:next :construct-aspect-labels ;
+  sm:next :construct-aspect-related-cardinalities ;
+  sm:next :constuct-ufo-based-question-templates ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - process intrinsic tropes
+CONSTRUCT {
+    ?parentEntity :has-trope ?trope .
+
+# inference
+    ?parentEntity :has-aspect ?trope .
+}
+WHERE {
+    ?trope a z-sgov-pojem:typ-vlastnosti .
+    ?trope rdfs:subClassOf/owl:someValuesFrom ?parentEntity .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - process relators
+CONSTRUCT {
+    ?parentEntity :has-relator ?relator .
+    ?relator :mediates-2 ?childEntity .
+
+#inference
+    ?parentEntity :has-aspect ?relator .
+}
+WHERE {
+    ?relator a z-sgov-pojem:typ-vztahu .
+    ?relator rdfs:subClassOf ?parentRestriction .
+    ?relator rdfs:subClassOf ?childRestriction .
+    ?parentRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-1 .
+    ?parentRestriction owl:someValuesFrom ?parentEntity .
+    ?childRestriction owl:onProperty z-sgov-pojem:má-vztažený-prvek-2 .
+    ?childRestriction owl:someValuesFrom ?childEntity .
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-core-aspect-model" ;
+.
 :attach-descriptions
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -118,7 +254,7 @@ WHERE {
 .
 :attach-duplicable-questions
   a sml:ApplyConstruct ;
-  sm:next :construct-duplicate-questions ;
+  sm:next :attach-duplicate-questions ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
@@ -126,16 +262,114 @@ WHERE {
 }
 WHERE {
 	?q a doc:question .
-    ?q :has-processing-entity ?entity .
-   ?entity   ft:max-cardinality ?cardinality .
+    ?q :has-processing-aspect ?aspect .
+   ?aspect   ft:max-cardinality ?cardinality .
 }""" ;
     ] ;
   sml:replace false ;
   rdfs:label "attach-duplicable-questions" ;
 .
+:attach-duplicate-questions
+  a sml:ApplyConstruct ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# question duplicity defined at different level (TODO -- not supported yet)
+ASK
+WHERE {
+    ?q :is-duplicable true .
+    ?qChild :is-duplicable true .
+    ?q doc:has_related_question+ ?qChild .
+}""" ;
+    ] ;
+  kbss-module:has-max-iteration-count "1" ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """ # there is a question with two parent question
+ASK
+WHERE {
+    ?parentQ1 doc:has_related_question ?q .
+    ?parentQ2 doc:has_related_question ?q .
+    FILTER(?parentQ1 != ?parentQ2)
+}""" ;
+    ] ;
+  sm:next :TODO ;
+  sm:next :question-siblings-ordering ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - construct deep copy of questions
+# TODO - not systematic
+CONSTRUCT {
+     ?qRootParent doc:has_related_question ?qRootX .
+     ?qDescendantX doc:has_related_question ?qDescendantChildX .
+     ?qDescendantX ?p ?o .
+}
+WHERE {
+
+     VALUES ?card { 1 2 3 4 }
+
+     ?qRoot :is-duplicable true .
+     ?qRoot doc:has_related_question* ?qDescendant .
+
+# attach to root
+     ?qRootParent doc:has_related_question ?qRoot .
+
+# construct doc:has_related_question taxonomy
+     OPTIONAL {
+         ?qDescendant doc:has_related_question ?qDescendantChild .
+     }
+
+# attach specific properties
+     OPTIONAL {
+          ?qDescendant ?p ?o .
+          FILTER(?p != doc:has_related_question )
+     }
+
+     BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
+     BIND(fl:create-q(?qDescendant, ?card) as ?qDescendantX)
+     BIND(fl:create-q(?qDescendantChild, ?card) as ?qDescendantChildX)
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 -  construct hiding logic and ordering
+# todo make is-relevant-if automatic from an attribute
+CONSTRUCT {
+      ?qRoot form-lt:has-layout-class \"answerable\" .
+      ?qRoot form-lt:has-layout-class \"checkbox\" .
+
+      ?qRootX form-lt:has-layout-class \"answerable\" .
+      ?qRootX form-lt:has-layout-class \"checkbox\" .
+
+     ?qRootX a form:relator-multiplicity-question .
+     ?qRootP a form:relator-multiplicity-question .
+     ?precedenceP a form:relator-multiplicity-precedence ;
+             form:has-first-question ?qRootP ;
+             form:has-second-question ?qRootX ;
+     .
+     ?qRootX form:has-preceding-question  ?qRootP .
+
+     ?qRootX form:is-relevant-if  ?condP .
+     ?condP   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qRootP ;
+    .
+}
+WHERE {
+    VALUES ?card { 1 2 3 4 }
+
+    ?qRoot :is-duplicable true .
+
+    BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
+    BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
+
+    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
+    BIND(IRI(concat(str(form:relator-multiplicity-precedence), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?precedenceP)
+}""" ;
+    ] ;
+  rdfs:label "attach-duplicate-questions" ;
+.
 :attach-duplicate-type-questions
   a sml:ApplyConstruct ;
-  sm:next :attach-duplicable-questions ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - construct copy of type questions
@@ -201,7 +435,7 @@ WHERE {
 .
 :attach-importance
   a sml:ApplyConstruct ;
-  sm:next :attach-importance-closure ;
+  sm:next :infer-entity-aspect-classifiers ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - make root question important
@@ -294,6 +528,22 @@ WHERE {
   sml:replace false ;
   rdfs:label "attach-importance-closure" ;
 .
+:attach-labels
+  a sml:ApplyConstruct ;
+  sm:next :attach-descriptions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add labels for intrinsic aspects, relators, and classifiers
+CONSTRUCT {
+    ?q rdfs:label ?qLabel .
+}
+WHERE {
+    ?q a doc:question .
+    ?q :has-label ?qLabel .
+}""" ;
+    ] ;
+  rdfs:label "attach-labels" ;
+.
 :attach-possible-values-hook
   a sml:ApplyConstruct ;
   sm:next :merge ;
@@ -341,6 +591,99 @@ WHERE {
     ] ;
   sml:replace true ;
 .
+:attach-question-origins
+  a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# question has multipe origins
+ASK
+WHERE {
+     ?q  form:has-question-origin ?qO1 .
+     ?q  form:has-question-origin ?qO2 .
+     FILTER(?qO1 != ?qO2)
+}""" ;
+    ] ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is a question without origin
+ASK
+WHERE {
+    ?q a doc:question .
+    FILTER NOT EXISTS {
+        ?q form:has-question-origin ?qONotExists .
+    }
+}""" ;
+    ] ;
+  sm:next :merge-with-origins ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - construct question origin for aspect questions
+CONSTRUCT {
+   ?q form:has-question-origin ?qO .
+}
+WHERE {
+    ?q :has-processing-aspect ?qO .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - construct question origin for aspect group questions
+CONSTRUCT {
+   ?q form:has-question-origin ?aspectClassifier  .
+}
+WHERE {
+    ?q a form:aspect-group-question .
+    ?q :has-main-processing-entity ?aspectClassifier .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# construct from processing entities (DISABLED)
+CONSTRUCT {
+#   ?q form:has-question-origin ?qO .
+}
+WHERE {
+#    ?q :has-processing-entity ?qO .
+#    FILTER NOT EXISTS {
+#              ?q :has-processing-entity ?qONotExists .
+#              ?qO rdfs:subClassOf+ ?qONotExists .
+#    }
+}""" ;
+    ] ;
+  rdfs:label "attach-question-origins" ;
+.
+:attach-related-question-level
+  a sml:ApplyConstruct ;
+  kbss-module:has-max-iteration-count 20 ;
+  sm:next :merge-with-questions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - annotate  root level of related questions
+CONSTRUCT {
+    ?rootQuestion :has-related-question-level  0 .
+}
+WHERE {
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - annotate next level of related questions
+CONSTRUCT {
+    ?q :has-related-question-level  ?rqLevel .
+}
+WHERE {
+    ?qParent doc:has_related_question   ?q .
+    ?qParent :has-related-question-level ?rqLevelParent .
+
+   FILTER NOT EXISTS {  # optimalization
+        ?q :has-related-question-level  ?rqLevelNE .
+    }
+
+    BIND((?rqLevelParent + 1) as ?rqLevel)
+}""" ;
+    ] ;
+  rdfs:label "attach-related-question-level" ;
+.
 :attach-relevant-tested-questions
   a sml:ApplyConstruct ;
   sml:constructQuery [
@@ -382,16 +725,16 @@ WHERE {
 .
 :attach-root-question
   a sml:ApplyConstruct ;
-  sm:next :construct-question-origins ;
-  sm:next :construct-subquestions ;
-  sm:next :merge-with-origins ;
+  sm:next :attach-aspect-model ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 0 - create root-subquestion question
 CONSTRUCT {
     ?rootQ a doc:question .
-    ?rootQ rdfs:label ?rootEntityLabel .
-    ?rootQ :has-processing-entity ?rootEntity .
+    ?rootQ :has-label ?rootEntityLabel .
+    ?rootQ :has-main-processing-entity ?rootEntity .
+# TODO we should not use question-origin here? rather do it through artifial has-processing-relator ?
+    ?rootQ form:has-question-origin ?rootEntity .
 }
 WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
@@ -403,9 +746,10 @@ WHERE {
       sp:text """# 1 - create root question
 CONSTRUCT {
     ?formQ a doc:question .
-    ?formQ rdfs:label ?formLabel .
+    ?formQ :has-label ?formLabel .
+# TODO we should not use question-origin here?
     ?formQ form:has-question-origin ?formEntity .
-    ?formQ doc:has_related_question ?rootQ .
+    ?formQ :has-ufo-related-question ?rootQ .
 }
 WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
@@ -439,12 +783,12 @@ WHERE {
 # TODO revise
 CONSTRUCT {
     ?q form:has-possible-value ?subTypeEntity .
-    ?subTypeEntity rdfs:label ?subTypeEntityLabel .
+    ?subTypeEntity :has-label ?subTypeEntityLabel .
     ?q form-lt:has-layout-class \"answerable\" .
     ?q form-lt:has-layout-class \"type-question\" .
 
     ?q form:has-possible-value ?typeEntity .
-    ?typeEntity rdfs:label ?typeEntityLabel .
+    ?typeEntity :has-label ?typeEntityLabel .
 }
 WHERE {
      ?q form:has-type-question ?typeQ .
@@ -460,7 +804,7 @@ WHERE {
 .
 :attach-value-types
   a sml:ApplyConstruct ;
-  sm:next :attach-descriptions ;
+  sm:next :attach-labels ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# boolean
@@ -589,7 +933,7 @@ WHERE {
   a sml:BindBySelect ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
-      sp:text """# (disabled) multiple root questions exists 
+      sp:text """# (disabled) multiple root questions exists
 # TODO  as the constraint is too slow to execute
 ASK WHERE {
 #    ?qRoot1 a doc:question .
@@ -743,8 +1087,6 @@ VALUES (?entityType) {
 :bind-question-instance-prefix
   a sml:BindWithConstant ;
   sm:next :bind-execution-id ;
-  sm:nodeX 1680 ;
-  sm:nodeY 41 ;
   sm:outputVariable "questionInstancePrefix" ;
   sml:value [
       a sp:concat ;
@@ -797,7 +1139,7 @@ WHERE {
 .
 :bind-root-question
   a sml:BindBySelect ;
-  sm:next :layout-form ;
+  sm:next :attach-related-question-level ;
   sml:selectQuery [
       a sp:Select ;
       sp:text """SELECT ?rootQuestion
@@ -899,6 +1241,32 @@ WHERE {
   a sml:ReturnRDF ;
   sml:serialization sml:Turtle ;
 .
+:construct-aspect-labels
+  a sml:ApplyConstruct ;
+  sm:next :constuct-ufo-based-question-templates ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add aspect has-label
+CONSTRUCT {
+    ?aspect :has-label ?aspectLabel .
+}
+WHERE {
+    ?parentEntity :has-aspect ?aspect .
+    ?aspect skos:prefLabel ?aspectPrefLabel .
+    OPTIONAL {
+        ?aspect skos:altLabel ?aspectAltLabel .
+    } .
+    BIND (fl:capitalize-first-letter(COALESCE(?aspectAltLabel, ?aspectPrefLabel)) AS ?aspectLabel) .
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "construct-aspect-labels" ;
+.
+:construct-aspect-related-cardinalities
+  a sml:ApplyConstruct ;
+  sm:next :constuct-ufo-based-question-templates ;
+  rdfs:label "construct-aspect-related-cardinalities" ;
+.
 :construct-direct-vocabulary-dependencies
   a sml:ApplyConstruct ;
   sm:next :attach-transitive-vocabulary-dependencies ;
@@ -912,7 +1280,7 @@ WHERE {
            ?dependantVocab	a popis-dat-pojem:slovník	.
            ?s ?p ?usedConcept .
        }
-       GRAPH ?usedVocab {    	
+       GRAPH ?usedVocab {
           ?usedVocab a popis-dat-pojem:slovník	.
           ?usedConcept skos:inScheme ?importedGlosary .
         }
@@ -930,7 +1298,7 @@ WHERE {
       sp:text """# TODO remove layout class
 CONSTRUCT {
       ?childQ a doc:question .
-      ?childQ rdfs:label ?valueLabel .
+      ?childQ :has-label ?valueLabel .
       ?childQ form:has-question-origin ?value .
       ?childQ  :has-processing-relator rdf:type .
       ?childQ form-lt:has-layout-class \"checkbox\" .
@@ -959,84 +1327,6 @@ WHERE {
   sml:replace true ;
   rdfs:label "construct-dny-v-tydnu-questions" ;
 .
-:construct-duplicate-questions
-  a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "1" ;
-  sm:next :attach-importance ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 1 - construct deep copy of questions
-# TODO - not systematic
-CONSTRUCT {
-     ?qRootParent doc:has_related_question ?qRootX .
-     ?qDescendantX doc:has_related_question ?qDescendantChildX .
-     ?qDescendantX ?p ?o .
-}
-WHERE {
-
-     VALUES ?card { 1 2 3 4 }
-
-     ?qRoot :is-duplicable true .
-     ?qRoot doc:has_related_question* ?qDescendant .
-
-# attach to root
-     ?qRootParent doc:has_related_question ?qRoot .
-
-# construct doc:has_related_question taxonomy
-     OPTIONAL {
-         ?qDescendant doc:has_related_question ?qDescendantChild .
-     }
-
-# attach specific properties
-     OPTIONAL {
-          ?qDescendant ?p ?o .
-          FILTER(?p != doc:has_related_question )
-     }
-
-     BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
-     BIND(fl:create-q(?qDescendant, ?card) as ?qDescendantX)
-     BIND(fl:create-q(?qDescendantChild, ?card) as ?qDescendantChildX)
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# 2 -  construct hiding logic and ordering
-# todo make is-relevant-if automatic from an attribute
-CONSTRUCT {
-      ?qRoot form-lt:has-layout-class \"answerable\" .
-      ?qRoot form-lt:has-layout-class \"checkbox\" .
-
-      ?qRootX form-lt:has-layout-class \"answerable\" .
-      ?qRootX form-lt:has-layout-class \"checkbox\" .
-
-     ?qRootX a form:relator-multiplicity-question .
-     ?qRootP a form:relator-multiplicity-question .
-     ?precedenceP a form:relator-multiplicity-precedence ;
-             form:has-first-question ?qRootP ;
-             form:has-second-question ?qRootX ;
-     .
-     ?qRootX form:has-preceding-question  ?qRootP .
-
-     ?qRootX form:is-relevant-if  ?condP .
-     ?condP   a form:condition ;
-             form:accepts-answer-value true ;
-             form:has-tested-question ?qRootP ;
-    .
-}
-WHERE {
-    VALUES ?card { 1 2 3 4 }
-
-    ?qRoot :is-duplicable true .
-
-    BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
-    BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
-
-    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
-    BIND(IRI(concat(str(form:relator-multiplicity-precedence), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?precedenceP)
-}""" ;
-    ] ;
-  rdfs:label "construct-duplicate-questions" ;
-.
 :construct-metaquestions
   a sml:ApplyConstruct ;
   sm:next :attach-answerable-section-logic ;
@@ -1047,7 +1337,7 @@ WHERE {
 CONSTRUCT {
      ?parentQ doc:has_related_question ?showAdvancedQ .
      ?showAdvancedQ a doc:question ;
-          rdfs:label \"Zobrazit více\" ;
+          :has-label \"Zobrazit více\" ;
           dce:description \"Zobrazí/Skryje pokročilé otázky. Otázky,  které jsou zodpovězeny a sekce, které obsahují zodpovězené otázky nelze skrýt.\" ;
           form-lt:has-layout-class \"checkbox\" ;
           form:has-question-origin form:show-advanced-question ;
@@ -1127,45 +1417,6 @@ WHERE {
   sml:replace false ;
   rdfs:label "attach-question-based-origins" ;
 .
-:construct-question-origins
-  a sml:ApplyConstruct ;
-  kbss-module:has-output-graph-constraint [
-      a sp:Ask ;
-      sp:text """# question has multipe origins
-ASK
-WHERE {
-     ?q  form:has-question-origin ?qO1 .
-     ?q  form:has-question-origin ?qO2 .
-     FILTER(?qO1 != ?qO2)
-}""" ;
-    ] ;
-  sm:next :merge-with-origins ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# construct from processed entities
-CONSTRUCT {
-   ?q form:has-question-origin ?qO .
-}
-WHERE {
-    ?q :has-processed-entity ?qO .
-}""" ;
-    ] ;
-  sml:constructQuery [
-      a sp:Construct ;
-      sp:text """# construct from processing entities
-CONSTRUCT {
-   ?q form:has-question-origin ?qO .
-}
-WHERE {
-    ?q :has-processing-entity ?qO .
-    FILTER NOT EXISTS {
-              ?q :has-processing-entity ?qONotExists .
-              ?qO rdfs:subClassOf+ ?qONotExists .
-    }
-}""" ;
-    ] ;
-  sml:replace true ;
-.
 :construct-related-dataset-iris
   a sml:ApplyConstruct ;
   sm:next :retrieve-related-datasets ;
@@ -1190,15 +1441,13 @@ WHERE {
 .
 :construct-subquestions
   a sml:ApplyConstruct ;
-  kbss-module:has-max-iteration-count "5" ;
-  sm:next :construct-question-origins ;
-  sm:next :merge-with-origins ;
+  kbss-module:has-max-iteration-count "4" ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - add intrinsic tropes
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label ?tropeLabel .
+    ?childQ :has-label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
@@ -1238,7 +1487,7 @@ WHERE {
       sp:text """# 2 - add relators
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label ?relatorLabel .
+    ?childQ :has-label ?relatorLabel .
     ?childQ :has-processing-entity ?childEntity .
     ?childQ :has-processing-relator ?relator .
     ?childQ :has-related-entity ?parentEntity .
@@ -1285,7 +1534,7 @@ WHERE {
       sp:text """# 3 - add questions for more specific subclasses
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label \"Typ\"  .
+    ?childQ :has-label \"Typ\"  .
     ?childQ :has-processed-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
     # TODO should not be here
@@ -1323,7 +1572,7 @@ WHERE {
       sp:text """# 5 - add question for value of complex trope
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label ?tropeValueLabel .
+    ?childQ :has-label ?tropeValueLabel .
     ?childQ :has-processing-entity ?tropeValue .
 # TODO related-entity cannot be applied
 #  ?childQ :has-related-entity ?trope .
@@ -1350,7 +1599,7 @@ CONSTRUCT {
 # TODO refactor
 CONSTRUCT {
     ?childQ a doc:question .
-    ?childQ rdfs:label ?tropeLabel .
+    ?childQ :has-label ?tropeLabel .
     ?childQ :has-processing-entity ?trope .
     ?childQ :has-related-entity ?parentEntity .
     ?parentQ doc:has_related_question ?childQ .
@@ -1436,6 +1685,127 @@ WHERE {
   sml:replace true ;
   rdfs:label "construct-unit-of-measure-questions" ;
 .
+:constuct-ufo-based-question-templates
+  a sml:ApplyConstruct ;
+  kbss-module:has-debug-mode-flag false ;
+  kbss-module:has-max-iteration-count 6 ;
+  sm:next :merge-with-ufo-based-question-templates ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add processing entities
+CONSTRUCT {
+    ?q :has-processing-entity ?aspectTarget .
+    ?q :has-processing-entity ?aspectTargetSubClass .
+    ?q :has-processing-entity ?aspectTargetSuperClass .
+}
+WHERE {
+    ?q :has-main-processing-entity ?aspectTarget .
+
+# TODO test FILTER NOT EXISTS { ?q :has-processing-entity ?aspectTarget . }
+    OPTIONAL {
+          {
+              ?aspectTargetSubClass rdfs:subClassOf+ ?aspectTarget .
+# TODO not very nice (we need to filter out blank nodes + z-sgov:vlastnost ...
+              ?aspectTargetSubClass a skos:Concept .
+          } UNION {
+              ?aspectTarget rdfs:subClassOf+ ?aspectTargetSuperClass .
+              ?aspectTargetSuperClass a skos:Concept .
+          }
+    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 2 - add intrinsic aspect question
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ :has-label ?tropeLabel .
+    ?childQ :has-main-processing-entity ?trope .
+    ?childQ :has-processing-aspect ?trope .   #TODO maybe infer in separate module
+    ?childQ :has-processing-intrinsic-mode ?trope .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ :has-ufo-related-question ?childQ .
+    ?childQ a form:trope-question .
+}
+WHERE {
+    ?parentEntity :has-trope ?trope .
+    ?trope :has-label ?tropeLabel .
+
+    ?parentQ :has-processing-entity ?parentEntity .
+
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?trope),?childExecutionId) AS ?childQ) .
+
+# TODO rather move it to #1 - add processing entities
+    FILTER NOT EXISTS {
+        ?parentEntity ft:ignore true .
+    } .
+    FILTER NOT EXISTS {
+        ?parentEntity ft:external true .
+    }
+
+   FILTER NOT EXISTS {
+        ?trope ft:ignore true .
+    } .
+
+# TODO do we need it ?
+#    FILTER NOT EXISTS {
+#        ?parentQ :has-main-processing-entity ?mainParentEntity .
+#        ?ic a ft:ignore-condition ;
+#              ft:has-parent-entity ?mainParentEntity  ;
+#              ft:has-target-entity ?trope  ;
+#        .
+#    }
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 3 - add relator questions
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ :has-label ?relatorLabel .
+    ?childQ :has-main-processing-entity ?childEntity .
+    ?childQ :has-processing-aspect ?relator .
+    ?childQ :has-processing-relator ?relator .
+    ?childQ :has-related-entity ?parentEntity .
+    ?parentQ :has-ufo-related-question ?childQ .
+    ?childQ a form:relator-question .
+}
+WHERE {
+    ?parentEntity :has-relator ?relator .
+    ?relator :mediates-2 ?childEntity .
+    ?relator :has-label ?relatorLabel .
+
+    ?parentQ :has-processing-entity ?parentEntity .
+
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(str(?relator),?childExecutionId) AS ?childQ) .
+
+# TODO do we need it ?
+#    FILTER (?parentEntity != ?childEntity) .
+    FILTER NOT EXISTS {
+        ?relator ft:ignore true .
+    }
+    FILTER NOT EXISTS {
+        ?parentEntity ft:ignore true .
+    }
+    FILTER NOT EXISTS {
+        ?parentEntity ft:external true .
+    }
+
+# TODO do we need it ?
+#    FILTER NOT EXISTS {
+#        ?parentQ :has-main-processing-entity ?mainParentEntity .
+#        ?ic a ft:ignore-condition ;
+#              ft:has-parent-entity ?mainParentEntity  ;
+#              ft:has-target-entity ?trope  ;
+#        .
+#    }
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "attach-ufo-based-question-templates" ;
+.
 :deploy-sample
   a sm:Function ;
   sm:returnModule :deploy-sample_Return ;
@@ -1493,8 +1863,6 @@ WHERE {
   a sml:ApplyConstruct ;
   sm:next :filter-out-question-origins ;
   sm:next :transform_Return ;
-  sm:nodeX 1180 ;
-  sm:nodeY 2915 ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
@@ -1528,25 +1896,94 @@ WHERE {
 :has-algorithm-related-property
   a rdf:Property ;
 .
+:has-aspect
+  a rdf:Property ;
+  rdfs:label "has-aspect" ;
+  rdfs:subPropertyOf :has-ufo-related-property ;
+.
+:has-aspect-classifier
+  a rdf:Property ;
+  rdfs:comment "Aspect classfier that classifies subquestions of this question." ;
+  rdfs:domain doc:question ;
+  rdfs:subPropertyOf :has-question-related-property ;
+.
+:has-label
+  a rdf:Property ;
+  rdfs:label "label" ;
+  rdfs:subPropertyOf :has-question-related-property ;
+.
+:has-local-id
+  a rdf:Property ;
+  rdfs:label "has-local-id" ;
+  rdfs:subPropertyOf :has-question-related-property ;
+.
+:has-main-processing-entity
+  a owl:ObjectProperty ;
+  rdfs:comment """Entity that is \"aspect target\" of this question.
+
+Note, we consider here that every question asks about an aspect of parent question. The main processing entity is so called \"aspect target\" of this aspect.  If the aspect is relator, aspect target is its second argument. Otherwise, aspect target is intrinsicAspect.
+""" ;
+  rdfs:label "has-main-processing-entity" ;
+  rdfs:subPropertyOf :has-processing-entity ;
+.
 :has-processed-entity
   a rdf:Property ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
-:has-processing-entity
+:has-processing-aspect
   a owl:ObjectProperty ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
+:has-processing-entity
+  a owl:ObjectProperty ;
+  rdfs:comment "Entity whose aspects should be processed within subquestions of this question." ;
+  rdfs:domain doc:question ;
+  rdfs:subPropertyOf :has-algorithm-related-property ;
+.
+:has-processing-intrinsic-mode
+  a owl:ObjectProperty ;
+  rdfs:subPropertyOf :has-processing-aspect ;
+.
 :has-processing-relator
   a owl:ObjectProperty ;
-  rdfs:subPropertyOf :has-algorithm-related-property ;
+  rdfs:subPropertyOf :has-processing-aspect ;
+.
+:has-question-related-property
+  a rdf:Property ;
+  rdfs:label "has-question-related-property" ;
 .
 :has-related-entity
   a owl:ObjectProperty ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
+:has-related-question-level
+  a rdf:Property ;
+  rdfs:label "has-related-question-level" ;
+  rdfs:subPropertyOf :has-question-related-property ;
+.
+:has-relator
+  a rdf:Property ;
+  rdfs:label "has-relator" ;
+  rdfs:subPropertyOf :has-aspect ;
+.
+:has-trope
+  a rdf:Property ;
+  rdfs:label "has-trope" ;
+  rdfs:subPropertyOf :has-aspect ;
+.
+:has-ufo-related-property
+  a rdf:Property ;
+  rdfs:label "has-ufo-related-property" ;
+.
+:has-ufo-related-question
+  a owl:ObjectProperty ;
+  rdfs:comment "Related question inferred from minimalistic ufo-based form model." ;
+  rdfs:subPropertyOf :has-question-related-property ;
+.
 :ignore-cycles
   a sml:ApplyConstruct ;
   sm:next :construct-subquestions ;
+  sm:next :constuct-ufo-based-question-templates ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# Ignore entities that would cause cycles
@@ -1576,6 +2013,47 @@ WHERE {
     (<https://slovník.gov.cz/generický/částky/pojem/jednotková-částka>)
 }""" ;
     ] ;
+.
+:infer-entity-aspect-classifiers
+  a sml:ApplyConstruct ;
+  sm:next :attach-aspect-classifiers-to-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - construct direct entity aspect classifier
+CONSTRUCT {
+    ?aspectClassifier ft:classifies-aspect ?aspect .
+}
+WHERE {
+   ?aspectClassifier a ft:direct-entity-aspect-classifier  ;
+        ft:classifies-aspects-of-entity ?entity ;
+   .
+   ?entity :has-aspect ?aspect .
+}""" ;
+    ] ;
+  sml:replace false ;
+  rdfs:label "infer-entity-aspect-classifiers" ;
+.
+:infer-ufo-based-questions
+  a sml:ApplyConstruct ;
+  sm:next :bind-root-question ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+    ?parentQ doc:has_related_question ?childQ .
+}
+WHERE {
+    ?parentQ :has-ufo-related-question ?childQ .
+    FILTER NOT EXISTS {
+        ?parentQ doc:has_related_question/doc:has_related_question ?childQ .
+    }
+}""" ;
+    ] ;
+  rdfs:label "infer-ufo-based-questions" ;
+.
+:is-duplicable
+  a rdf:Property ;
+  rdfs:label "is-duplicable" ;
+  rdfs:subPropertyOf :has-question-related-property ;
 .
 :layout-form
   a sml:ApplyConstruct ;
@@ -1614,7 +2092,12 @@ WHERE {
 }""" ;
     ] ;
   sml:replace true ;
-  rdfs:label "Layout form" ;
+  rdfs:label "layout-form" ;
+.
+:mediates-2
+  a rdf:Property ;
+  rdfs:label "mediates-2" ;
+  rdfs:subPropertyOf :has-ufo-related-property ;
 .
 :merge
   a sml:Merge ;
@@ -1661,11 +2144,11 @@ WHERE {
     ] ;
   kbss-module:has-input-graph-constraint [
       a sp:Ask ;
-      sp:text """# there is a question without a label
+      sp:text """# there is a question without a has-label
 ASK WHERE {
     ?question a doc:question .
     FILTER NOT EXISTS {
-        ?question rdfs:label ?label .
+        ?question :has-label ?hasLabel .
     }
 }""" ;
     ] ;
@@ -1740,10 +2223,33 @@ WHERE {
 .
 :merge-with-origins
   a sml:Merge ;
-  sm:next :attach-duplicate-type-questions ;
-  sm:next :attach-importance ;
+  sm:next :attach-duplicable-questions ;
   sm:next :construct-dny-v-tydnu-questions ;
+  sm:next :question-siblings-ordering ;
+  sm:next :todo2 ;
   rdfs:label "merge-with-origins" ;
+.
+:merge-with-question-duplicates
+  a sml:Merge ;
+  sm:next :question-siblings-ordering ;
+  sm:nodeX 1008 ;
+  sm:nodeY 3082 ;
+  rdfs:label "merge-with-question-duplicates" ;
+.
+:merge-with-questions
+  a sml:Merge ;
+  sm:next :merge-with-type-selection-questions ;
+  rdfs:label "merge-with-questions" ;
+.
+:merge-with-type-selection-questions
+  a sml:Merge ;
+  sm:next :attach-question-origins ;
+  rdfs:label "merge-with-type-selection-questions" ;
+.
+:merge-with-ufo-based-question-templates
+  a sml:Merge ;
+  sm:next :attach-importance ;
+  rdfs:label "merge-with-ufo-based-question-templates" ;
 .
 :question-siblings-ordering
   a sml:ApplyConstruct ;
@@ -1774,9 +2280,9 @@ WHERE {
   sm:next :attach-possible-values-hook ;
   sm:next :attach-relevant-tested-questions ;
   sm:next :attach-type-questions-possible-values ;
-  sm:next :bind-root-question ;
   sm:next :construct-metaquestions ;
   sm:next :construct-unit-of-measure-questions ;
+  sm:next :layout-form ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - start with direct-precedence
@@ -2160,6 +2666,10 @@ WHERE {
     ] ;
   sml:replace true ;
 .
+:todo2
+  a sml:Merge ;
+  sm:next :attach-duplicate-type-questions ;
+.
 :transform
   a sm:Function ;
   sm:returnModule :transform_Return ;
@@ -2169,4 +2679,13 @@ WHERE {
 :transform_Return
   a sml:ReturnRDF ;
   sml:serialization sml:Turtle ;
+.
+skos:definition
+  a rdf:Property ;
+.
+skos:prefLabel
+  a rdf:Property ;
+.
+skos:scopeNote
+  a rdf:Property ;
 .
