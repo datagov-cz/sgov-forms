@@ -18,12 +18,57 @@ ft:advanced
   a ft:importance ;
   a owl:NamedIndividual ;
 .
+ft:aspect
+  a owl:Class ;
+  rdfs:label "Aspect" ;
+  rdfs:subClassOf owl:Thing ;
+.
+ft:aspect-classifier
+  a owl:Class ;
+  rdfs:label "Aspect classifier" ;
+  rdfs:subClassOf [
+      a owl:Restriction ;
+      owl:onProperty ft:classifies-aspect ;
+      owl:someValuesFrom ft:aspect ;
+    ] ;
+.
+ft:aspect-classifier-condition
+  a owl:Class ;
+  rdfs:subClassOf ft:condition ;
+.
+ft:classifies-aspect
+  a rdf:Property ;
+  rdfs:domain ft:aspect-classifier ;
+  rdfs:label "classifies-aspect" ;
+  rdfs:range ft:aspect ;
+.
+ft:classifies-aspects-of-entity
+  a rdf:Property ;
+  rdfs:domain ft:entity-aspect-classifier ;
+  rdfs:label "classifies-aspects-of-entity" ;
+.
 ft:condition
   a owl:Class ;
   rdfs:comment "Each condition is evaluated to true if parents (entity or relator) are matched and at least one target (entity or relator) is matched."@en ;
 .
+ft:direct-entity-aspect-classifier
+  a owl:Class ;
+  rdfs:label "Direct entity aspect classifier" ;
+  rdfs:subClassOf ft:entity-aspect-classifier ;
+.
+ft:entity-aspect-classifier
+  a owl:Class ;
+  rdfs:label "entity-aspect-classifier" ;
+  rdfs:subClassOf ft:aspect-classifier ;
+.
 ft:external
   a owl:DatatypeProperty ;
+.
+ft:has-classifier-part
+  a owl:DatatypeProperty ;
+  rdfs:domain ft:aspect-classifier ;
+  rdfs:label "has-classifier-part" ;
+  rdfs:range ft:aspect-classifier ;
 .
 ft:has-codelist-entity
   a owl:ObjectProperty ;
@@ -84,6 +129,11 @@ ft:important
   a ft:importance ;
   a owl:NamedIndividual ;
 .
+ft:inherited-entity-aspect-classifier
+  a owl:Class ;
+  rdfs:label "Inherited entity aspect classifier" ;
+  rdfs:subClassOf ft:entity-aspect-classifier ;
+.
 ft:is-advanced
   a owl:DatatypeProperty ;
   rdfs:comment "Entity is advanced for a user. If true, the entity is by default hidden to user in forms and is shown to only on his/her explicit request."@en ;
@@ -108,4 +158,16 @@ ft:root-entity
 ft:step
   a owl:DatatypeProperty ;
   rdfs:range xsd:decimal ;
+.
+ft:targets-all-aspects
+  a rdf:Property ;
+  rdfs:domain ft:condition ;
+  rdfs:label "targets-all-aspects" ;
+  rdfs:range xsd:boolean ;
+.
+ft:targets-aspects-by-classifier
+  a rdf:Property ;
+  rdfs:domain ft:aspect-classifier-condition ;
+  rdfs:label "targets-aspects-by-classifier" ;
+  rdfs:range ft:aspect-classifier ;
 .
