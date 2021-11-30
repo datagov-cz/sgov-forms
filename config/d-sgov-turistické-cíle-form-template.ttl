@@ -49,6 +49,13 @@ d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 ### field size ### 	(default is 65)
 #d-sgov-turistické-cíle-pojem:kapacita ft:has-initial-input-length 6 .
 
+[] a ft:layout-rule ;
+	ft:has-parent-relator d-sgov-turistické-cíle-pojem:kapacita ;
+	ft:has-target-entity g-sgov-množství-pojem:hodnota ;
+	ft:has-initial-input-length 6 ;
+.
+
+
 
 # vlastnosti u turisitckeho cile
 d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
@@ -143,6 +150,7 @@ g-sgov-bezbariérové-přístupy-pojem:madlo-ve-výtahu-v-interiéru a ft:boolea
 g-sgov-bezbariérové-přístupy-pojem:točité-schodiště-v-interiéru a ft:boolean .
 
 ### bezbarierovost / Toaleta
+
 # g-sgov-bezbariérové-přístupy-pojem:šířka-vstupních-dveří-na-toaletu
 g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené a ft:boolean .
 g-sgov-bezbariérové-přístupy-pojem:dveře-na-toaletu-uzamčené-euroklíčem a ft:boolean .
@@ -156,6 +164,7 @@ g-sgov-bezbariérové-přístupy-pojem:přebalovací-pult-na-toaletě a ft:boole
 # g-sgov-bezbariérové-přístupy-pojem:přístupnost-toalety-pro-tělesně-postižené
 
 ### bezbarierovost / Přístupnost pro zrakově postižené
+
 g-sgov-bezbariérové-přístupy-pojem:braillovo-písmo a ft:boolean .
 g-sgov-bezbariérové-přístupy-pojem:hlasový-asistent a ft:boolean .
 g-sgov-bezbariérové-přístupy-pojem:vodící-linie a ft:boolean .
@@ -229,3 +238,6 @@ g-sgov-bezbariérové-přístupy-pojem:vodící-pes a ft:boolean .
 	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:vodící-linie ;
 	ft:classifies-aspect g-sgov-bezbariérové-přístupy-pojem:vodící-pes ;
 .
+
+
+
