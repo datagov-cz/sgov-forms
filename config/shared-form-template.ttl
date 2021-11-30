@@ -101,6 +101,19 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 	ft:has-importance ft:important ;
 .
 
+#_	.. bezbarierovost
+#_	.... cena
+#[] a ft:importance-condition ;
+#	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
+#	ft:has-target-entity g-sgov-věci-pojem:název ;
+#	ft:has-target-entity g-sgov-věci-pojem:popis ;
+#	ft:has-target-relator g-sgov-čas-pojem:má-časovou-dobu ;
+#	ft:has-target-relator g-sgov-čas-pojem:má-den-v-týdnu ;
+#	ft:has-importance ft:important ;
+#.
+
+
+
 
 
 ### ignore ####
@@ -168,6 +181,20 @@ g-sgov-čas-pojem:čas ft:ignore true .
 ### unit of measure ####
 g-sgov-čásky-pojem:výše-částky ft:has-unit-of-measure g-sgov-číselníky-pojem:měna .
 g-sgov-množství-pojem:hodnota ft:has-unit-of-measure g-sgov-číselníky-pojem:jednotka .
+
+# TODO following ignore conditions are consequecnes of "ft:has-unit-of-measure" rule ==> should be inferred
+[] a ft:ignore-condition ;
+	ft:has-parent-entity g-sgov-číselníky-pojem:jednotka ;
+	ft:targets-all-aspects true ;
+.
+[] a ft:ignore-condition ;
+	ft:has-parent-entity g-sgov-číselníky-pojem:měna ;
+	ft:targets-all-aspects true ;
+.
+
+g-sgov-číselníky-pojem:jednotka ft:external true .
+g-sgov-číselníky-pojem:měna ft:external true .
+
 
 
 ##############################
