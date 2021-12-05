@@ -219,6 +219,11 @@ g-sgov-čas-pojem:od ft:precedes-relatively-in-time g-sgov-čas-pojem:do .
         ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
         ft:has-codelist-entity <http://publications.europa.eu/resource/authority/currency> ;
         ft:has-internal-entity g-sgov-číselníky-pojem:měna ;
+	ft:has-additional-triples """
+      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/CZK> .
+      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/EUR> .
+      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/USD> .
+""" ;
 .
 
 ft:language-czech a ft:language ;
