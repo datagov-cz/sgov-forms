@@ -583,11 +583,11 @@ CONSTRUCT {
 }
 WHERE {
 #    SERVICE ?formMetadataServiceUrl {
-        ?entity ft:external true .
+    ?entity ft:internal true . # TODO changed
 #    } .
     ?question :has-processing-aspect-target ?entity .
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
-    BIND (REPLACE(?possibleValuesQueryTemplate, \"XXXXX\", str(?entity)) AS ?downloadSuffixRaw) .
+    BIND (REPLACE(?possibleValuesQueryTemplate, \"XXX_ENTITY_TYPE_XXX\", str(?entity)) AS ?downloadSuffixRaw) .
     BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
     BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString)
 }""" ;
@@ -606,11 +606,28 @@ WHERE {
         ft:has-codelist-entity ?codeListEntity ;
         ft:has-internal-entity ?entity  ;
     .
+    OPTIONAL {
+         ?codelistMapping ft:has-additional-triples ?additionalTriples .
+    }
+
 #    } .
     ?question :has-processing-aspect-target ?entity .
+    BIND(COALESCE(?additionalTriples, \"\") as ?orderingTriples)
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
-    BIND (REPLACE(?externalPossibleValuesQueryTemplate, \"XXX_SERVICE_XXX\", str(?codeListServiceUrl)) AS ?preparedPossibleValuesQueryTemplate) .
-    BIND (REPLACE(?preparedPossibleValuesQueryTemplate, \"XXXXX\", str(?codeListEntity)) AS ?downloadSuffixRaw) .
+    BIND (
+      REPLACE(
+         REPLACE(
+           REPLACE(
+             ?externalPossibleValuesQueryTemplate,
+             \"XXX_ENTITY_TYPE_XXX\",
+             str(?codeListEntity)
+           ),
+           \"XXX_VALUES_ORDERING_XXX\",
+           ?orderingTriples
+          ),
+         \"XXX_SERVICE_XXX\",
+         str(?codeListServiceUrl)
+    )  AS ?downloadSuffixRaw) .
     BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
     BIND (CONCAT(?dowloadPrefix, ?downloadSuffix) AS ?downloadString)
 }""" ;
@@ -1184,10 +1201,9 @@ prefix dce: <http://purl.org/dc/elements/1.1/>
 prefix form: <http://onto.fel.cvut.cz/ontologies/form/>
 
 CONSTRUCT {
-      # TODO remove
-      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/CZK> .
-      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/EUR> .
-      <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/USD> .
+
+      XXX_VALUES_ORDERING_XXX
+
       ?value rdfs:label ?labelStr .
       ?value rdfs:comment ?explanationStr .
 }
@@ -1196,7 +1212,7 @@ WHERE {
      SELECT ?value ?labelStr ?explanationStr ?entityType {
 
           VALUES (?entityType) {
-               (<XXXXX>)
+               (<XXX_ENTITY_TYPE_XXX>)
           }
 
           ?value skos:inScheme ?entityType .
@@ -1274,7 +1290,7 @@ WHERE {
           ?value a ?entityType .
 }
 VALUES (?entityType) {
-      (<XXXXX>)
+      (<XXX_ENTITY_TYPE_XXX>)
 }""" ;
 .
 :bind-question-instance-prefix
