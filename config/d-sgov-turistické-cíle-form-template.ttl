@@ -438,7 +438,7 @@ g-sgov-bezbariérové-přístupy-pojem:vodící-pes a ft:boolean .
 <https://slovník.gov.cz/generický/umístění/pojem/má-popis-umístění> skos:altLabel
     "Popis umístění" .
 
-<https://slovník.gov.cz/generický/umístění/pojem/má-geometrii> skos:altLabel "Geometrii" .
+<https://slovník.gov.cz/generický/umístění/pojem/má-geometrii> skos:altLabel "Geometrie" .
 
 <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-adresu> skos:altLabel
     "Adresa" .
