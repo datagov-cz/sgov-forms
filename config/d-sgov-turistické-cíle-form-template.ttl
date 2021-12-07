@@ -241,3 +241,200 @@ g-sgov-bezbariérové-přístupy-pojem:vodící-pes a ft:boolean .
 
 
 
+<https://slovník.gov.cz/generický/čas/pojem/má-den-v-týdnu> skos:altLabel "Den v týdnu" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-časovou-dobu> skos:altLabel "Časová doba" .
+
+<https://slovník.gov.cz/generický/veřejná-místa/pojem/má-vstupné> skos:altLabel "Vstupné" .
+
+<https://slovník.gov.cz/generický/kontakty/pojem/má-e-mailovou-adresu> skos:altLabel
+    "E-mailová adresra" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-podmínky-užití> skos:altLabel
+    "Podmínky užití" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-časové-období> skos:altLabel "Časové období" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-zpracovatele-osobních-údajů>
+  skos:altLabel "Zpracovatele osobních údajů" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-typ-média> skos:altLabel
+    "Typ média" .
+
+<https://slovník.gov.cz/generický/množství/pojem/má-jednotku> skos:altLabel "Jednotka" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-specifickou-frekvenci> skos:altLabel
+    "Specifická frekvence" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-vykonavatele-majetkových-práv-autorských-u-autorského-díla>
+  skos:altLabel "Vykonavatel majetkových práv autorských u autorského díla" .
+
+<https://slovník.gov.cz/generický/bezbariérové-přístupy/pojem/má-mapující-subjekt>
+  skos:altLabel "Mapující subjekt" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-poskytovatele> skos:altLabel
+    "Poskytovatel" .
+
+<https://slovník.gov.cz/generický/věci/pojem/má-přílohu> skos:altLabel "Příloha" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-pořizovatele-databáze>
+  skos:altLabel "Pořizovatel databáz" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-místo-narození> skos:altLabel
+    "Místo narození" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-správce-osobních-údajů>
+  skos:altLabel "Správce osobních údajů" .
+
+<https://slovník.gov.cz/legislativní/sbírka/89/2012/pojem/má-bydliště-fyzické-osoby>
+  skos:altLabel "Bydliště" .
+
+<https://slovník.gov.cz/legislativní/sbírka/304/2013/pojem/má-udělenu-prokuru> skos:altLabel
+    "Udělená prokura" .
+
+<https://slovník.gov.cz/generický/lidé/pojem/má-pohlaví> skos:altLabel "Pohlaví" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-vykonavatele-majetkových-práv-autorských-u-originální-databáze>
+  skos:altLabel "Vykonavatele majetkových práv autorských u originální databáze" .
+
+<https://slovník.gov.cz/generický/digitální-objekty/pojem/má-kurátora> skos:altLabel
+    "Kurátora" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-časový-interval> skos:altLabel "Časový interval" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-časový-okamžik> skos:altLabel "Časový okamžik" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-jinou-časovou-specifikaci> skos:altLabel
+    "Jinou časovou specifikaci" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-frekvenci> skos:altLabel "Frekvenci" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-konec> skos:altLabel "Konec" .
+
+<https://slovník.gov.cz/generický/čas/pojem/má-začátek> skos:altLabel "Začátek" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-adresu> skos:altLabel "Adresa" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-území-městského-obvodu-v-hlavním-městě-praze>
+  skos:altLabel "Přiřazené území městského obvodu v hlavním městě Praze" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-území-okresu>
+  skos:altLabel "Přiřazené území okresa" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-části-obce> skos:altLabel
+    "Název části obce" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-katastrální-území>
+  skos:altLabel "Přiřazené katastrální území" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-území-obce>
+  skos:altLabel "Přiřazené území obce" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-ulice> skos:altLabel
+    "Název ulice" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazenou-ulici> skos:altLabel
+    "Přiřazenou ulici" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-číslo-domovní> skos:altLabel
+    "Číslo domovní" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-zvláštní-údaje-pro-doručování>
+  skos:altLabel "Zvláštní údaje pro doručování" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-obce-nebo-vojenského-újezdu>
+  skos:altLabel "Název obce nebo vojenského újezda" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-městského-obvodu-v-hlavním-městě-praze>
+  skos:altLabel "Název městského obvodu v hlavním městě Praze" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-katastrálního-území>
+  skos:altLabel "Název katastrálního území" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-území-vojenského-újezdu>
+  skos:altLabel "Přiřazené území vojenského újezda" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazenou-část-obce>
+  skos:altLabel "Přiřazenou část obce" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-okresu> skos:altLabel
+    "Název okresu" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-přiřazené-území-obce-nebo-vojenského-újezdu>
+  skos:altLabel "Přiřazené území obce nebo vojenského újezdu" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-vazbu-na-adresní-komponent>
+  skos:altLabel "Vazbu na adresní komponent" .
+
+<https://slovník.gov.cz/generický/adresy/pojem/má-kód-adresního-místa> skos:altLabel
+    "Kód adresního místa" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-identifikační-údaje-územního-prvku>
+  skos:altLabel "Identifikační údaje územního prvku" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-lokalizační-údaje-územního-prvku>
+  skos:altLabel "Lokalizační údaje územního prvku" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-identifikační-údaje-územně-evidenční-jednotky>
+  skos:altLabel "Identifikační údaje územně evidenční jednotky" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-kód-adresního-místa>
+  skos:altLabel "Kód adresního místa" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-lokalizační-údaje-části-obce>
+  skos:altLabel "Lokalizační údaje části obce" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-technickoekonomické-atributy-stavebního-objektu>
+  skos:altLabel "Technickoekonomické atributy stavebního objektu" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-lokalizační-údaje-ulice>
+  skos:altLabel "Lokalizační údaje ulice" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-identifikační-údaje-stavebního-objektu>
+  skos:altLabel "Identifikační údaje stavebního objektu" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-adresní-místo> skos:altLabel
+    "Adresní místo" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-technickoekonomické-atributy-stavebního-objektu-s-č.-p.-nebo-č.-ev.>
+  skos:altLabel "Technickoekonomické atributy stavebního objektu s č. p. nebo č. ev." .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-lokalizační-údaje-územně-evidenční-jednotky>
+  skos:altLabel "Lokalizační údaje územně evidenční jednotky" .
+
+<https://slovník.gov.cz/veřejný-sektor/pojem/má-přílohu> skos:altLabel "Příloha" .
+
+<https://slovník.gov.cz/veřejný-sektor/pojem/má-administrativní-platnost-položky>
+  skos:altLabel "Platnost" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-zahraniční-adresu> skos:altLabel
+    "Zahraniční adresa" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-geografický-identifikátor> skos:altLabel
+    "Geografický identifikátor" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-souřadnicový-referenční-systém>
+  skos:altLabel "Souřadnicový referenční systém" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-identifikační-údaje-pozemku>
+  skos:altLabel "Identifikační údaje pozemku" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-popis-umístění> skos:altLabel
+    "Popis umístění" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-geometrii> skos:altLabel "Geometrii" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-adresu> skos:altLabel
+    "Adresa" .
+
+<https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-technickoekonomické-atributy-pozemku>
+  skos:altLabel "Technickoekonomické atributy pozemku" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-budovu> skos:altLabel "Budova" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-geografický-název> skos:altLabel
+    "Geografický název" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-místnost> skos:altLabel "Místnost" .
+
+<https://slovník.gov.cz/generický/umístění/pojem/má-patro> skos:altLabel "Patro" .
