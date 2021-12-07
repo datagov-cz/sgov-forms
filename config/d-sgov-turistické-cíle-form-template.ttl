@@ -33,6 +33,21 @@ d-sgov-turistické-cíle-pojem:kouření-povoleno a ft:boolean .
 d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 
 
+## TODO workarounds for ordering (see kodi.mm for more info):
+# 	TODO not use classifier such as :umístnění-aspect-classifier
+g-sgov-věci-pojem:popis ft:precedes :umístnění-aspect-classifier .
+:umístnění-aspect-classifier ft:precedes  d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle .
+d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:precedes d-sgov-turistické-cíle-pojem:kouření-povoleno .
+d-sgov-turistické-cíle-pojem:kouření-povoleno ft:precedes d-sgov-turistické-cíle-pojem:veřejná-přístupnost .
+
+:obecné-vlastnosti-classifier ft:precedes :hlavní-vstup-classifier .
+:hlavní-vstup-classifier ft:precedes :vedlejší-vstup-classifier .
+:vedlejší-vstup-classifier ft:precedes :interiér-classifier .
+:interiér-classifier ft:precedes :toaleta-classifier .
+:toaleta-classifier ft:precedes :přístupnost-pro-zrakově-postižené-classifier .
+
+
+
 ### importance ####
 
 #_	turisticky cil
@@ -42,6 +57,7 @@ d-sgov-turistické-cíle-pojem:veřejná-přístupnost a ft:boolean .
 	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
 	ft:has-target-relator d-sgov-turistické-cíle-pojem:má-umístění ;
 	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-vstupné ;
+	ft:has-target-relator d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ;
 	ft:has-importance ft:important ;
 .
 
