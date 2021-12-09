@@ -54,7 +54,7 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 	ft:has-parent-entity g-sgov-vstupné-pojem:vstupné ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
 	ft:has-target-entity g-sgov-vstupné-pojem:podmínka ;
-	ft:has-target-relator g-sgov-vstupné-pojem:má-cenu ;
+	ft:has-target-aspect g-sgov-vstupné-pojem:má-cenu ;
 	ft:has-importance ft:important ;
 .
 
@@ -62,7 +62,7 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 [] a ft:importance-condition ;
 	ft:has-parent-entity g-sgov-čásky-pojem:částka ;
 	ft:has-target-entity g-sgov-čásky-pojem:výše-částky ;
-	ft:has-target-relator g-sgov-čásky-pojem:má-měnu ;
+	ft:has-target-aspect g-sgov-čásky-pojem:má-měnu ;
 	ft:has-importance ft:important ;
 .
 
@@ -72,8 +72,8 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
 	ft:has-target-entity g-sgov-věci-pojem:popis ;
-	ft:has-target-relator g-sgov-čas-pojem:má-časovou-dobu ;
-	ft:has-target-relator g-sgov-čas-pojem:má-den-v-týdnu ;
+	ft:has-target-aspect g-sgov-čas-pojem:má-časovou-dobu ;
+	ft:has-target-aspect g-sgov-čas-pojem:má-den-v-týdnu ;
 	ft:has-importance ft:important ;
 .
 
@@ -81,7 +81,7 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 #_	.... den-v-týdnu
 [] a ft:importance-condition ;
 	ft:has-parent-entity g-sgov-číselníky-pojem:den-v-týdnu ;
-	ft:has-target-relator rdf:type ;
+	ft:has-target-aspect rdf:type ;
 	ft:has-importance ft:important ;
 .
 
@@ -97,7 +97,7 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 [] a ft:importance-condition ;
 	ft:has-parent-entity g-sgov-množství-pojem:množství  ;
 	ft:has-target-entity g-sgov-množství-pojem:hodnota ;
-	ft:has-target-relator g-sgov-množství-pojem:má-jednotku ;
+	ft:has-target-aspect g-sgov-množství-pojem:má-jednotku ;
 	ft:has-importance ft:important ;
 .
 
@@ -107,8 +107,8 @@ g-sgov-vstupné-pojem:podmínka a ft:multilingual-quality .
 #	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
 #	ft:has-target-entity g-sgov-věci-pojem:název ;
 #	ft:has-target-entity g-sgov-věci-pojem:popis ;
-#	ft:has-target-relator g-sgov-čas-pojem:má-časovou-dobu ;
-#	ft:has-target-relator g-sgov-čas-pojem:má-den-v-týdnu ;
+#	ft:has-target-aspect g-sgov-čas-pojem:má-časovou-dobu ;
+#	ft:has-target-aspect g-sgov-čas-pojem:má-den-v-týdnu ;
 #	ft:has-importance ft:important ;
 #.
 
