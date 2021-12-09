@@ -54,13 +54,38 @@ d-sgov-turistické-cíle-pojem:kouření-povoleno ft:precedes d-sgov-turistické
 [] a ft:importance-condition ;
 	ft:has-parent-entity d-sgov-turistické-cíle-pojem:turistický-cíl ;
 	ft:has-target-entity g-sgov-věci-pojem:název ;
-	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
-	ft:has-target-relator d-sgov-turistické-cíle-pojem:má-umístění ;
-	ft:has-target-relator g-sgov-veřejná-místa-pojem:má-vstupné ;
-	ft:has-target-relator d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ;
+	ft:has-target-aspect g-sgov-veřejná-místa-pojem:má-otevírací-dobu ;
+	ft:has-target-aspect d-sgov-turistické-cíle-pojem:má-umístění ; # TODO what is it ?
+	ft:has-target-aspect g-sgov-veřejná-místa-pojem:má-vstupné ;
+	ft:has-target-aspect d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ;
+
+	# in section :umístnění-aspect-classifier
+	ft:has-target-aspect g-sgov-umístění-pojem:má-geometrii ;
 	ft:has-importance ft:important ;
 .
 
+#_	ma-kontakt
+[] a ft:importance-condition ;
+	ft:has-parent-relator g-sgov-veřejná-místa-pojem:má-kontakt ;
+	ft:has-target-aspect g-sgov-kontakty:má-url ;
+	ft:has-target-aspect g-sgov-kontakty:má-účet-na-twitteru ;
+	ft:has-target-aspect g-sgov-kontakty:má-účet-na-instagramu ;
+	ft:has-target-aspect g-sgov-kontakty:má-účet-na-facebooku ;
+	ft:has-target-aspect g-sgov-kontakty:má-telefonní-číslo-na-mobilní-telefon ;
+	ft:has-target-aspect g-sgov-kontakty:má-e-mailovou-adresu ;
+	ft:has-importance ft:important ;
+.
+
+
+#_	má-přílohu
+[] a ft:importance-condition ;
+	ft:has-parent-relator g-sgov-věci-pojem:má-přílohu  ;
+	ft:has-target-aspect g-sgov-digitální-objekty:autor-díla ;
+	ft:has-target-aspect g-sgov-digitální-objekty:má-podmínky-užití ;
+	ft:has-target-aspect g-sgov-digitální-objekty:má-typ-média ;
+	ft:has-target-entity g-sgov-digitální-objekty:url-ke-stažení ;
+	ft:has-importance ft:important ;
+.
 
 ### field size ### 	(default is 65)
 #d-sgov-turistické-cíle-pojem:kapacita ft:has-initial-input-length 6 .
@@ -92,6 +117,13 @@ d-sgov-turistické-cíle-pojem:má-dostupný-jazyk   ft:ignore true .
 	ft:targets-aspects-by-classifier :umístnění-aspect-classifier ;
 .
 
+[] a ft:importance-condition ;
+	ft:has-parent-relator g-sgov-umístění-pojem:má-geometrii ;
+	ft:has-target-entity v-sgov-pojem:zemepisná-šírka ;
+	ft:has-target-entity v-sgov-pojem:zemepisná-délka ;
+	ft:has-target-entity v-sgov-pojem:adresní-místo ;
+	ft:has-importance ft:important ;
+.
 
 ### ma-bezbarierovost
 
