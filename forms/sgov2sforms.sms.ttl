@@ -436,6 +436,17 @@ WHERE {
 .
 :attach-importance
   a sml:ApplyConstruct ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# 1 - there is importance condition without assigned importance
+ASK
+WHERE {
+     ?ic a ft:importance-condition  .
+     FILTER NOT EXISTS {
+          ?ic ft:has-importance ?importance .
+    }
+}""" ;
+    ] ;
   sm:next :infer-entity-aspect-classifiers ;
   sml:constructQuery [
       a sp:Construct ;
