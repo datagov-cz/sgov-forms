@@ -1514,14 +1514,14 @@ CONSTRUCT {
 }
 WHERE {
    #TODO remove constants
-   BIND(<https://slovník.gov.cz/generický/číselníky/pojem/den-v-týdnu> as ?parentEntity)
+   BIND(<https://slovník.gov.cz/generický/číselníky/pojem/den-v-týdnu> as ?aspectTarget)
 
-    ?parentQ form:has-question-origin ?parentEntity .
+    ?parentQ :has-processing-aspect-target ?aspectTarget .
 
     ?codelistMapping a ft:codelist-mapping ;
         ft:has-codelist-service-url ?codeListServiceUrl  ;
         ft:has-codelist-entity ?codeListEntity ;
-        ft:has-internal-entity ?parentEntity  ;
+        ft:has-internal-entity ?aspectTarget  ;
      .
 
     SERVICE ?codeListServiceUrl {
@@ -1613,8 +1613,6 @@ CONSTRUCT {
       ?q form:has-preceding-question ?showAdvancedQ .
 }
 WHERE {
-    ?parentQ doc:has_related_question ?advancedQ .
-    ?advancedQ ft:has-importance ft:advanced .
     ?parentQ doc:has_related_question ?q  .
     ?q ft:has-importance ft:advanced .
 
