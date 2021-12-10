@@ -2435,10 +2435,37 @@ WHERE {
       a sp:Construct ;
       sp:text """# 1 - start with direct-precedence
 CONSTRUCT {
-    form:direct-precedence :is-processed true .
+    ### precedence prioritization
+    ?currentP :is-processed true .
+
+    ### rule implementation
+    ?q2 form:has-preceding-question  ?q1 .
 }
 WHERE {
 
+     ### precedence prioritization
+     BIND(form:direct-precedence as ?currentP)
+
+     FILTER NOT EXISTS {
+          ?currentP  :is-processed true .
+     }
+
+#     ?currentP  form:has-higher-priority-precedence ?previousP .
+#     ?previousP  :is-processed true .
+
+
+     ### rule implementation
+     ?parentQ doc:has_related_question ?q1  .
+     ?q1 form:has-question-origin ?earlierQO .
+     ?parentQ doc:has_related_question ?q2 .
+     ?q2 form:has-question-origin ?laterQO .
+     ?earlierQO ft:precedes ?laterQO .
+
+
+     ### prevent cycle condition
+     FILTER NOT EXISTS {
+          ?q1  form:has-preceding-question*  ?q2 .
+     }
 }""" ;
     ] ;
   sml:constructQuery [
@@ -2490,7 +2517,7 @@ WHERE {
 
      ### prevent cycle condition
      FILTER NOT EXISTS {
-           ?q1  form:has-preceding-question  ?q2 .
+           ?q1  form:has-preceding-question*  ?q2 .
      }
 }""" ;
     ] ;
@@ -2554,7 +2581,7 @@ WHERE {
 
      ### prevent cycle condition
      FILTER NOT EXISTS {
-          ?q1  form:has-preceding-question  ?q2 .
+          ?q1  form:has-preceding-question*  ?q2 .
      }
 
 }""" ;
@@ -2602,7 +2629,7 @@ WHERE {
 
      ### prevent cycle condition
      FILTER NOT EXISTS {
-          ?q1  form:has-preceding-question  ?q2 .
+          ?q1  form:has-preceding-question*  ?q2 .
      }
 
 }""" ;
@@ -2640,7 +2667,7 @@ CONSTRUCT {
 
      ### prevent cycle condition
      FILTER NOT EXISTS {
-           ?q1  form:has-preceding-question  ?q2 .
+           ?q1  form:has-preceding-question*  ?q2 .
      }
 
 }
@@ -2682,7 +2709,7 @@ WHERE {
 
      ### prevent cycle condition
      FILTER NOT EXISTS {
-          ?q1  form:has-preceding-question  ?q2 .
+          ?q1  form:has-preceding-question*  ?q2 .
      }
 
 }""" ;
