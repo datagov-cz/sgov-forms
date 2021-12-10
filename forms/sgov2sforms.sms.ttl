@@ -497,8 +497,8 @@ WHERE {
            ?q :has-processing-aspect-target ?processingEntity .
            ?ic ft:has-target-entity ?processingEntity .
     } UNION {
-           ?q :is-question-of-relator ?processingRelator .
-           ?ic ft:has-target-relator ?processingRelator .
+           ?q :is-question-of-aspect ?processingRelator .
+           ?ic ft:has-target-aspect ?processingRelator .
     }
 }""" ;
     ] ;
