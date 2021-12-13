@@ -18,6 +18,7 @@
 @prefix g-sgov-množství-pojem: <https://slovník.gov.cz/generický/množství/pojem/> .
 @prefix d-sgov-turistické-cíle: <https://slovník.gov.cz/datový/turistické-cíle/> .
 @prefix d-sgov-turistické-cíle-pojem: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
+@prefix dce: <http://purl.org/dc/elements/1.1/> .
 
 
 # čas
@@ -151,8 +152,6 @@ v-sgov-pojem:má-platnost ft:ignore true .
 #g-sgov-veřejná-místa-pojem:má-provozovatele ft:ignore true .
 #g-sgov-veřejná-místa-pojem:má-vlastníka ft:ignore true .
 
-#d-sgov-turistické-cíle-pojem:má-typ-turistického-cíle ft:ignore true .
-
 
 # TODO - error multiple questions of a parent !!!
 g-sgov-vstupné-pojem:platnost ft:ignore true .
@@ -178,22 +177,64 @@ g-sgov-čas-pojem:čas ft:ignore true .
 
 
 
-### unit of measure ####
+### unit of measure questions ####
+#
+#	- pattern:
+#		?valueType ft:has-unit-of-measure ?unitOfMeasureType .
+#	- renders:
+#		# ?valueType question
+#		# ?unitOfMeasureType question
+#	- infers: 
+#		?unitOfMeasureType a ft:codelist-aspect-target .
+#
+#
 g-sgov-čásky-pojem:výše-částky ft:has-unit-of-measure g-sgov-číselníky-pojem:měna .
 g-sgov-množství-pojem:hodnota ft:has-unit-of-measure g-sgov-číselníky-pojem:jednotka .
 
-# TODO following ignore conditions are consequecnes of "ft:has-unit-of-measure" rule ==> should be inferred
+### codelist aspect questions ###
+#
+#	- pattern:
+#		?objectType a ft:codelist-aspect-target .
+#	- renders:
+#		# aspect question having this aspect-target type with autocomplete from a codelist
+#	- infers: 
+#		[] a ft:ignore-condition ;
+#			ft:has-parent-entity ?objectType ;
+#			ft:targets-all-aspects true ;
+#		.
+#	- requires:
+#		?cm a ft:codelist-mapping ;
+#		    ft:has-internal-entity ?objectType ;
+#		.
+#
+#
+g-sgov-číselníky-pojem:typ-turistického-cíle a ft:codelist-aspect-target .
+g-sgov-číselníky-pojem:stupeň-přístupnosti a ft:codelist-aspect-target .
+g-sgov-číselníky-pojem:pohlaví a ft:codelist-aspect-target .
+g-sgov-číselníky-pojem:typ-média a ft:codelist-aspect-target .
+
+
+# TODO is it correct way ?
 [] a ft:ignore-condition ;
-	ft:has-parent-entity g-sgov-číselníky-pojem:jednotka ;
-	ft:targets-all-aspects true ;
-.
-[] a ft:ignore-condition ;
-	ft:has-parent-entity g-sgov-číselníky-pojem:měna ;
+	ft:has-parent-relator  <https://slovník.gov.cz/generický/čas/pojem/má-den-v-týdnu>  ;
 	ft:targets-all-aspects true ;
 .
 
-g-sgov-číselníky-pojem:jednotka ft:external true .
-g-sgov-číselníky-pojem:měna ft:external true .
+
+
+# TODO following ignore conditions are consequecnes of "ft:has-unit-of-measure" rule ==> should be inferred
+#[] a ft:ignore-condition ;
+#	ft:has-parent-entity g-sgov-číselníky-pojem:jednotka ;
+#	ft:targets-all-aspects true ;
+#.
+#[] a ft:ignore-condition ;
+#	ft:has-parent-entity g-sgov-číselníky-pojem:měna ;
+#	ft:targets-all-aspects true ;
+#.
+
+# g-sgov-číselníky-pojem:jednotka ft:external true .
+#g-sgov-číselníky-pojem:měna ft:external true .
+
 
 
 
@@ -208,11 +249,49 @@ g-sgov-číselníky-pojem:měna ft:external true .
 
 g-sgov-čas-pojem:od ft:precedes-relatively-in-time g-sgov-čas-pojem:do .
 
-# entity mapping with internal code list - <https://data.mvcr.gov.cz/sparql> and external code list - <https://data.gov.cz/sparql>
+
+
+### codelist mappings ###
+# 	- ft:has-codelist-service-url has following values:
+#		- private code list [if value is not provided it is inferred from ?formMetadataServiceUrl]
+#		- internal code list - <https://data.mvcr.gov.cz/sparql> 
+#		- external code list - <https://data.gov.cz/sparql>
 [] a ft:codelist-mapping ;
         ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
         ft:has-codelist-entity <https://data.mvcr.gov.cz/zdroj/číselníky/dny-v-týdnu> ;
         ft:has-internal-entity g-sgov-číselníky-pojem:den-v-týdnu ;
+.
+
+# turisticky cil
+[] a ft:codelist-mapping ;
+        ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
+        ft:has-codelist-entity <https://data.mvcr.gov.cz/zdroj/číselníky/typy-turistických-cílů> ;
+        ft:has-internal-entity g-sgov-číselníky-pojem:typ-turistického-cíle ;
+.
+
+# bezbarierovost
+[] a ft:codelist-mapping ;
+        ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
+        ft:has-codelist-entity <https://data.mvcr.gov.cz/zdroj/číselníky/stupně-přístupnosti> ;
+        ft:has-internal-entity g-sgov-číselníky-pojem:stupeň-přístupnosti ;
+.
+
+# lide a osoby
+[] a ft:codelist-mapping ;
+        ft:has-codelist-service-url <https://data.mvcr.gov.cz/sparql>  ;
+        ft:has-codelist-entity <https://data.mvcr.gov.cz/zdroj/číselníky/pohlaví> ;
+        ft:has-internal-entity g-sgov-číselníky-pojem:pohlaví ;
+.
+
+[] a ft:codelist-mapping ;
+        ft:has-codelist-entity <http://www.ontology-of-units-of-measure.org/resource/om-2/length-Dimension> ;
+        ft:has-internal-entity g-sgov-číselníky-pojem:jednotka ;
+.
+
+# 	typ media
+[] a ft:codelist-mapping ;
+        ft:has-codelist-entity <http://www.iana.org/assignments/media-type> ;
+        ft:has-internal-entity g-sgov-číselníky-pojem:typ-média ;
 .
 
 [] a ft:codelist-mapping ;
@@ -225,6 +304,41 @@ g-sgov-čas-pojem:od ft:precedes-relatively-in-time g-sgov-čas-pojem:do .
       <http://publications.europa.eu/resource/authority/currency/AFA> form:has-preceding-value <http://publications.europa.eu/resource/authority/currency/USD> .
 """ ;
 .
+
+
+### codelists ###
+
+#	length-dimension
+<http://www.ontology-of-units-of-measure.org/resource/om-2/centimetre>
+	skos:inScheme <http://www.ontology-of-units-of-measure.org/resource/om-2/length-Dimension> ;
+	skos:prefLabel "cm"@cs ;
+	dce:description "Centimetr je jednotka délky definována jako 1.0e-2 metra."@cs ;
+.
+<http://www.ontology-of-units-of-measure.org/resource/om-2/millimetre>
+	skos:inScheme <http://www.ontology-of-units-of-measure.org/resource/om-2/length-Dimension> ;
+	skos:prefLabel "mm"@cs ;
+	dce:description "Milimeter je jednotka délky definována jako 1.0e-3 metra."@cs ;
+.
+
+
+#	typ media
+<http://www.iana.org/assignments/media-types/image/jpeg>
+	skos:inScheme <http://www.iana.org/assignments/media-type> ; # TODO not correct
+	skos:prefLabel "jpeg"@cs ;
+	dce:description "JPEG obrázek."@cs ;
+.
+<http://www.iana.org/assignments/media-types/image/pdf>
+	skos:inScheme <http://www.iana.org/assignments/media-type> ; # TODO not correct
+	skos:prefLabel "pdf"@cs ;
+	dce:description "PDF dokument."@cs ;
+.
+
+
+
+
+
+
+
 
 ft:language-czech a ft:language ;
 	skos:prefLabel "Česky" ;
@@ -274,7 +388,6 @@ v-sgov-pojem:bod
         skos:broader     z-sgov-pojem:typ-objektu , v-sgov-pojem:geometrie ;
         skos:inScheme    <https://slovník.gov.cz/veřejný-sektor/glosář> ;
         skos:prefLabel   "Bod"@cs .
-
 
 
 v-sgov-pojem:zemepisná-šírka
