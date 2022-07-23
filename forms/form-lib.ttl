@@ -61,8 +61,8 @@ fl:create-q
       a sp:Select ;
       sp:text """SELECT ?question
 WHERE {
-    BIND(IF(?arg2, CONCAT(str(?arg2),\"-\"),\"\") as ?uniqueId)
-    BIND (URI(CONCAT(str(?arg1), \"-\", ?uniqueId, \"q\")) AS ?question) .
+    BIND(COALESCE(CONCAT(str(?arg2),\"-\"),\"\") as ?uniqueId)
+    BIND(URI(CONCAT(str(?arg1), \"-\", ?uniqueId, \"q\")) AS ?question)
 }""" ;
     ] ;
   spin:constraint [
