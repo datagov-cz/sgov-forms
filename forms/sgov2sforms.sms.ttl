@@ -15,7 +15,6 @@
 @prefix doc: <http://onto.fel.cvut.cz/ontologies/documentation/> .
 @prefix fl: <http://onto.fel.cvut.cz/ontologies/form-lib/> .
 @prefix form: <http://onto.fel.cvut.cz/ontologies/form/> .
-@prefix form-ecc-lib: <http://onto.fel.cvut.cz/ontologies/aviation/eccairs-form-lib/> .
 @prefix form-lt: <http://onto.fel.cvut.cz/ontologies/form-layout/> .
 @prefix ft: <http://onto.fel.cvut.cz/ontologies/form-template/> .
 @prefix kbss-module: <http://onto.fel.cvut.cz/ontologies/lib/module/> .
@@ -333,27 +332,15 @@ WHERE {
     ] ;
   sml:constructQuery [
       a sp:Construct ;
-      sp:text """# 2 -  construct hiding logic and ordering
-# TODO make is-relevant-if automatic from an attribute (move it for later)
+      sp:text """# 2 -  construct relator multiplicity precedence relation
 CONSTRUCT {
-      ?qRoot form-lt:has-layout-class \"answerable\" .
-      ?qRoot form-lt:has-layout-class \"checkbox\" .
-
-      ?qRootX form-lt:has-layout-class \"answerable\" .
-      ?qRootX form-lt:has-layout-class \"checkbox\" .
-
      ?qRootX a form:relator-multiplicity-question .
      ?qRootP a form:relator-multiplicity-question .
      ?precedenceP a form:relator-multiplicity-precedence ;
+             form:id ?precedencePId ;
              form:has-first-question ?qRootP ;
              form:has-second-question ?qRootX ;
      .
-
-     ?qRootX form:is-relevant-if  ?condP .
-     ?condP   a form:condition ;
-             form:accepts-answer-value true ;
-             form:has-tested-question ?qRootP ;
-    .
 }
 WHERE {
     VALUES ?card { 1 2 3 4 }
@@ -363,8 +350,8 @@ WHERE {
     BIND(fl:create-q(?qRoot, ?card) as ?qRootX)
     BIND( IF(?card=1, ?qRoot, fl:create-q(?qRoot, ?card-1)) as ?qRootP)
 
-    BIND(IRI(concat(str(form:condition), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?condP)
-    BIND(IRI(concat(str(form:relator-multiplicity-precedence), \"-\", md5(concat(str(?qRootX), str(?qRootP))))) as ?precedenceP)
+    BIND(md5(concat(str(?qRootX), str(?qRootP))) as ?precedencePId)
+    BIND(IRI(concat(str(form:relator-multiplicity-precedence), \"-\", ?precedencePId)) as ?precedenceP)
 }""" ;
     ] ;
   rdfs:label "attach-duplicate-questions" ;
@@ -766,6 +753,39 @@ WHERE {
 }""" ;
     ] ;
   rdfs:label "attach-related-question-level" ;
+.
+:attach-relator-multiplicity-hiding-logic
+  a sml:ApplyConstruct ;
+  sm:next :merge ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 -  construct hiding logic and ordering
+CONSTRUCT {
+      ?qRootP form-lt:has-layout-class \"answerable\" .
+      ?qRootP form-lt:has-layout-class \"checkbox\" .
+
+      ?qRootX form-lt:has-layout-class \"answerable\" .
+      ?qRootX form-lt:has-layout-class \"checkbox\" .
+
+     ?qRootX form:is-relevant-if  ?condP .
+     ?condP   a form:condition ;
+             form:accepts-answer-value true ;
+             form:has-tested-question ?qRootP ;
+    .
+}
+WHERE {
+     ?qRootX a form:relator-multiplicity-question .
+     ?qRootP a form:relator-multiplicity-question .
+     ?precedenceP a form:relator-multiplicity-precedence ;
+             form:id ?precedencePId ;
+             form:has-first-question ?qRootP ;
+             form:has-second-question ?qRootX ;
+     .
+
+    BIND(IRI(concat(str(form:condition), \"-\", ?precedencePId)) as ?condP)
+}""" ;
+    ] ;
+  sml:replace true ;
 .
 :attach-relevant-tested-questions
   a sml:ApplyConstruct ;
@@ -2452,6 +2472,7 @@ WHERE {
   sm:next :attach-answerable-section-logic ;
   sm:next :attach-identifier-to-section ;
   sm:next :attach-possible-values-hook ;
+  sm:next :attach-relator-multiplicity-hiding-logic ;
   sm:next :attach-relevant-tested-questions ;
   sm:next :attach-type-questions-possible-values ;
   sm:next :construct-external-links ;
