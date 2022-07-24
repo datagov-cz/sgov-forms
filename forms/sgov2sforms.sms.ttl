@@ -371,6 +371,7 @@ WHERE {
 .
 :attach-duplicate-type-questions
   a sml:ApplyConstruct ;
+  sm:next :merge-with-type-selection-questions ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """# 1 - construct copy of type questions
@@ -385,6 +386,11 @@ WHERE {
      VALUES ?card { 1 2 3 4 }
 
      ?parentQ form:has-type-question ?childQ .
+
+     OPTIONAL {
+         ?parentQ   :max-type-question-cardinality ?maxCardinality .
+     }
+     FILTER(!bound(?maxCardinality) || ?card < ?maxCardinality)
 
 # attach specific properties
      OPTIONAL {
@@ -538,6 +544,17 @@ WHERE {
 .
 :attach-labels
   a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is an entity  with two labels within possible values of an answer
+ASK
+WHERE {
+    ?q form:has-possible-value ?entity .
+    ?entity :has-label ?qLabel1 .
+    ?entity :has-label ?qLabel2 .
+    FILTER(?qLabel1 != ?qLabel2)
+}""" ;
+    ] ;
   sm:next :attach-descriptions ;
   sml:constructQuery [
       a sp:Construct ;
@@ -548,6 +565,17 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q :has-label ?qLabel .
+}""" ;
+    ] ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add labels for possible values
+CONSTRUCT {
+    ?entity rdfs:label ?qLabel .
+}
+WHERE {
+    ?q form:has-possible-value ?entity .
+    ?entity :has-label ?qLabel .
 }""" ;
     ] ;
   rdfs:label "attach-labels" ;
@@ -828,6 +856,65 @@ WHERE {
 }""" ;
     ] ;
 .
+:attach-type-questions
+  a sml:ApplyConstruct ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Ask ;
+      sp:text """# type selection rule is applicable to entity that does not have subtypes
+ASK {
+    ?parentQ :has-ufo-related-question ?q .
+    ?ic a ft:type-selection-rule .
+    {
+          ?parentQ :has-processing-aspect-target ?parentProcessingEntity .
+          ?ic ft:has-parent-entity ?parentProcessingEntity .
+    } UNION {
+          ?parentQ :is-question-of-relator ?parentProcessingRelator .
+          ?ic ft:has-parent-relator ?parentProcessingRelator .
+    }
+    FILTER NOT EXISTS {
+        ?parentQ :has-processing-aspect-sub-target ?atSubClass .
+    }
+}""" ;
+    ] ;
+  sm:next :attach-duplicate-type-questions ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add questions for type-selection
+CONSTRUCT {
+    ?childQ a doc:question .
+    ?childQ :has-label \"Typ\"  .
+    ?childQ :is-question-of-aspect rdf:type .
+    ?parentQ doc:has_related_question ?childQ ;
+# TODO should not be here
+        form:has-type-question ?childQ ;
+# TODO should not be here
+        form:has-non-selectable-value ?nonSelectableValue ;
+# TODO wird way to express
+        :max-type-question-cardinality ?maxCardinality .
+}
+WHERE {
+    ?parentQ :has-main-processing-aspect-target ?mainParentEntity ;
+        :has-ufo-related-question ?q .
+    ?ic a ft:type-selection-rule .
+    {
+          ?parentQ :has-processing-aspect-target ?parentProcessingEntity .
+          ?ic ft:has-parent-entity ?parentProcessingEntity .
+    } UNION {
+          ?parentQ :is-question-of-relator ?parentProcessingRelator .
+          ?ic ft:has-parent-relator ?parentProcessingRelator .
+    }
+    BIND(md5(concat(str(?parentQ),?executionId)) as ?childExecutionId)
+    BIND (fl:create-q(concat(str(?mainParentEntity),\"-type\"), ?childExecutionId) AS ?childQ) .
+    OPTIONAL {
+        ?ic ft:number-of-choices ?maxCardinality .
+    }
+    OPTIONAL {
+        ?ic  ft:has-non-selectable-value ?nonSelectableValue .
+    }
+}""" ;
+    ] ;
+  rdfs:label "attach-type-questions" ;
+.
 :attach-type-questions-possible-values
   a sml:ApplyConstruct ;
   sm:next :construct-possible-value-broader-relations ;
@@ -846,11 +933,11 @@ CONSTRUCT {
 }
 WHERE {
      ?q form:has-type-question ?typeQ .
-     ?typeQ :has-processed-aspect-target ?typeEntity .
-     ?subTypeEntity rdfs:subClassOf+  ?typeEntity .
+     ?q :has-main-processing-aspect-target ?typeEntity .
+     ?q :has-processing-aspect-sub-target ?subTypeEntity .
      ?subTypeEntity skos:prefLabel ?subTypeEntityLabel .
 
-      ?typeEntity skos:prefLabel ?typeEntityLabel .
+     ?typeEntity skos:prefLabel ?typeEntityLabel .
 }""" ;
     ] ;
   sml:replace false ;
@@ -865,24 +952,25 @@ WHERE {
       a sp:Construct ;
       sp:text """# 1 - add processing entities
 CONSTRUCT {
-    ?q :has-processing-aspect-target ?aspectTarget .
-    ?q :has-processing-aspect-target ?aspectTargetSubClass .
-    ?q :has-processing-aspect-target ?aspectTargetSuperClass .
+    ?q :has-processing-aspect-target ?atReflexiveSuperClassOfAnyReflexiveSubClass .
+    ?q :has-processing-aspect-sub-target ?atSubClass .
 }
 WHERE {
     ?q :has-main-processing-aspect-target ?aspectTarget .
 
-# TODO test FILTER NOT EXISTS { ?q :has-processing-aspect-target ?aspectTarget . }
-    OPTIONAL {
-          {
-              ?aspectTargetSubClass rdfs:subClassOf+ ?aspectTarget .
+    ?atReflexiveSubClass rdfs:subClassOf* ?aspectTarget .
 # TODO not very nice (we need to filter out blank nodes + z-sgov:vlastnost ...
-              ?aspectTargetSubClass a skos:Concept .
-          } UNION {
-              ?aspectTarget rdfs:subClassOf+ ?aspectTargetSuperClass .
-              ?aspectTargetSuperClass a skos:Concept .
-          }
-    }
+    ?atReflexiveSubClass a skos:Concept .
+
+     ?atReflexiveSubClass rdfs:subClassOf* ?atReflexiveSuperClassOfAnyReflexiveSubClass .
+# TODO not very nice (we need to filter out blank nodes + z-sgov:vlastnost ...
+     ?atReflexiveSuperClassOfAnyReflexiveSubClass a skos:Concept .
+
+#     OPTIONAL {
+#    	BIND(?atReflexiveSubClass as ?atSubClass)
+#        FILTER(?atReflexiveSubClass != ?aspectTarget)
+#     }
+    BIND(IF(?atReflexiveSubClass != ?aspectTarget, ?atReflexiveSubClass, ?undef) as ?atSubClass)
 }""" ;
     ] ;
   sml:constructQuery [
@@ -1197,8 +1285,6 @@ WHERE {
 :bind-external-link-template
   a sml:BindWithConstant ;
   sm:next :construct-external-links ;
-  sm:nodeX 1536 ;
-  sm:nodeY 3757 ;
   sm:outputVariable "externalLinkTemplate" ;
   sml:value "https://slovník.gov.cz/prohlížíme/vocabularies/__VOCABULARY_NAME__/terms/__TERM_NAME__?namespace=__NAMESPACE__" ;
   rdfs:label "bind-external-link-template" ;
@@ -2072,6 +2158,11 @@ Note, we consider here that every question asks about an aspect of parent questi
   a rdf:Property ;
   rdfs:subPropertyOf :has-algorithm-related-property ;
 .
+:has-processing-aspect-sub-target
+  a owl:ObjectProperty ;
+  rdfs:label "has-processing-aspect-sub-target" ;
+  rdfs:subPropertyOf :has-processing-aspect-target ;
+.
 :has-processing-aspect-target
   a owl:ObjectProperty ;
   rdfs:comment "Entity whose aspects should be processed within subquestions of this question." ;
@@ -2373,7 +2464,6 @@ WHERE {
   a sml:Merge ;
   sm:next :attach-duplicable-questions ;
   sm:next :construct-dny-v-tydnu-questions ;
-  sm:next :todo2 ;
   rdfs:label "merge-with-origins" ;
 .
 :merge-with-question-duplicates
@@ -2394,7 +2484,7 @@ WHERE {
     }
 }""" ;
     ] ;
-  sm:next :merge-with-type-selection-questions ;
+  sm:next :attach-type-questions ;
   rdfs:label "merge-with-questions" ;
 .
 :merge-with-type-selection-questions
@@ -2849,10 +2939,6 @@ WHERE {
 }""" ;
     ] ;
   sml:replace true ;
-.
-:todo2
-  a sml:Merge ;
-  sm:next :attach-duplicate-type-questions ;
 .
 :transform
   a sm:Function ;
