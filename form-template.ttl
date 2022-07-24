@@ -47,12 +47,6 @@ ft:classifies-aspects-of-entity
   rdfs:domain ft:entity-aspect-classifier ;
   rdfs:label "classifies-aspects-of-entity" ;
 .
-ft:codelist-aspect-target
-  a owl:Class ;
-  rdfs:comment "Aspect target type that should be represented by codelist. E.g. g-sgov-číselníky-pojem:typ-turistického-cíle." ;
-  rdfs:label "codelist-aspect-target" ;
-  rdfs:subClassOf owl:Thing ;
-.
 ft:condition
   a owl:Class ;
   rdfs:comment "Each condition is evaluated to true if parents (entity or relator) are matched and at least one target (entity or relator) is matched."@en ;
@@ -176,9 +170,4 @@ ft:targets-aspects-by-classifier
   rdfs:domain ft:aspect-classifier-condition ;
   rdfs:label "targets-aspects-by-classifier" ;
   rdfs:range ft:aspect-classifier ;
-.
-ft:type-selection-rule
-  a owl:Class ;
-  rdfs:label "type-selection-rule" ;
-  rdfs:subClassOf ft:condition ;
 .
