@@ -1539,6 +1539,34 @@ WHERE {
   a sml:ReturnRDF ;
   sml:serialization sml:Turtle ;
 .
+:compute-form-template-inferences
+  a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Ask ;
+      sp:text """# there is no codelist-mapping for codelist-aspect-target
+ASK
+WHERE {
+    ?objectType a ft:codelist-aspect-target .
+    FILTER NOT EXISTS {
+        ?cm a ft:codelist-mapping ;
+            ft:has-internal-entity ?objectType ;
+        .
+    }
+}""" ;
+    ] ;
+  sm:next :infer-ignore-rules ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# 1 - add unit-of-measure-type as codelist-aspect-target
+CONSTRUCT {
+    ?unitOfMeasureType a ft:codelist-aspect-target .
+}
+WHERE {
+    ?valueType ft:has-unit-of-measure ?unitOfMeasureType .
+}""" ;
+    ] ;
+  rdfs:label "infer-from-unit-of-measure" ;
+.
 :construct-aspect-labels
   a sml:ApplyConstruct ;
   sm:next :attach-ufo-based-question-templates ;
@@ -2207,6 +2235,24 @@ WHERE {
 }""" ;
     ] ;
 .
+:infer-codelist-cervice-url
+  a sml:ApplyConstruct ;
+  sm:next :compute-form-template-inferences ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """CONSTRUCT {
+       ?clMapping ft:has-codelist-service-url ?formMetadataServiceUrl .
+}
+WHERE {
+    ?clMapping a ft:codelist-mapping .
+
+     FILTER NOT EXISTS {
+           ?clMapping ft:has-codelist-service-url ?clServiceUrlNE .
+     }
+}""" ;
+    ] ;
+  rdfs:label "infer-codelist-service-url" ;
+.
 :infer-entity-aspect-classifiers
   a sml:ApplyConstruct ;
   sm:next :attach-aspect-classifiers-to-question ;
@@ -2225,6 +2271,24 @@ WHERE {
     ] ;
   sml:replace false ;
   rdfs:label "infer-entity-aspect-classifiers" ;
+.
+:infer-ignore-rules
+  a sml:ApplyConstruct ;
+  sm:next :merge-with-form-template-inferences ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# infer ignore-conditions based on codelist-aspect-target
+CONSTRUCT {
+    ?ic a ft:ignore-condition ;
+        ft:has-parent-entity ?objectType ;
+        ft:targets-all-aspects true ;
+    .
+} WHERE {
+    ?objectType a ft:codelist-aspect-target .
+    BIND(iri(concat(str(?objectType), \"-ignore-condition\")) as ?ic)
+}""" ;
+    ] ;
+  rdfs:label "infer-ignore-rules" ;
 .
 :infer-ufo-based-questions
   a sml:ApplyConstruct ;
@@ -2425,6 +2489,11 @@ WHERE {
   sm:next :clone_Return ;
   sml:replace true ;
   rdfs:label "merge-form-metadata" ;
+.
+:merge-with-form-template-inferences
+  a sml:Merge ;
+  sm:next :attach-root-question ;
+  rdfs:label "merge-with-form-template-inferences" ;
 .
 :merge-with-importance-closure
   a sml:Merge ;
@@ -2837,6 +2906,7 @@ WHERE {
 :retrieve-form-template
   a sml:ApplyConstruct ;
   sm:next :bind-root-entity ;
+  sm:next :infer-codelist-cervice-url ;
   sml:constructQuery [
       a sp:Construct ;
       sp:text """CONSTRUCT {
