@@ -1262,7 +1262,7 @@ WHERE {
       sp:text """SELECT ?formTemplate
 WHERE {
     OPTIONAL {
-         ?r <http://vfn.cz/ontologies/study-manager/has-form-template> ?formTemplateStr .
+         ?r <http://onto.fel.cvut.cz/ontologies/record-manager/has-form-template> ?formTemplateStr .
     }
     BIND (COALESCE(?_DformTemplate, str(?formTemplateStr)) AS ?formTemplate) .
 }""" ;
