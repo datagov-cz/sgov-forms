@@ -809,7 +809,7 @@ WHERE {
     ?rootEntity skos:prefLabel ?rootEntityLabel .
     BIND (fl:create-q(CONCAT(str(?rootEntity)),?executionId) AS ?rootQ) .
     BIND (fl:create-q(CONCAT(str(?rootEntity), \"-form\"),?executionId) AS ?formQ) .
-    BIND (CONCAT(str(?rootEntityLabel), \"-form\") AS ?formLabel) .
+    BIND (STRLANG(CONCAT(str(?rootEntityLabel), \"-form\"), lang(?rootEntityLabel)) AS ?formLabel) .
     BIND (IRI(CONCAT(str(?rootEntity), \"-form\")) AS ?formEntity) .
 }""" ;
     ] ;
