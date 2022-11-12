@@ -584,6 +584,16 @@ WHERE {
 .
 :attach-possible-values-hook
   a sml:ApplyConstruct ;
+  kbss-module:has-output-graph-constraint [
+      a sp:Select ;
+      sp:text """# 1 - there is ?question with multiple possible value queries
+SELECT ?question
+WHERE {
+   ?question form:has-possible-values-query ?downloadString1 .
+   ?question form:has-possible-values-query ?downloadString2 .
+   FILTER(?downloadString1 != ?downloadString2)
+}""" ;
+    ] ;
   sm:next :merge ;
   sml:constructQuery [
       a sp:Construct ;
@@ -596,7 +606,7 @@ WHERE {
 #    SERVICE ?formMetadataServiceUrl {
     ?entity ft:internal true . # TODO changed
 #    } .
-    ?question :has-processing-aspect-target ?entity .
+    ?question :has-main-processing-aspect-target ?entity .
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
     BIND (REPLACE(?possibleValuesQueryTemplate, \"XXX_ENTITY_TYPE_XXX\", str(?entity)) AS ?downloadSuffixRaw) .
     BIND (ENCODE_FOR_URI(?downloadSuffixRaw) AS ?downloadSuffix) .
@@ -622,7 +632,7 @@ WHERE {
     }
 
 #    } .
-    ?question :has-processing-aspect-target ?entity .
+    ?question :has-main-processing-aspect-target ?entity .
     BIND(COALESCE(?additionalTriples, \"\") as ?orderingTriples)
     BIND (CONCAT(str(?formGenRepositoryUrl), \"?query=\") AS ?dowloadPrefix) .
     BIND (
