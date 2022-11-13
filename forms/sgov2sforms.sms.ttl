@@ -538,6 +538,16 @@ WHERE {
 .
 :attach-labels
   a sml:ApplyConstruct ;
+  kbss-module:has-input-graph-constraint [
+      a sp:Select ;
+      sp:text """# There is ?question with label not having language tag
+SELECT ?question
+WHERE {
+    ?question a doc:question .
+    ?question :has-label ?qLabel .
+    FILTER(lang(?o) = \"\")
+}""" ;
+    ] ;
   sm:next :attach-descriptions ;
   sml:constructQuery [
       a sp:Construct ;
@@ -548,6 +558,15 @@ CONSTRUCT {
 WHERE {
     ?q a doc:question .
     ?q :has-label ?qLabel .
+
+# TODO make it unique among siblings as well
+# there is not shorter label than ?qLabel
+    FILTER NOT EXISTS {
+         ?q :has-label ?qLabelNE .
+         FILTER(?qLabel != ?qLabelNE)
+         FILTER(lang(?qLabel) = lang(?qLabelNE))
+         FILTER(strlen(?qLabelNE) <=  strlen(?qLabel))
+    }
 }""" ;
     ] ;
   rdfs:label "attach-labels" ;
