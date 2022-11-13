@@ -14,7 +14,7 @@
 
 
 d-sgov-sportoviště:form-template a owl:Ontology ;
-	skos:prefLabel "Sportoviště".
+	skos:prefLabel "Sportoviště"@cs .
 
 ### shared ###
 g-sgov-věci-pojem:název a ft:object-identifier-quality .

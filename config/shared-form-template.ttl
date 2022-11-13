@@ -341,11 +341,11 @@ g-sgov-čas-pojem:od ft:precedes-relatively-in-time g-sgov-čas-pojem:do .
 
 
 ft:language-czech a ft:language ;
-	skos:prefLabel "Česky" ;
+	skos:prefLabel "Česky"@cs ;
 .
 
 ft:language-english a ft:language ;
-	skos:prefLabel "Anglicky" ;
+	skos:prefLabel "Anglicky"@cs ;
 .
 
 

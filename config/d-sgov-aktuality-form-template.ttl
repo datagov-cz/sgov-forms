@@ -14,7 +14,7 @@
 @prefix d-sgov-aktuality-pojem: <https://slovník.gov.cz/datový/aktuality/pojem/> .
 
 d-sgov-aktuality:form-template a owl:Ontology ;
-	skos:prefLabel "Aktualita".
+	skos:prefLabel "Aktualita"@cs .
 
 ### shared ###
 g-sgov-věci-pojem:název a ft:object-identifier-quality .

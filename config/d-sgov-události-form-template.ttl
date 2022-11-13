@@ -14,7 +14,7 @@
 
 
 d-sgov-události:form-template a owl:Ontology ;
-	skos:prefLabel "Událost".
+	skos:prefLabel "Událost"@cs .
 
 ### shared ###
 g-sgov-věci-pojem:název a ft:object-identifier-quality .
