@@ -1229,7 +1229,7 @@ WHERE {
   sm:nodeX 1536 ;
   sm:nodeY 3757 ;
   sm:outputVariable "externalLinkTemplate" ;
-  sml:value "https://slovník.gov.cz/prohlížíme/vocabularies/__VOCABULARY_NAME__/terms/__TERM_NAME__?namespace=__NAMESPACE__" ;
+  sml:value "https://slovník.gov.cz/prohlížíme/pojem?iri=__TERM_IRI__" ;
   rdfs:label "bind-external-link-template" ;
 .
 :bind-external-possible-values-query-template
@@ -1588,28 +1588,17 @@ WHERE {
   	?q a doc:question .
     ?q form:has-question-origin ?entity .
 
-    BIND(str(?entity) as ?urlStr)
+    BIND(str(?entity) as ?entityUrl)
 
-	FILTER(! strstarts(?urlStr,str(ft:)))
-	FILTER(! strstarts(?urlStr,str(:)))
-	FILTER(! strstarts(?urlStr,str(form:)))
+	FILTER(! strstarts(?entityUrl,str(ft:)))
+	FILTER(! strstarts(?entityUrl,str(:)))
+	FILTER(! strstarts(?entityUrl,str(form:)))
 
-    BIND(replace(?urlStr, \".*/pojem/\", \"\") as ?termName)
-    BIND(replace(?urlStr, \"/pojem/.*\", \"\") as ?vocabulary)
-    BIND(replace(?vocabulary, \".*/\", \"\") as ?vocabularyName)
-    BIND(replace(?vocabulary, \"[^/]*$\", \"\") as ?namespace)
     BIND(
         replace(
-            replace(
-                replace(?externalLinkTemplate,
-                    \"__VOCABULARY_NAME__\",
-                    ?vocabularyName
-                ),
-                \"__TERM_NAME__\",
-                ?termName
-             ),
-            \"__NAMESPACE__\",
-            ?namespace
+            ?externalLinkTemplate,
+            \"__TERM_IRI__\",
+            ?entityUrl
         ) as ?externalLink)
 }""" ;
     ] ;
