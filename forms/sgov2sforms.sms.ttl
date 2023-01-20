@@ -52,6 +52,34 @@
   a sml:Merge ;
   rdfs:label "TODO-neduplikujes-ufo-otazky" ;
 .
+:apply-workaround-for-missing-subclass-axioms
+  a sml:ApplyConstruct ;
+  sm:next :attach-ufo-based-question-templates ;
+  sm:nodeX 1846 ;
+  sm:nodeY 1332 ;
+  sml:constructQuery [
+      a sp:Construct ;
+      sp:text """# workaround for missing subclass axioms described in https://github.com/opendata-mvcr/sgov/issues/155
+# TODO remove
+CONSTRUCT {
+  ?narrowerConcept rdfs:subClassOf ?broaderConcept 
+} WHERE {
+  
+      ?narrowerConcept a skos:Concept .
+      ?narrowerConcept skos:broader   ?broaderConcept .
+      FILTER NOT EXISTS {
+         ?narrowerConcept rdfs:subClassOf   ?broaderConcept .
+      }
+      FILTER NOT EXISTS {
+         ?narrowerConcept a ?broaderConcept .
+      }
+      
+      FILTER(! strstarts(str(?broaderConcept), str(z-sgov-pojem:)))
+}""" ;
+    ] ;
+  sml:replace true ;
+  rdfs:label "apply-workaround-for-missing-subclass-axioms" ;
+.
 :attach-advanced
   a sml:ApplyConstruct ;
   sm:next :merge-with-importance-closure ;
@@ -189,6 +217,7 @@ WHERE {
 .
 :attach-aspect-model
   a sml:ApplyConstruct ;
+  sm:next :apply-workaround-for-missing-subclass-axioms ;
   sm:next :attach-ufo-based-question-templates ;
   sm:next :construct-aspect-labels ;
   sm:next :construct-aspect-related-cardinalities ;
@@ -1246,8 +1275,8 @@ WHERE {
 :bind-external-link-template
   a sml:BindWithConstant ;
   sm:next :construct-external-links ;
-  sm:nodeX 1536 ;
-  sm:nodeY 3757 ;
+  sm:nodeX 1275 ;
+  sm:nodeY 3754 ;
   sm:outputVariable "externalLinkTemplate" ;
   sml:value "https://slovník.gov.cz/prohlížíme/pojem?iri=__TERM_IRI__" ;
   rdfs:label "bind-external-link-template" ;
